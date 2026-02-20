@@ -463,8 +463,10 @@ app.get('/deletar/:id', isAdminAuthenticated, function (req, res) {
 });
 
 
-app.listen(PORT, () => {
-    console.log(`Servidor funcionando na porta http://localhost:${PORT}`);
-    console.log(`Servidor funcionando na porta http://localhost:${PORT}/admin`);
-    console.log(`Servidor funcionando na porta http://localhost:${PORT}/loginUsuario`);
+sequelize.sync({ force: false }).then(() => {
+    app.listen(PORT, () => {
+        console.log(`Servidor funcionando na porta http://localhost:${PORT}`);
+        console.log(`Servidor funcionando na porta http://localhost:${PORT}/admin`);
+        console.log(`Servidor funcionando na porta http://localhost:${PORT}/loginUsuario`);
+    });
 });

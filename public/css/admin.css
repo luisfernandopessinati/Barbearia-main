@@ -1,0 +1,153 @@
+:root {
+    --background: #1e1e20;
+    --background1: rgb(19, 19, 19);
+    --secundario: #eb9c2d;
+    --secundario-1: #e7ab57;
+    --light: #fff;
+
+}
+
+
+/* PAGINA ADMIN */
+.admin {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-height: auto;
+}
+
+.header-admin {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 50px;
+}
+
+a .fa-arrow-left {
+    padding: 10px;
+    background-color: var(--secundario);
+    border-radius: 100%;
+}
+
+a .fa-arrow-left:hover {
+    padding: 10px;
+    background-color: #efc488;
+    border-radius: 100%;
+}
+
+
+.fa-arrow-left {
+    font-size: 25px;
+    color: #000000;
+}
+#btn-sair{
+    background-color: #eb9c2d;
+    width:60px;
+    padding: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+#btn-sair:hover{
+    background: #e7ab57;
+}
+
+.admin h1 {
+    margin-bottom: 50px;
+}
+
+.tabela {
+    background-color: var(--light);
+    margin: 0 60px;
+}
+
+.tabela th {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.tabela th,
+.tabela td {
+    border: 1px solid #b8b7b7;
+    text-align: left;
+    width: auto;
+    text-align: center;
+}
+
+.tabela thead {
+    background-color: var(--secundario);
+}
+
+.tabela input {
+    font-size: 16px;
+    text-align: center;
+}
+
+td i {
+    color: #000;
+    font-size: 25px;
+    margin: 5px;
+    padding: 10px;
+    border-radius: 50px;
+    transition: all 0.3s;
+    background-color: var(--secundario);
+}
+
+td i:hover {
+    color: #fff;
+}
+
+/* PAGINA EDITAR DADOS */
+.editar {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.form-editar {
+    display: flex;
+    flex-direction: column;
+    margin:auto; 
+    padding: 6px;
+
+    width: 450px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-radius: 16px;
+}
+
+.form-editar label {
+    color: #ffffff;
+    text-align: center;
+ 
+}
+
+.form-editar input,
+select,
+button {
+    width: 70%;
+    margin: 10px 0;
+    padding: 5px;
+    font-size: 16px;
+    border: 1px solid black;
+    border-radius: 8px;
+}
+
+.btn-editar {
+    cursor: pointer;
+    transition: all 0.3s;
+    background-color: var(--secundario);
+    color: #000;
+    border: none;
+    font-weight: 600;
+    font-size: 16px;
+    padding: 10px;
+    margin-top: 20px;
+}
+
+.btn-editar:hover {
+    background-color: var(--secundario-1);
+}

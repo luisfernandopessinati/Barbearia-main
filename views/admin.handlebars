@@ -1,0 +1,647 @@
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+        --gold: #b8860b; --gold-light: #d4a012; --gold-dim: #b8860b33;
+        --bg: #090909; --bg2: #111111; --bg3: #181818;
+        --border: #222222; --text: #e8e8e8; --muted: #555;
+        --danger: #c0392b; --danger-dim: #c0392b22;
+    }
+
+    body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; }
+
+    .adm-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 40px; border-bottom: 1px solid var(--border); background: var(--bg2); position: sticky; top: 0; z-index: 100; }
+    .adm-header-left { display: flex; align-items: center; gap: 20px; }
+    .adm-back { color: var(--muted); text-decoration: none; font-size: 18px; transition: color 0.2s; }
+    .adm-back:hover { color: var(--gold); }
+    .adm-logo { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px; color: var(--gold); text-decoration: none; }
+    .adm-header-center { font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 4px; color: var(--muted); text-transform: uppercase; }
+    .btn-sair { background: none; border: 1px solid var(--border); color: var(--muted); padding: 8px 20px; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+    .btn-sair:hover { border-color: var(--danger); color: var(--danger); }
+    .adm-body { display: flex; min-height: calc(100vh - 65px); }
+    .sidebar { width: 220px; flex-shrink: 0; border-right: 1px solid var(--border); padding: 32px 0; background: var(--bg2); }
+    .sidebar-label { font-size: 10px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; padding: 0 24px; margin-bottom: 16px; }
+    .barber-tab { display: flex; align-items: center; gap: 12px; padding: 12px 24px; cursor: pointer; border-left: 3px solid transparent; transition: all 0.2s; background: none; border-right: none; border-top: none; border-bottom: none; width: 100%; text-align: left; color: var(--muted); font-family: 'DM Sans', sans-serif; }
+    .barber-tab:hover { background: var(--bg3); color: var(--text); }
+    .barber-tab.active { border-left-color: var(--gold); background: var(--bg3); color: var(--text); }
+    .barber-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #6b4c00); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 14px; color: #fff; flex-shrink: 0; }
+    .barber-tab.active .barber-avatar { background: linear-gradient(135deg, var(--gold-light), var(--gold)); }
+    .barber-name { font-size: 13px; font-weight: 500; }
+    .barber-count { margin-left: auto; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; font-size: 10px; padding: 2px 7px; color: var(--muted); }
+    .barber-tab.active .barber-count { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+    .sidebar-sep { height: 1px; background: var(--border); margin: 20px 0; }
+    .tab-todos { display: flex; align-items: center; gap: 12px; padding: 12px 24px; cursor: pointer; border-left: 3px solid transparent; transition: all 0.2s; background: none; border-right: none; border-top: none; border-bottom: none; width: 100%; text-align: left; font-family: 'DM Sans', sans-serif; color: var(--muted); font-size: 13px; }
+    .tab-todos:hover, .tab-todos.active { background: var(--bg3); color: var(--text); border-left-color: var(--gold); }
+    .adm-content { flex: 1; padding: 36px 40px; overflow-x: auto; }
+    .date-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 32px; }
+    .date-nav-btn { background: var(--bg2); border: 1px solid var(--border); color: var(--muted); width: 34px; height: 34px; border-radius: 6px; font-size: 16px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+    .date-nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .date-chips { display: flex; gap: 6px; overflow-x: auto; flex: 1; padding-bottom: 2px; scrollbar-width: none; }
+    .date-chips::-webkit-scrollbar { display: none; }
+    .date-chip { flex-shrink: 0; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; cursor: pointer; transition: all 0.2s; text-align: center; min-width: 56px; }
+    .date-chip:hover { border-color: var(--gold-dim); }
+    .date-chip.active { background: var(--gold); border-color: var(--gold); }
+    .date-chip .chip-day { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; display: block; }
+    .date-chip.active .chip-day { color: #000; }
+    .date-chip .chip-num { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--text); line-height: 1.1; display: block; }
+    .date-chip.active .chip-num { color: #000; }
+    .date-chip.has-appt { position: relative; }
+    .date-chip.has-appt::after { content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: var(--gold); }
+    .date-chip.active.has-appt::after { background: #000; }
+    .section-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 20px; }
+    .section-head h2 { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--text); letter-spacing: 1px; }
+    .section-head span { font-size: 12px; color: var(--muted); letter-spacing: 1px; }
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+    .appt-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; transition: border-color 0.2s, transform 0.2s; animation: fadeUp 0.3s ease both; position: relative; overflow: hidden; }
+    .appt-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--gold); border-radius: 2px 0 0 2px; }
+    .appt-card:hover { border-color: #333; transform: translateY(-2px); }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .card-time { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--gold); letter-spacing: 1px; line-height: 1; margin-bottom: 12px; }
+    .card-name { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+    .card-tel { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+    .card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+    .tag { font-size: 11px; padding: 3px 10px; border-radius: 20px; background: var(--bg3); border: 1px solid var(--border); color: #aaa; }
+    .tag.barbeiro { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+    .card-actions { display: flex; gap: 8px; border-top: 1px solid var(--border); padding-top: 14px; }
+    .btn-edit, .btn-del { flex: 1; padding: 8px; border-radius: 6px; font-size: 12px; font-family: 'DM Sans', sans-serif; cursor: pointer; text-decoration: none; text-align: center; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-edit { background: var(--bg3); border: 1px solid var(--border); color: var(--muted); }
+    .btn-edit:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-del { background: var(--danger-dim); border: 1px solid var(--danger); color: var(--danger); }
+    .btn-del:hover { background: var(--danger); color: #fff; }
+    .empty-state { text-align: center; padding: 80px 20px; color: var(--muted); display: none; }
+    .empty-state.visible { display: block; }
+    .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
+    .empty-state p { font-size: 14px; }
+    .stats-bar { display: flex; gap: 16px; margin-bottom: 28px; }
+    .stat-item { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; flex: 1; }
+    .stat-label { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
+    .stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--text); line-height: 1; }
+    .stat-value.gold { color: var(--gold); }
+    @media (max-width: 900px) { .sidebar { display: none; } .adm-content { padding: 20px; } .adm-header { padding: 16px 20px; } .stats-bar { flex-wrap: wrap; } }
+    .btn-novo { margin-left: auto; background: var(--gold); border: none; color: #000; width: 36px; height: 36px; border-radius: 8px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.15s; flex-shrink: 0; line-height: 1; }
+    .btn-novo:hover { background: var(--gold-light); transform: scale(1.08); }
+    .modal-overlay { position: fixed; inset: 0; background: #000000cc; backdrop-filter: blur(4px); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 36px; width: 100%; max-width: 480px; transform: translateY(16px); transition: transform 0.25s; position: relative; }
+    .modal-overlay.open .modal { transform: translateY(0); }
+    .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--text); letter-spacing: 1px; margin-bottom: 4px; }
+    .modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 28px; }
+    .modal-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; transition: color 0.2s; }
+    .modal-close:hover { color: var(--text); }
+    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .modal-grid .full { grid-column: 1 / -1; }
+    .modal-field { display: flex; flex-direction: column; gap: 6px; }
+    .modal-field label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+    .modal-field input, .modal-field select { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); outline: none; transition: border-color 0.2s; width: 100%; }
+    .modal-field input:focus, .modal-field select:focus { border-color: var(--gold); }
+    .modal-field select option { background: var(--bg3); }
+    .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
+    .btn-cancelar { flex: 1; background: none; border: 1px solid var(--border); color: var(--muted); padding: 12px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+    .btn-cancelar:hover { border-color: var(--danger); color: var(--danger); }
+    .btn-confirmar { flex: 2; background: var(--gold); border: none; color: #000; padding: 12px; border-radius: 8px; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; cursor: pointer; transition: background 0.2s; }
+    .btn-confirmar:hover { background: var(--gold-light); }
+    .modal-erro { font-size: 12px; color: var(--danger); margin-top: 10px; text-align: center; min-height: 16px; }
+    .btn-feriados { background: none; border: 1px solid var(--border); color: var(--muted); padding: 8px 16px; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; margin-right: 8px; }
+    .btn-feriados:hover { border-color: var(--gold); color: var(--gold); }
+    .feriado-lista { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; max-height: 220px; overflow-y: auto; }
+    .feriado-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; }
+    .feriado-item-info { display: flex; flex-direction: column; gap: 2px; }
+    .feriado-item-data { font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: var(--gold); letter-spacing: 1px; }
+    .feriado-item-desc { font-size: 12px; color: var(--muted); }
+    .feriado-del { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 14px; padding: 4px 8px; border-radius: 4px; transition: background 0.2s; opacity: 0.6; }
+    .feriado-del:hover { background: var(--danger-dim); opacity: 1; }
+    .feriados-empty { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
+    .feriados-sep { height: 1px; background: var(--border); margin: 20px 0; }
+    .btn-servicos { background: none; border: 1px solid var(--border); color: var(--muted); padding: 8px 16px; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; margin-right: 8px; }
+    .btn-servicos:hover { border-color: var(--gold); color: var(--gold); }
+    .servico-lista { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; max-height: 260px; overflow-y: auto; }
+    .servico-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; gap: 10px; }
+    .servico-item.inativo { opacity: 0.4; }
+    .servico-item-nome { font-size: 13px; font-weight: 500; color: var(--text); flex: 1; }
+    .servico-item-valor { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--gold); letter-spacing: 1px; min-width: 70px; text-align: right; }
+    .servico-item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .btn-servico-edit { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 11px; padding: 4px 8px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+    .btn-servico-edit:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-servico-toggle { background: none; border: 1px solid #27ae6055; color: #27ae60; background: #27ae6011; font-size: 11px; padding: 4px 8px; border-radius: 4px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .btn-servico-toggle.inativo { border-color: var(--danger); color: var(--danger); background: var(--danger-dim); }
+    .btn-servico-toggle:hover { opacity: 0.8; }
+    .servicos-sep { height: 1px; background: var(--border); margin: 20px 0; }
+    .servicos-empty { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
+    .servico-edit-row { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
+    .servico-edit-row input { background: var(--bg); border: 1px solid var(--gold); border-radius: 6px; padding: 4px 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--text); outline: none; width: 80px; }
+</style>
+
+<div class="adm-header">
+    <div class="adm-header-left">
+        <a href="/loginAdmin" class="adm-back"><i class="fa-solid fa-arrow-left"></i></a>
+        <a href="/" class="adm-logo">Barbearia</a>
+    </div>
+    <div class="adm-header-center">Painel Administrativo</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+        <button class="btn-servicos" id="btn-servicos">✂️ Serviços</button>
+        <button class="btn-feriados" id="btn-feriados">📅 Feriados</button>
+        <button class="btn-sair" id="btn-sair">Sair</button>
+    </div>
+</div>
+
+<div class="adm-body">
+    <aside class="sidebar">
+        <p class="sidebar-label">Barbeiros</p>
+        <button class="tab-todos active" data-barbeiro="todos">
+            <i class="fa-solid fa-users" style="width:16px;text-align:center;opacity:.5"></i> Todos
+        </button>
+        <div class="sidebar-sep"></div>
+        {{#each barbeiros}}
+        <button class="barber-tab" data-barbeiro="{{this}}">
+            <div class="barber-avatar">{{substr this 0 1}}</div>
+            <span class="barber-name">{{this}}</span>
+            <span class="barber-count" data-count-barbeiro="{{this}}">0</span>
+        </button>
+        {{/each}}
+        <div id="sidebar-fallback" style="display:none">
+            <button class="barber-tab" data-barbeiro="Eré">
+                <div class="barber-avatar">E</div>
+                <span class="barber-name">Eré</span>
+                <span class="barber-count" data-count-barbeiro="Eré">0</span>
+            </button>
+            <button class="barber-tab" data-barbeiro="Guilherme">
+                <div class="barber-avatar">G</div>
+                <span class="barber-name">Guilherme</span>
+                <span class="barber-count" data-count-barbeiro="Guilherme">0</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="adm-content">
+        <div class="stats-bar">
+            <div class="stat-item"><div class="stat-label">Total hoje</div><div class="stat-value gold" id="stat-hoje">0</div></div>
+            <div class="stat-item"><div class="stat-label">Esta semana</div><div class="stat-value" id="stat-semana">0</div></div>
+            <div class="stat-item"><div class="stat-label">Total geral</div><div class="stat-value" id="stat-total">0</div></div>
+        </div>
+        <div class="date-nav">
+            <button class="date-nav-btn" id="prev-week"><i class="fa-solid fa-chevron-left"></i></button>
+            <div class="date-chips" id="date-chips"></div>
+            <button class="date-nav-btn" id="next-week"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+        <div class="section-head">
+            <h2 id="section-title">Agendamentos</h2>
+            <span id="section-sub"></span>
+            <button class="btn-novo" id="btn-novo" title="Novo agendamento">+</button>
+        </div>
+        <div class="cards-grid" id="cards-grid"></div>
+        <div class="empty-state" id="empty-state">
+            <div class="empty-icon">✂️</div>
+            <p>Nenhum agendamento para este dia</p>
+        </div>
+    </main>
+</div>
+
+<!-- MODAL NOVO AGENDAMENTO -->
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+        <button class="modal-close" id="modal-close">✕</button>
+        <div class="modal-title">Novo Agendamento</div>
+        <p class="modal-sub">Cadastro rápido pelo admin</p>
+        <form action="/agendar/admin" method="post" id="form-admin">
+            <div class="modal-grid">
+                <div class="modal-field full">
+                    <label>Nome do cliente</label>
+                    <input type="text" name="nome" placeholder="Nome completo" required>
+                </div>
+                <div class="modal-field full">
+                    <label>Telefone</label>
+                    <input type="tel" name="telefone" placeholder="(00) 00000-0000" required>
+                </div>
+                <div class="modal-field">
+                    <label>Data</label>
+                    <input type="date" name="data" id="modal-data" required>
+                </div>
+                <div class="modal-field">
+                    <label>Horário</label>
+                    <select name="horario" required>
+                        <option value="">Selecione</option>
+                        <option>08:00</option><option>09:00</option><option>10:00</option>
+                        <option>11:00</option><option>12:00</option><option>13:00</option>
+                        <option>14:00</option><option>15:00</option><option>16:00</option>
+                        <option>17:00</option><option>18:00</option><option>19:00</option>
+                    </select>
+                </div>
+                <div class="modal-field full">
+                    <label>Barbeiro</label>
+                    <select name="barbeiro" required>
+                        <option value="">Selecione</option>
+                        {{#each barbeiros}}
+                        <option value="{{this}}">{{this}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="modal-field full">
+                    <label>Serviço</label>
+                    <select name="servico" required>
+                        <option value="">Selecione</option>
+                        {{#each servicos}}
+                        <option value="{{nome}}">{{nome}} — R$ {{valor}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+            </div>
+            <div class="modal-erro" id="modal-erro"></div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancelar" id="btn-cancelar">Cancelar</button>
+                <button type="submit" class="btn-confirmar">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL FERIADOS -->
+<div class="modal-overlay" id="modal-feriados-overlay">
+    <div class="modal">
+        <button class="modal-close" id="modal-feriados-close">✕</button>
+        <div class="modal-title">Feriados</div>
+        <p class="modal-sub">Datas bloqueadas para agendamento</p>
+        <div class="modal-grid">
+            <div class="modal-field">
+                <label>Data</label>
+                <input type="date" id="feriado-data">
+            </div>
+            <div class="modal-field">
+                <label>Descrição</label>
+                <input type="text" id="feriado-desc" placeholder="Ex: Natal">
+            </div>
+        </div>
+        <div style="margin-top:12px;">
+            <button class="btn-confirmar" id="btn-add-feriado" style="width:100%;font-size:15px;padding:10px;">+ Adicionar Feriado</button>
+        </div>
+        <div class="modal-erro" id="feriado-erro"></div>
+        <div class="feriados-sep"></div>
+        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">Feriados cadastrados</p>
+        <div class="feriado-lista" id="feriado-lista">
+            <div class="feriados-empty">Carregando...</div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL SERVIÇOS -->
+<div class="modal-overlay" id="modal-servicos-overlay">
+    <div class="modal">
+        <button class="modal-close" id="modal-servicos-close">✕</button>
+        <div class="modal-title">Serviços</div>
+        <p class="modal-sub">Gerencie os serviços e valores</p>
+
+        <!-- Adicionar novo serviço -->
+        <div class="modal-grid">
+            <div class="modal-field full">
+                <label>Nome do serviço</label>
+                <input type="text" id="servico-nome-input" placeholder="Ex: Corte + Barba">
+            </div>
+            <div class="modal-field">
+                <label>Valor (R$)</label>
+                <input type="number" id="servico-valor-input" placeholder="0,00" step="0.01" min="0">
+            </div>
+            <div class="modal-field" style="justify-content:flex-end;">
+                <label>&nbsp;</label>
+                <button class="btn-confirmar" id="btn-add-servico" style="padding:10px 16px;font-size:15px;">+ Adicionar</button>
+            </div>
+        </div>
+
+        <div class="modal-erro" id="servico-erro"></div>
+        <div class="servicos-sep"></div>
+
+        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">Serviços cadastrados</p>
+        <div class="servico-lista" id="servico-lista">
+            <div class="servicos-empty">Carregando...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ── Dados do backend ──────────────────────────────────
+    const todosAgendamentos = [
+        {{#each agendamentos}}
+        { id: {{id}}, nome: "{{nome}}", telefone: "{{telefone}}", data: "{{data}}", horario: "{{horario}}", servico: "{{servico}}", barbeiro: "{{barbeiro}}" },
+        {{/each}}
+    ];
+
+    let filtroData = null;
+    let filtroBarbeiro = 'todos';
+    let weekOffset = 0;
+
+    const diasSemana = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+    function fmtDate(d) {
+        return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+    }
+
+    const datasComAgendamento = new Set(todosAgendamentos.map(a => a.data));
+
+    function renderDateChips() {
+        const chips = document.getElementById('date-chips');
+        chips.innerHTML = '';
+        const today = new Date(); today.setHours(0,0,0,0);
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(today);
+            d.setDate(today.getDate() + weekOffset * 7 + i);
+            const str = fmtDate(d);
+            const chip = document.createElement('div');
+            chip.className = 'date-chip' + (datasComAgendamento.has(str) ? ' has-appt' : '') + (filtroData === str ? ' active' : '');
+            chip.innerHTML = `<span class="chip-day">${diasSemana[d.getDay()]}</span><span class="chip-num">${d.getDate()}</span>`;
+            chip.addEventListener('click', () => { filtroData = str; renderDateChips(); renderCards(); });
+            chips.appendChild(chip);
+        }
+        if (filtroData === null && weekOffset === 0) { filtroData = fmtDate(today); renderDateChips(); }
+    }
+
+    function renderCards() {
+        const grid = document.getElementById('cards-grid');
+        const empty = document.getElementById('empty-state');
+        const title = document.getElementById('section-title');
+        const sub = document.getElementById('section-sub');
+        let lista = todosAgendamentos;
+        if (filtroData) lista = lista.filter(a => a.data === filtroData);
+        if (filtroBarbeiro !== 'todos') lista = lista.filter(a => a.barbeiro === filtroBarbeiro);
+        lista = lista.sort((a, b) => a.horario.localeCompare(b.horario));
+        if (filtroData) {
+            const [dd, mm, yy] = filtroData.split('/');
+            const d = new Date(yy, mm-1, dd);
+            title.textContent = `${diasSemana[d.getDay()]}, ${dd} ${meses[mm-1]}`;
+        }
+        sub.textContent = lista.length ? `${lista.length} agendamento${lista.length > 1 ? 's' : ''}` : '';
+        grid.innerHTML = '';
+        if (lista.length === 0) { empty.classList.add('visible'); return; }
+        empty.classList.remove('visible');
+        lista.forEach((a, idx) => {
+            const card = document.createElement('div');
+            card.className = 'appt-card';
+            card.style.animationDelay = `${idx * 0.05}s`;
+            card.innerHTML = `
+                <div class="card-time">${a.horario}</div>
+                <div class="card-name">${a.nome}</div>
+                <div class="card-tel">${a.telefone}</div>
+                <div class="card-tags">
+                    <span class="tag">${a.servico}</span>
+                    ${a.barbeiro ? `<span class="tag barbeiro">${a.barbeiro}</span>` : ''}
+                </div>
+                <div class="card-actions">
+                    <a href="/editar/${a.id}" class="btn-edit"><i class="fa-solid fa-pen"></i> Editar</a>
+                    <a href="/deletar/${a.id}" class="btn-del" onclick="return confirm('Excluir agendamento de ${a.nome}?')">
+                        <i class="fa fa-trash"></i> Excluir
+                    </a>
+                </div>`;
+            grid.appendChild(card);
+        });
+    }
+
+    function renderStats() {
+        const today = fmtDate(new Date());
+        const weekDates = [];
+        const base = new Date(); base.setHours(0,0,0,0);
+        for (let i = 0; i < 7; i++) { const d = new Date(base); d.setDate(base.getDate() + i); weekDates.push(fmtDate(d)); }
+        document.getElementById('stat-hoje').textContent   = todosAgendamentos.filter(a => a.data === today).length;
+        document.getElementById('stat-semana').textContent = todosAgendamentos.filter(a => weekDates.includes(a.data)).length;
+        document.getElementById('stat-total').textContent  = todosAgendamentos.length;
+    }
+
+    function renderCounts() {
+        document.querySelectorAll('[data-count-barbeiro]').forEach(el => {
+            const nome = el.dataset.countBarbeiro;
+            const n = filtroData
+                ? todosAgendamentos.filter(a => a.barbeiro === nome && a.data === filtroData).length
+                : todosAgendamentos.filter(a => a.barbeiro === nome).length;
+            el.textContent = n;
+        });
+    }
+
+    document.querySelectorAll('.barber-tab, .tab-todos').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.barber-tab, .tab-todos').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filtroBarbeiro = btn.dataset.barbeiro;
+            renderCards(); renderCounts();
+        });
+    });
+
+    document.getElementById('prev-week').addEventListener('click', () => { weekOffset--; filtroData = null; renderDateChips(); renderCards(); });
+    document.getElementById('next-week').addEventListener('click', () => { weekOffset++; filtroData = null; renderDateChips(); renderCards(); });
+    document.getElementById('btn-sair').addEventListener('click', () => { window.location.href = '/logout'; });
+
+    // ── Modal Feriados ─────────────────────────────────────
+    const feriadosOverlay  = document.getElementById('modal-feriados-overlay');
+    const feriadoLista     = document.getElementById('feriado-lista');
+    const feriadoErro      = document.getElementById('feriado-erro');
+    const feriadoDataInput = document.getElementById('feriado-data');
+    const feriadoDescInput = document.getElementById('feriado-desc');
+    const btnAddFeriado    = document.getElementById('btn-add-feriado');
+
+    function fmtFeriadoData(str) { const [y, m, d] = str.split('-'); return `${d}/${m}/${y}`; }
+
+    async function carregarFeriados() {
+        feriadoLista.innerHTML = '<div class="feriados-empty">Carregando...</div>';
+        try {
+            const res  = await fetch('/feriados');
+            const json = await res.json();
+            if (!json.feriados || json.feriados.length === 0) { feriadoLista.innerHTML = '<div class="feriados-empty">Nenhum feriado cadastrado</div>'; return; }
+            feriadoLista.innerHTML = '';
+            json.feriados.sort((a, b) => a.data.localeCompare(b.data)).forEach(f => {
+                const item = document.createElement('div');
+                item.className = 'feriado-item';
+                item.innerHTML = `
+                    <div class="feriado-item-info">
+                        <span class="feriado-item-data">${fmtFeriadoData(f.data)}</span>
+                        <span class="feriado-item-desc">${f.descricao}</span>
+                    </div>
+                    <button class="feriado-del" data-data="${f.data}" title="Remover">✕</button>`;
+                feriadoLista.appendChild(item);
+            });
+            feriadoLista.querySelectorAll('.feriado-del').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (!confirm('Remover este feriado?')) return;
+                    await fetch(`/feriados/${btn.dataset.data}`, { method: 'DELETE' });
+                    carregarFeriados();
+                });
+            });
+        } catch (e) { feriadoLista.innerHTML = '<div class="feriados-empty">Erro ao carregar.</div>'; }
+    }
+
+    btnAddFeriado.addEventListener('click', async () => {
+        feriadoErro.textContent = '';
+        const data = feriadoDataInput.value;
+        const descricao = feriadoDescInput.value.trim();
+        if (!data || !descricao) { feriadoErro.textContent = '⚠ Preencha a data e a descrição.'; return; }
+        btnAddFeriado.textContent = 'Salvando...'; btnAddFeriado.disabled = true;
+        try {
+            const res  = await fetch('/feriados', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `data=${data}&descricao=${encodeURIComponent(descricao)}` });
+            const json = await res.json();
+            if (json.sucesso) { feriadoDataInput.value = ''; feriadoDescInput.value = ''; carregarFeriados(); }
+            else feriadoErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar.');
+        } catch (e) { feriadoErro.textContent = '⚠ Erro de conexão.'; }
+        finally { btnAddFeriado.textContent = '+ Adicionar Feriado'; btnAddFeriado.disabled = false; }
+    });
+
+    document.getElementById('btn-feriados').addEventListener('click', () => { feriadoErro.textContent = ''; feriadosOverlay.classList.add('open'); carregarFeriados(); });
+    document.getElementById('modal-feriados-close').addEventListener('click', () => feriadosOverlay.classList.remove('open'));
+    feriadosOverlay.addEventListener('click', (e) => { if (e.target === feriadosOverlay) feriadosOverlay.classList.remove('open'); });
+
+    // ── Modal Novo Agendamento ─────────────────────────────
+    const overlay      = document.getElementById('modal-overlay');
+    const modalErro    = document.getElementById('modal-erro');
+    const modalData    = document.getElementById('modal-data');
+    const formAdmin    = document.getElementById('form-admin');
+    const btnConfirmar = formAdmin.querySelector('.btn-confirmar');
+
+    const hoje    = new Date();
+    const minDate = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
+    modalData.setAttribute('min', minDate);
+
+    function abrirModal() {
+        modalErro.textContent = '';
+        if (filtroData) { const [dd, mm, yy] = filtroData.split('/'); modalData.value = `${yy}-${mm}-${dd}`; }
+        overlay.classList.add('open');
+    }
+
+    function fecharModal() { overlay.classList.remove('open'); formAdmin.reset(); modalErro.textContent = ''; }
+
+    document.getElementById('btn-novo').addEventListener('click', abrirModal);
+    document.getElementById('modal-close').addEventListener('click', fecharModal);
+    document.getElementById('btn-cancelar').addEventListener('click', fecharModal);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fecharModal(); });
+
+    formAdmin.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        modalErro.textContent = '';
+        btnConfirmar.textContent = 'Salvando...'; btnConfirmar.disabled = true;
+        const dados = new URLSearchParams(new FormData(formAdmin));
+        try {
+            const res  = await fetch('/agendar/admin', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: dados.toString() });
+            const json = await res.json();
+            if (res.ok && json.sucesso) { fecharModal(); window.location.reload(); }
+            else modalErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar agendamento.');
+        } catch (err) { modalErro.textContent = '⚠ Erro de conexão. Tente novamente.'; }
+        finally { btnConfirmar.textContent = 'Salvar'; btnConfirmar.disabled = false; }
+    });
+
+    // ── Fallback sidebar ───────────────────────────────────
+    const hasBarbeiros = {{#if barbeiros}}true{{else}}false{{/if}};
+    if (!hasBarbeiros) {
+        document.getElementById('sidebar-fallback').style.display = 'block';
+        document.querySelectorAll('.barber-tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.barber-tab, .tab-todos').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                filtroBarbeiro = btn.dataset.barbeiro;
+                renderCards(); renderCounts();
+            });
+        });
+    }
+
+    // ── Modal Serviços ────────────────────────────────────
+    const servicosOverlay   = document.getElementById('modal-servicos-overlay');
+    const servicoLista      = document.getElementById('servico-lista');
+    const servicoErro       = document.getElementById('servico-erro');
+    const servicoNomeInput  = document.getElementById('servico-nome-input');
+    const servicoValorInput = document.getElementById('servico-valor-input');
+    const btnAddServico     = document.getElementById('btn-add-servico');
+
+    async function carregarServicos() {
+        servicoLista.innerHTML = '<div class="servicos-empty">Carregando...</div>';
+        try {
+            const res  = await fetch('/servicos/admin');
+            const json = await res.json();
+            if (!json.servicos || json.servicos.length === 0) {
+                servicoLista.innerHTML = '<div class="servicos-empty">Nenhum serviço cadastrado</div>';
+                return;
+            }
+            servicoLista.innerHTML = '';
+            json.servicos.forEach(s => {
+                const item = document.createElement('div');
+                item.className = 'servico-item' + (s.ativo ? '' : ' inativo');
+                item.dataset.id = s.id;
+                item.innerHTML = `
+                    <span class="servico-item-nome">${s.nome}</span>
+                    <span class="servico-item-valor">R$ ${parseFloat(s.valor).toFixed(2).replace('.',',')}</span>
+                    <div class="servico-item-actions">
+                        <button class="btn-servico-edit" data-id="${s.id}" data-nome="${s.nome}" data-valor="${s.valor}" title="Editar valor">✏️</button>
+                        <button class="btn-servico-toggle ${s.ativo ? '' : 'inativo'}" data-id="${s.id}" data-ativo="${s.ativo}">
+                            ${s.ativo ? 'Ativo' : 'Inativo'}
+                        </button>
+                    </div>`;
+                servicoLista.appendChild(item);
+            });
+
+            // Editar valor inline
+            servicoLista.querySelectorAll('.btn-servico-edit').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const item = btn.closest('.servico-item');
+                    const jaEditando = item.querySelector('.servico-edit-row');
+                    if (jaEditando) { jaEditando.remove(); return; }
+                    const row = document.createElement('div');
+                    row.className = 'servico-edit-row';
+                    row.style.gridColumn = '1/-1';
+                    row.innerHTML = `
+                        <input type="number" value="${btn.dataset.valor}" step="0.01" min="0" style="background:var(--bg);border:1px solid var(--gold);border-radius:6px;padding:5px 8px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);outline:none;width:90px;">
+                        <button style="background:var(--gold);border:none;color:#000;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;">Salvar</button>
+                        <button style="background:none;border:1px solid var(--border);color:var(--muted);padding:5px 10px;border-radius:6px;cursor:pointer;font-size:12px;">✕</button>
+                    `;
+                    item.appendChild(row);
+                    const [inputVal, btnSalvar, btnCancelar] = row.querySelectorAll('input, button');
+                    btnCancelar.addEventListener('click', () => row.remove());
+                    btnSalvar.addEventListener('click', async () => {
+                        const novoValor = parseFloat(inputVal.value);
+                        if (isNaN(novoValor) || novoValor < 0) return;
+                        try {
+                            const res = await fetch(`/servicos/${btn.dataset.id}`, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ valor: novoValor, nome: btn.dataset.nome })
+                            });
+                            const json = await res.json();
+                            if (json.sucesso) carregarServicos();
+                            else servicoErro.textContent = '⚠ Erro ao salvar.';
+                        } catch(e) { servicoErro.textContent = '⚠ Erro de conexão.'; }
+                    });
+                });
+            });
+
+            // Ativar/desativar
+            servicoLista.querySelectorAll('.btn-servico-toggle').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const ativo = btn.dataset.ativo === 'true';
+                    try {
+                        const res = await fetch(`/servicos/${btn.dataset.id}/toggle`, { method: 'PUT' });
+                        const json = await res.json();
+                        if (json.sucesso) carregarServicos();
+                    } catch(e) { servicoErro.textContent = '⚠ Erro ao atualizar.'; }
+                });
+            });
+
+        } catch(e) { servicoLista.innerHTML = '<div class="servicos-empty">Erro ao carregar.</div>'; }
+    }
+
+    btnAddServico.addEventListener('click', async () => {
+        servicoErro.textContent = '';
+        const nome  = servicoNomeInput.value.trim();
+        const valor = parseFloat(servicoValorInput.value);
+        if (!nome || isNaN(valor) || valor < 0) { servicoErro.textContent = '⚠ Preencha nome e valor.'; return; }
+        btnAddServico.textContent = 'Salvando...'; btnAddServico.disabled = true;
+        try {
+            const res  = await fetch('/servicos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome, valor }) });
+            const json = await res.json();
+            if (json.sucesso) { servicoNomeInput.value = ''; servicoValorInput.value = ''; carregarServicos(); }
+            else servicoErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar.');
+        } catch(e) { servicoErro.textContent = '⚠ Erro de conexão.'; }
+        finally { btnAddServico.textContent = '+ Adicionar'; btnAddServico.disabled = false; }
+    });
+
+    document.getElementById('btn-servicos').addEventListener('click', () => { servicoErro.textContent = ''; servicosOverlay.classList.add('open'); carregarServicos(); });
+    document.getElementById('modal-servicos-close').addEventListener('click', () => servicosOverlay.classList.remove('open'));
+    servicosOverlay.addEventListener('click', (e) => { if (e.target === servicosOverlay) servicosOverlay.classList.remove('open'); });
+
+        renderStats();
+    renderDateChips();
+    renderCards();
+    renderCounts();
+</script>

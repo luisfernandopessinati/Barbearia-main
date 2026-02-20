@@ -470,3 +470,10 @@ sequelize.sync({ force: false }).then(() => {
         console.log(`Servidor funcionando na porta http://localhost:${PORT}/loginUsuario`);
     });
 });
+
+/*app.listen(PORT, () => {
+    console.log(`Servidor funcionando na porta http://localhost:${PORT}`);
+    console.log(`Servidor funcionando na porta http://localhost:${PORT}/admin`);
+    console.log(`Servidor funcionando na porta http://localhost:${PORT}/loginUsuario`);
+});
+*/

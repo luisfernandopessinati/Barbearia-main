@@ -9,7 +9,7 @@ const bcrypt = require('bcryptjs');
 const Agendamento = require('./models/Agendamento');
 const Cliente = require('./models/Cliente');
 const Admin = require('./models/Admin');
-const Feriado = require('./models/Feriado');
+const Feriado = require('./models/feriado');
 const Servico = require('./models/servico');
 
 const passport = require('passport');

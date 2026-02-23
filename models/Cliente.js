@@ -28,5 +28,5 @@ const Cliente = sequelize.define('Clientes', {
     }
 });
 
-// Cliente.sync({ force: true });
+ Cliente.sync({ force: true });
 module.exports = Cliente;

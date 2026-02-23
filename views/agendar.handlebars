@@ -562,18 +562,17 @@
 </div>
 
 <script>
-  const state = {
+const hoje = new Date();
+const state = {
     barbeiro: null,
     data: null,
     horario: null,
     servico: null,
     servicoLabel: null,
     servicoPreco: null,
-    viewYear: null,
-    viewMonth: null,
-  };
-
-  const horariosTodos = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
+    viewYear: hoje.getFullYear(),
+    viewMonth: hoje.getMonth(),
+};
 
   let horariosOcupados = [];  // ← carregado via fetch
   let feriadosSet = new Set(); // ← datas bloqueadas YYYY-MM-DD
@@ -655,7 +654,7 @@
       el.textContent = d;
 
       const diaSemana = date.getDay();
-      const fimSemana = diaSemana === 0 || diaSemana === 6;
+      const fimSemana = diaSemana === 0 || diaSemana === 1;
       const feriado = feriadosSet.has(toDateStr(date));
 
       if (date < today || fimSemana || feriado) {
@@ -668,6 +667,7 @@
 
         el.addEventListener('click', async () => {
           state.data = date;
+          console.log('Data clicada:', state.data, 'getDay:', state.data.getDay());
           state.horario = null;
           document.getElementById('input-horario').value = '';
           renderCalendar();
@@ -694,6 +694,13 @@
   function renderHorarios() {
     const grid = document.getElementById('horarios-grid');
     grid.innerHTML = '';
+    if (!state.data) return;
+
+    const diaSemanaSelecionado = state.data.getDay();
+    
+    const horariosTodos = diaSemanaSelecionado === 6
+      ? ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00']
+      : ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
 
     horariosTodos.forEach(h => {
       const btn = document.createElement('button');

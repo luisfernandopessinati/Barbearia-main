@@ -5,15 +5,12 @@ const bcrypt = require('bcryptjs');
 const Cliente = sequelize.define('Clientes', {
     email: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true,
-        validate: {
-            isEmail: true
-        }
     },
     senha: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     },
     nome: {
         type: DataTypes.STRING,
@@ -21,14 +18,15 @@ const Cliente = sequelize.define('Clientes', {
     },
     cpf: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true
     },
     telefone: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     }
-})
+});
 
 // Cliente.sync({ force: true });
 module.exports = Cliente;

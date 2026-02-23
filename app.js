@@ -424,30 +424,25 @@ app.post('/editar/:id', isAdminAuthenticated, (req, res) => {
 
 // LOGIN DO USUÁRIO (CLIENTE)
 app.post('/loginUsuario', async (req, res) => {
-    const { email, senha } = req.body;
+    const { nome, telefone } = req.body;
 
     try {
-        const cliente = await Cliente.findOne({ where: { email } });
+        // Busca pelo telefone, se não existir cria automaticamente
+        let cliente = await Cliente.findOne({ where: { telefone } });
 
         if (!cliente) {
-            return res.render('loginUsuario', { erro: 'Email ou senha inválidos.' });
+            cliente = await Cliente.create({ nome, telefone });
         }
 
-        const senhaCorreta = await bcrypt.compare(senha, cliente.senha);
-
-        if (!senhaCorreta) {
-            return res.render('loginUsuario', { erro: 'Email ou senha inválidos.' });
-        }
-
-        // ← Salva os dados do cliente na sessão
+        // Salva os dados do cliente na sessão
         req.session.clienteId = cliente.id;
         req.session.clienteNome = cliente.nome;
         req.session.clienteTelefone = cliente.telefone;
-        req.session.clienteEmail = cliente.email;
 
         res.redirect('/agendar');
 
     } catch (error) {
+        console.error(error);
         res.render('loginUsuario', { erro: 'Erro ao fazer login.' });
     }
 });

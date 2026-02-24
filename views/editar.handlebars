@@ -1,32 +1,219 @@
-<section class="editar">
-    <div class="header-admin">
-        <a href="/admin"><i class="fa-solid fa-arrow-left"></i></a>
-        <a href="/"><img src="/img/logo2.svg" alt="Logo da barbearia" width="100px" ;></a>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+        --gold: #b8860b; --gold-light: #d4a012; --gold-dim: #b8860b33;
+        --bg: #090909; --bg2: #111111; --bg3: #181818;
+        --border: #222222; --text: #e8e8e8; --muted: #555;
+        --danger: #c0392b; --danger-dim: #c0392b22;
+    }
+
+    body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; }
+
+    /* ── Header ── */
+    .edit-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 40px; border-bottom: 1px solid var(--border); background: var(--bg2); position: sticky; top: 0; z-index: 100; }
+    .edit-header-left { display: flex; align-items: center; gap: 20px; }
+    .edit-back { color: var(--muted); text-decoration: none; font-size: 18px; transition: color 0.2s; display: flex; align-items: center; }
+    .edit-back:hover { color: var(--gold); }
+    .edit-logo { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px; color: var(--gold); text-decoration: none; }
+    .edit-header-center { font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 4px; color: var(--muted); text-transform: uppercase; }
+
+    /* ── Layout principal ── */
+    .edit-body { display: flex; align-items: flex-start; justify-content: center; padding: 48px 40px; min-height: calc(100vh - 65px); }
+
+    /* ── Card do formulário ── */
+    .edit-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 40px; width: 100%; max-width: 520px; position: relative; overflow: hidden; }
+    .edit-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--gold), var(--gold-light), transparent); }
+
+    .edit-title { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 2px; color: var(--text); margin-bottom: 4px; }
+    .edit-sub { font-size: 12px; color: var(--muted); margin-bottom: 32px; }
+
+    /* ── Campos ── */
+    .edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .edit-field { display: flex; flex-direction: column; gap: 7px; }
+    .edit-field.full { grid-column: 1 / -1; }
+
+    .edit-field label {
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .edit-field input,
+    .edit-field select {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 11px 14px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 14px;
+        color: var(--text);
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        width: 100%;
+        appearance: none;
+        -webkit-appearance: none;
+    }
+
+    .edit-field input:focus,
+    .edit-field select:focus {
+        border-color: var(--gold);
+        box-shadow: 0 0 0 3px var(--gold-dim);
+    }
+
+    .edit-field select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        padding-right: 36px;
+    }
+
+    .edit-field select option { background: var(--bg3); }
+
+    /* ── Separador ── */
+    .edit-sep { height: 1px; background: var(--border); margin: 24px 0; grid-column: 1 / -1; }
+
+    /* ── Ações ── */
+    .edit-actions { display: flex; gap: 12px; margin-top: 28px; }
+
+    .btn-cancelar {
+        flex: 1;
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 13px;
+        border-radius: 8px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+    .btn-cancelar:hover { border-color: var(--danger); color: var(--danger); }
+
+    .btn-salvar {
+        flex: 2;
+        background: var(--gold);
+        border: none;
+        color: #000;
+        padding: 13px;
+        border-radius: 8px;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 20px;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .btn-salvar:hover { background: var(--gold-light); }
+
+    /* ── Chip do agendamento atual ── */
+    .edit-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--gold-dim);
+        border: 1px solid var(--gold);
+        color: var(--gold);
+        font-size: 11px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 4px 12px;
+        border-radius: 20px;
+        margin-bottom: 24px;
+    }
+
+    @media (max-width: 600px) {
+        .edit-body { padding: 24px 16px; }
+        .edit-card { padding: 28px 20px; }
+        .edit-grid { grid-template-columns: 1fr; }
+        .edit-field.full { grid-column: 1; }
+        .edit-header { padding: 16px 20px; }
+        .edit-header-center { display: none; }
+    }
+</style>
+
+<div class="edit-header">
+    <div class="edit-header-left">
+        <a href="/admin" class="edit-back"><i class="fa-solid fa-arrow-left"></i></a>
+        <a href="/" class="edit-logo">Barbearia</a>
     </div>
+    <div class="edit-header-center">Editar Agendamento</div>
+</div>
 
-    <form action="/editar/{{agendamento.id}}" method="POST" class="form-editar">
-        <h2 style="color: white;">Editar Dados</h2>
-        <label for="nome">Nome:</label>
-        <input type="text" id="nome" name="nome" value="{{agendamento.nome}}" required>
+<div class="edit-body">
+    <div class="edit-card">
 
-        <label for="telefone">Telefone:</label>
-        <input type="text" id="telefone" name="telefone" value="{{agendamento.telefone}}" required>
+        <div class="edit-title">Editar Agendamento</div>
+        <p class="edit-sub">Atualize os dados do cliente abaixo</p>
 
-        <label for="data">Data:</label>
-        <input type="date" id="data" name="data" value="{{agendamento.data}}" required>
+        <div class="edit-badge">
+            <i class="fa-solid fa-pen fa-xs"></i>
+            ID #{{agendamento.id}}
+        </div>
 
-        <label for="horario">Horário:</label>
-        <input type="time" id="horario" name="horario" value="{{agendamento.horario}}" required>
+        <form action="/editar/{{agendamento.id}}" method="POST">
+            <div class="edit-grid">
 
-        <label for="servico">Serviço:</label>
-        <select name="servico" id="servico" value="{{agendamento.servico}}" required>
-            <option value="corte de cabelo">Corte de cabelo</option>
-            <option value="barba">Barba</option>
-            <option value="sobrancelha">Sobrancelha</option>
-            <option value="pigmentação">Pigmentação</option>
-            <option value="combo">Combo</option>
-        </select>
-        <button class="btn-editar" type="submit">Salvar</button>
-    </form>
-    
-</section>
+                <!-- Nome -->
+                <div class="edit-field full">
+                    <label for="nome">Nome do cliente</label>
+                    <input type="text" id="nome" name="nome" value="{{agendamento.nome}}" placeholder="Nome completo" required>
+                </div>
+
+                <!-- Telefone -->
+                <div class="edit-field full">
+                    <label for="telefone">Telefone</label>
+                    <input type="text" id="telefone" name="telefone" value="{{agendamento.telefone}}" placeholder="(00) 00000-0000" required>
+                </div>
+
+                <!-- Data -->
+                <div class="edit-field">
+                    <label for="data">Data</label>
+                    <input type="date" id="data" name="data" value="{{agendamento.data}}" required>
+                </div>
+
+                <!-- Horário -->
+                <div class="edit-field">
+                    <label for="horario">Horário</label>
+                    <input type="time" id="horario" name="horario" value="{{agendamento.horario}}" required>
+                </div>
+
+                <!-- Barbeiro -->
+                <div class="edit-field">
+                    <label for="barbeiro">Barbeiro</label>
+                    <select id="barbeiro" name="barbeiro" required>
+                        <option value="">Selecione</option>
+                        {{#each barbeiros}}
+                        <option value="{{this}}" {{#if (eq this ../agendamento.barbeiro)}}selected{{/if}}>{{this}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+
+                <!-- Serviço -->
+                <div class="edit-field">
+                    <label for="servico">Serviço</label>
+                    <select id="servico" name="servico" required>
+                        <option value="">Selecione</option>
+                        {{#each servicos}}
+                        <option value="{{nome}}" {{#if (eq nome ../agendamento.servico)}}selected{{/if}}>{{nome}} — R$ {{valor}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="edit-actions">
+                <a href="/admin" class="btn-cancelar">Cancelar</a>
+                <button type="submit" class="btn-salvar">Salvar alterações</button>
+            </div>
+        </form>
+
+    </div>
+</div>

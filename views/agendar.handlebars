@@ -465,27 +465,23 @@
 </style>
 
 <div class="page-agendar">
-
   <!-- Painel Esquerdo: Escolha do Barbeiro -->
   <div class="panel-left">
     <div class="big-letter">B</div>
-
     <p class="barbers-label">Escolha seu barbeiro</p>
     <div class="barbers-list" id="barbers-list">
-      <div class="barber-card" data-barbeiro="Eré">
-        <div class="barber-avatar">E</div>
-        <div class="barber-info">
-          <h4>Eré</h4>
-        </div>
+      {{#if barbeiros}}
+      {{#each barbeiros}}
+      <div class="barber-card" data-barbeiro="{{this}}">
+        <h4>{{this}}</h4>
       </div>
-      <div class="barber-card" data-barbeiro="Guilherme">
-        <div class="barber-avatar">G</div>
-        <div class="barber-info">
-          <h4>Guilherme</h4>
-        </div>
-      </div>
+      {{/each}}
+      {{else}}
+      <p>Nenhum barbeiro disponível</p>
+      {{/if}}
     </div>
   </div>
+
 
   <!-- Painel Direito: Formulário -->
   <div class="panel-right">
@@ -562,8 +558,8 @@
 </div>
 
 <script>
-const hoje = new Date();
-const state = {
+  const hoje = new Date();
+  const state = {
     barbeiro: null,
     data: null,
     horario: null,
@@ -572,7 +568,7 @@ const state = {
     servicoPreco: null,
     viewYear: hoje.getFullYear(),
     viewMonth: hoje.getMonth(),
-};
+  };
 
   let horariosOcupados = [];  // ← carregado via fetch
   let feriadosSet = new Set(); // ← datas bloqueadas YYYY-MM-DD
@@ -603,6 +599,7 @@ const state = {
     try {
       const res = await fetch(`/horarios-ocupados?barbeiro=${encodeURIComponent(state.barbeiro)}&data=${dataStr}`);
       const json = await res.json();
+console.log('Horários ocupados:', json.ocupados);
       horariosOcupados = json.ocupados || [];
     } catch (e) {
       horariosOcupados = [];
@@ -613,7 +610,6 @@ const state = {
       state.horario = null;
       document.getElementById('input-horario').value = '';
     }
-
     renderHorarios();
     updateResumo();
   }
@@ -671,7 +667,7 @@ const state = {
           state.horario = null;
           document.getElementById('input-horario').value = '';
           renderCalendar();
-          await buscarHorariosOcupados();  // ← busca ao trocar data também
+          await buscarHorariosOcupados();         
         });
       }
       grid.appendChild(el);
@@ -697,7 +693,7 @@ const state = {
     if (!state.data) return;
 
     const diaSemanaSelecionado = state.data.getDay();
-    
+
     const horariosTodos = diaSemanaSelecionado === 6
       ? ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00']
       : ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
@@ -788,4 +784,15 @@ const state = {
     renderHorarios();
     updateResumo();
   })();
+
+  // iniciar com um barbeiro padrao
+  document.addEventListener('DOMContentLoaded', () => {
+    const firstBarber = document.querySelector('.barber-card');
+
+    if (firstBarber) {
+      firstBarber.classList.add('active');
+      state.barbeiro = firstBarber.dataset.barbeiro;
+      document.getElementById('input-barbeiro').value = state.barbeiro;
+    }
+  });  
 </script>

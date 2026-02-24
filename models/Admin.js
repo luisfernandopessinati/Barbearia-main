@@ -18,7 +18,11 @@ const Admin = sequelize.define('Admin', {
     senha: {
         type: DataTypes.STRING,
         allowNull: false
-    }
+    },
+    role: {
+    type: DataTypes.STRING,
+    defaultValue: 'admin'
+}
 })
 
  //Admin.sync({ force: true });

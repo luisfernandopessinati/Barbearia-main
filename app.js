@@ -36,7 +36,8 @@ app.engine('handlebars', engine({
         substr: (str, start, len) => {
             if (!str) return '';
             return str.substring(start, start + len).toUpperCase();
-        }
+        },
+        eq: (a, b) => a === b
     }
 }));
 app.set('view engine', 'handlebars');
@@ -63,9 +64,10 @@ app.get('/', (req, res) => {
 
 app.get('/agendar', async (req, res) => {
     try {
-        const [agendamentos, servicos] = await Promise.all([
+        const [agendamentos, servicos, admins] = await Promise.all([
             Agendamento.findAll({ attributes: ['data', 'horario'] }),
-            Servico.findAll({ where: { ativo: true }, order: [['nome', 'ASC']] })
+            Servico.findAll({ where: { ativo: true }, order: [['nome', 'ASC']] }),
+            Admin.findAll({ attributes: ['nome'] })
         ]);
 
         const horariosOcupados = agendamentos.map(a => ({
@@ -73,15 +75,22 @@ app.get('/agendar', async (req, res) => {
             horario: a.horario
         }));
 
-        // ← aqui dentro, depois do Promise.all
         const servicosFormatados = servicos.map(s => ({
             nome: s.nome,
             valor: parseFloat(s.valor).toFixed(2).replace('.', ',')
         }));
 
-        res.render('agendar', { horariosOcupados, servicos: servicosFormatados });
+        const barbeiros = admins.map(a => a.nome);
+
+        return res.render('agendar', {  // ← IMPORTANTE
+            horariosOcupados,
+            servicos: servicosFormatados,
+            barbeiros
+        });
+
     } catch (error) {
-        res.render('agendar', { erro: 'Erro ao carregar.' });
+        console.error(error);
+        return res.render('agendar', { erro: 'Erro ao carregar.' }); // ← IMPORTANTE
     }
 });
 
@@ -109,7 +118,7 @@ async function criarAdmin() {
     try {
         const email = 'admin@gmail.com';
         const senha = '1234';
-        const nome = 'Eré';           // ← adiciona o nome
+        const nome = 'ADMIN';           // ← adiciona o nome
         const hashSenha = await bcrypt.hash(senha, 10);
 
         const adminExistente = await Admin.findOne({ where: { email } });
@@ -166,47 +175,130 @@ async function criarServicosIniciais() {
 }
 criarServicosIniciais();
 
+// ============================================================
+// ROTAS ADMINS — adicionar no app.js após a rota GET /admin
+// ============================================================
+
+// GET /admins — lista todos os admins (para o modal)
+app.get('/admins', isAdminAuthenticated, async (req, res) => {
+    try {
+        const admins = await Admin.findAll({
+            attributes: ['id', 'nome', 'email', 'role'],
+            order: [['nome', 'ASC']]
+        });
+        res.json({ admins });
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao buscar admins: ' + error.message });
+    }
+});
+
+// POST /admins — cria um novo admin
+app.post('/admins', isAdminAuthenticated, async (req, res) => {
+    try {
+        const { nome, email, senha, role } = req.body;
+
+        if (!nome || !email || !senha) {
+            return res.status(400).json({ erro: 'Nome, e-mail e senha são obrigatórios.' });
+        }
+        if (senha.length < 6) {
+            return res.status(400).json({ erro: 'A senha precisa ter no mínimo 6 caracteres.' });
+        }
+
+        const emailNormalizado = email.trim().toLowerCase();
+
+        const jaExiste = await Admin.findOne({ where: { email: emailNormalizado } });
+        if (jaExiste) {
+            return res.status(409).json({ erro: 'Já existe um admin com este e-mail.' });
+        }
+
+        const hashSenha = await bcrypt.hash(senha, 10);
+
+        await Admin.create({
+            nome: nome.trim(),
+            email: emailNormalizado,
+            senha: hashSenha,
+            role: role === 'owner' ? 'owner' : 'admin'   // só aceita os dois valores válidos
+        });
+
+        res.json({ sucesso: true });
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao criar admin: ' + error.message });
+    }
+});
+
+// DELETE /admins/:id — remove um admin (nunca remove o próprio usuário logado nem owners)
+app.delete('/admins/:id', isAdminAuthenticated, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const admin = await Admin.findByPk(id);
+        if (!admin) {
+            return res.status(404).json({ erro: 'Admin não encontrado.' });
+        }
+
+        // Proteção: não deixa excluir owner nem o próprio usuário logado
+        if (admin.role === 'owner') {
+            return res.status(403).json({ erro: 'Não é possível remover um Owner.' });
+        }
+        if (req.session?.adminId && String(admin.id) === String(req.session.adminId)) {
+            return res.status(403).json({ erro: 'Você não pode remover sua própria conta.' });
+        }
+
+        await admin.destroy();
+        res.json({ sucesso: true });
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao remover admin: ' + error.message });
+    }
+});
+
 // RETORNA HORÁRIOS OCUPADOS POR BARBEIRO E DATA
-// SEM proteção — cliente também precisa acessar
 app.get('/horarios-ocupados', async (req, res) => {
     const { barbeiro, data } = req.query;
+
     try {
-        const inicioDia = new Date(data + 'T00:00:00.000Z');
-        const fimDia = new Date(data + 'T23:59:59.999Z');
+        const inicioDia = new Date(`${data}T00:00:00.000Z`);
+        const proximoDia = new Date(`${data}T00:00:00.000Z`);
+        proximoDia.setUTCDate(proximoDia.getUTCDate() + 1);
 
         const agendamentos = await Agendamento.findAll({
             where: {
                 barbeiro,
-                data: { [Op.between]: [inicioDia, fimDia] }
+                data: {
+                    [Op.gte]: inicioDia,
+                    [Op.lt]: proximoDia
+                }
             },
             attributes: ['horario']
         });
 
-        res.json({ ocupados: agendamentos.map(a => a.horario) });
+        res.json({
+            ocupados: agendamentos.map(a => a.horario)
+        });
+
     } catch (error) {
+        console.error(error);
         res.json({ ocupados: [] });
     }
 });
 
 // FUNÇÃO AUXILIAR - verifica conflito de horário
 async function verificarConflito(barbeiro, data, horario, idIgnorar = null) {
-    // Cria o intervalo do dia inteiro: 00:00:00 até 23:59:59
-    const inicioDia = new Date(data + 'T00:00:00.000Z');
-    const fimDia = new Date(data + 'T23:59:59.999Z');
+    const inicioDia = new Date(`${data}T00:00:00.000Z`);
+    const proximoDia = new Date(`${data}T00:00:00.000Z`);
+    proximoDia.setUTCDate(proximoDia.getUTCDate() + 1);
 
     const where = {
         barbeiro,
         horario,
-        data: { [Op.between]: [inicioDia, fimDia] }
+        data: {
+            [Op.gte]: inicioDia,
+            [Op.lt]: proximoDia
+        }
     };
 
     if (idIgnorar) where.id = { [Op.ne]: idIgnorar };
 
     const conflito = await Agendamento.findOne({ where });
-
-    console.log('Verificando conflito:', { barbeiro, data, horario });
-    console.log('Conflito encontrado?', !!conflito);
-
     return !!conflito;
 }
 
@@ -270,7 +362,7 @@ app.post('/agendar/admin', isAdminAuthenticated, async (req, res) => {
     }
 });
 
-// LER OS AGENDAMENTOS CRIADOS NO BANCO DE DADOS
+// BUSCAR AGENDAMENTOS - ADMINS e SERVICOS
 app.get('/admin', isAdminAuthenticated, async (req, res) => {
     try {
         const [agendamentos, admins, servicos] = await Promise.all([
@@ -310,6 +402,7 @@ app.get('/admin', isAdminAuthenticated, async (req, res) => {
     }
 });
 
+
 // GET - lista feriados (público, cliente também acessa)
 app.get('/feriados', async (req, res) => {
     const feriados = await Feriado.findAll({ attributes: ['data', 'descricao'] });
@@ -338,31 +431,40 @@ app.delete('/feriados/:data', isAdminAuthenticated, async (req, res) => {
 });
 
 // EXIBIR OS DADOS NO INPUT E ATUALIZAR OS DADOS
-app.get('/editar/:id', isAdminAuthenticated, (req, res) => {
-    const id = req.params.id;
-    Agendamento.findByPk(id)
-        .then(agendamento => {
-            if (agendamento) {
+app.get('/editar/:id', isAdminAuthenticated, async (req, res) => {
+    try {
+        const id = req.params.id;
 
-                const plainAgendamento = agendamento.get({ plain: true });
+        const [agendamento, admins, servicos] = await Promise.all([
+            Agendamento.findByPk(id),
+            Admin.findAll({ attributes: ['nome'] }),
+            Servico.findAll({ where: { ativo: true }, order: [['nome', 'ASC']] })
+        ]);
 
-                const data = new Date(plainAgendamento.data);
-                data.setMinutes(data.getMinutes() + data.getTimezoneOffset());
-                const ano = data.getFullYear();
-                const mes = String(data.getMonth() + 1).padStart(2, '0');
-                const dia = String(data.getDate()).padStart(2, '0');
-                const dataFormatada = `${ano}-${mes}-${dia}`;
+        if (!agendamento) return res.status(404).send('Agendamento não encontrado');
 
-                plainAgendamento.data = dataFormatada;
+        const plain = agendamento.get({ plain: true });
 
-                res.render('editar', { agendamento: plainAgendamento });
-            } else {
-                res.status(404).send('Agendamento não encontrado');
-            }
-        })
-        .catch(error => {
-            res.status(500).send('Erro ao buscar agendamento: ' + error.message);
+        // Formata a data para yyyy-mm-dd (valor do input date)
+        const data = new Date(plain.data);
+        data.setMinutes(data.getMinutes() + data.getTimezoneOffset());
+        plain.data = `${data.getFullYear()}-${String(data.getMonth()+1).padStart(2,'0')}-${String(data.getDate()).padStart(2,'0')}`;
+
+        const barbeiros = admins.map(a => a.nome);
+        const servicosFormatados = servicos.map(s => ({
+            nome: s.nome,
+            valor: parseFloat(s.valor).toFixed(2).replace('.', ',')
+        }));
+
+        res.render('editar', {
+            agendamento: plain,
+            barbeiros,
+            servicos: servicosFormatados
         });
+
+    } catch (error) {
+        res.status(500).send('Erro ao buscar agendamento: ' + error.message);
+    }
 });
 
 // LISTA TODOS OS SERVIÇOS (admin — inclui inativos)
@@ -412,7 +514,8 @@ app.post('/editar/:id', isAdminAuthenticated, (req, res) => {
             telefone: req.body.telefone,
             data: req.body.data,
             horario: req.body.horario,
-            servico: req.body.servico
+            servico: req.body.servico,
+            barbeiro: req.body.barbeiro  
         },
         { where: { id: id } }
     ).then(() => {

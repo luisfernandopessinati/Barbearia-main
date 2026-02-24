@@ -393,25 +393,24 @@ header .header-titulo span {
 }
 
 swiper-container {
-    width: 900px;
+    width: 85%;
     height: auto;
     margin: auto;
 }
 
 swiper-slide {
     text-align: center;
-    background: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 40px 0;
+    margin: 20px 0;
 }
 
 swiper-slide img {
-    display: block;
-    width: 100%;
-    height: 100%;
+    max-width: 70%;    /* limite máximo */
+    aspect-ratio: 3 / 4;
     object-fit: cover;
+    border-radius: 12px;
 }
 
 .nome-profissional {
@@ -425,6 +424,22 @@ swiper-slide img {
     margin: 0;
     font-size: 16px;
 }
+
+
+/*Barbeiro */
+
+.barbers-label {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.panel-left {
+    color: #fff;
+}
+
+/* whatsapp*/
 
 .whatsapp-fixed {
     position: fixed;
@@ -467,4 +482,304 @@ footer .fa-arrow-up {
 footer p {
     color: var(--light);
     font-weight: 500;
+}
+
+/* ============================================================
+   MENU CONFIGURAÇÕES — botão + dropdown
+   ============================================================ */
+
+.config-menu-wrap {
+    position: relative;
+    display: inline-block;
+}
+
+.btn-config-menu {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-config-menu:hover,
+.btn-config-menu.open {
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+.btn-config-menu .menu-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 14px;
+}
+
+.btn-config-menu .menu-icon span {
+    display: block;
+    height: 1.5px;
+    background: currentColor;
+    border-radius: 2px;
+    transition: all 0.2s;
+}
+
+/* Ícone animado → X quando aberto */
+.btn-config-menu.open .menu-icon span:nth-child(1) {
+    transform: translateY(4.5px) rotate(45deg);
+}
+.btn-config-menu.open .menu-icon span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+}
+.btn-config-menu.open .menu-icon span:nth-child(3) {
+    transform: translateY(-4.5px) rotate(-45deg);
+}
+
+/* Dropdown */
+.config-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    min-width: 210px;
+    padding: 6px;
+    z-index: 150;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-6px) scale(0.98);
+    transform-origin: top right;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    box-shadow: 0 16px 40px #00000088;
+}
+
+.config-dropdown.open {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0) scale(1);
+}
+
+.config-dropdown-label {
+    font-size: 9px;
+    letter-spacing: 2.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding: 8px 10px 4px;
+}
+
+.config-dropdown-sep {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 0;
+}
+
+.config-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 9px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+}
+
+.config-dropdown-item:hover {
+    background: var(--bg3);
+    color: var(--text);
+}
+
+.config-dropdown-item .item-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+    transition: all 0.15s;
+}
+
+.config-dropdown-item:hover .item-icon {
+    background: var(--gold-dim);
+    border-color: var(--gold);
+}
+
+.config-dropdown-item .item-label {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.config-dropdown-item .item-label span {
+    font-size: 13px;
+    font-weight: 500;
+    color: inherit;
+}
+
+.config-dropdown-item .item-label small {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 400;
+}
+
+/* Badge "novo" */
+.item-badge {
+    margin-left: auto;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: var(--gold-dim);
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    padding: 1px 6px;
+    border-radius: 10px;
+}
+
+/* ============================================================
+   MODAL ADMINS
+   ============================================================ */
+
+.admin-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.admin-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+}
+
+.admin-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), #6b4c00);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.admin-item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.admin-item-nome {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.admin-item-email {
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.admin-item-role {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    background: var(--bg);
+}
+
+.admin-item-role.owner {
+    background: var(--gold-dim);
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+.admin-del {
+    background: none;
+    border: none;
+    color: var(--danger);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+    opacity: 0.6;
+}
+
+.admin-del:hover {
+    background: var(--danger-dim);
+    opacity: 1;
+}
+
+.admins-empty {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 20px;
+}
+
+.admins-sep {
+    height: 1px;
+    background: var(--border);
+    margin: 20px 0;
+}
+
+/* Password toggle */
+.input-pass-wrap {
+    position: relative;
+}
+
+.input-pass-wrap input {
+    padding-right: 40px !important;
+}
+
+.btn-toggle-pass {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 2px;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.btn-toggle-pass:hover {
+    color: var(--gold);
 }

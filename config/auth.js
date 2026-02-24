@@ -23,9 +23,9 @@ module.exports = function (passport) {
             // Comparar a senha fornecida com a senha armazenada utilizando bcrypt
             const isValidPassword = await bcrypt.compare(senha, user.senha);
 
-            console.log('Senha digitada:', senha);
-            console.log('Senha armazenada no banco:', user.senha);
-            console.log('Comparação de senhas válida?', isValidPassword);
+           // console.log('Senha digitada:', senha);
+           // console.log('Senha armazenada no banco:', user.senha);
+           // console.log('Comparação de senhas válida?', isValidPassword);
 
             if (!isValidPassword) {
                 console.log('Senha incorreta para o email:', email);

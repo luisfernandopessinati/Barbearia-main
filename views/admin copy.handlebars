@@ -53,43 +53,23 @@
     .section-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 20px; }
     .section-head h2 { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--text); letter-spacing: 1px; }
     .section-head span { font-size: 12px; color: var(--muted); letter-spacing: 1px; }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* ── KANBAN (modo Todos) ── */
-    .kanban-board { display: flex; gap: 16px; align-items: flex-start; overflow-x: auto; padding-bottom: 12px; }
-    .kanban-board::-webkit-scrollbar { height: 4px; }
-    .kanban-board::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-    .kanban-col { flex: 0 0 230px; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-    .kanban-col-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .kanban-col-name { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 2px; color: var(--text); }
-    .kanban-col-badge { font-family: 'Bebas Neue', sans-serif; font-size: 15px; color: var(--gold); background: var(--gold-dim); border: 1px solid var(--gold); border-radius: 20px; padding: 0 8px; line-height: 1.7; flex-shrink: 0; }
-    .kanban-col-body { padding: 8px; display: flex; flex-direction: column; gap: 6px; min-height: 60px; }
-    .kanban-empty { text-align: center; color: var(--muted); font-size: 11px; padding: 18px 0; opacity: 0.5; }
-
-    /* ── Card compacto ── */
-    .appt-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px 9px 15px; transition: border-color 0.15s; animation: fadeUp 0.25s ease both; position: relative; overflow: hidden; }
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+    .appt-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; transition: border-color 0.2s, transform 0.2s; animation: fadeUp 0.3s ease both; position: relative; overflow: hidden; }
     .appt-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--gold); border-radius: 2px 0 0 2px; }
-    .appt-card:hover { border-color: #2a2a2a; }
-    .card-main { display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; }
-    .card-time { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--gold); letter-spacing: 1px; line-height: 1; flex-shrink: 0; }
-    .card-name { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .card-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 7px; overflow: hidden; }
-    .card-servico { font-size: 11px; color: var(--muted); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .card-tel { font-size: 11px; color: var(--muted); flex-shrink: 0; }
-    .card-actions { display: flex; gap: 5px; }
-    .btn-edit, .btn-del { flex: 1; padding: 4px 6px; border-radius: 5px; font-size: 11px; font-family: 'DM Sans', sans-serif; cursor: pointer; text-decoration: none; text-align: center; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 3px; }
-    .btn-edit { background: var(--bg2); border: 1px solid var(--border); color: var(--muted); }
+    .appt-card:hover { border-color: #333; transform: translateY(-2px); }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .card-time { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--gold); letter-spacing: 1px; line-height: 1; margin-bottom: 12px; }
+    .card-name { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+    .card-tel { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+    .card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+    .tag { font-size: 11px; padding: 3px 10px; border-radius: 20px; background: var(--bg3); border: 1px solid var(--border); color: #aaa; }
+    .tag.barbeiro { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+    .card-actions { display: flex; gap: 8px; border-top: 1px solid var(--border); padding-top: 14px; }
+    .btn-edit, .btn-del { flex: 1; padding: 8px; border-radius: 6px; font-size: 12px; font-family: 'DM Sans', sans-serif; cursor: pointer; text-decoration: none; text-align: center; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-edit { background: var(--bg3); border: 1px solid var(--border); color: var(--muted); }
     .btn-edit:hover { border-color: var(--gold); color: var(--gold); }
     .btn-del { background: var(--danger-dim); border: 1px solid var(--danger); color: var(--danger); }
     .btn-del:hover { background: var(--danger); color: #fff; }
-
-    /* ── Lista (modo barbeiro único) ── */
-    .agenda-list { display: flex; flex-direction: column; gap: 6px; max-width: 520px; }
-    .agenda-list .appt-card { background: var(--bg2); padding: 11px 14px 11px 17px; }
-    .agenda-list .card-time { font-size: 26px; }
-    .agenda-list .card-name { font-size: 15px; }
-    .agenda-list .card-tel { font-size: 12px; }
-    .agenda-list .card-servico { font-size: 12px; }
     .empty-state { text-align: center; padding: 80px 20px; color: var(--muted); display: none; }
     .empty-state.visible { display: block; }
     .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
@@ -274,7 +254,7 @@
             <span id="section-sub"></span>
             <button class="btn-novo" id="btn-novo" title="Novo agendamento">+</button>
         </div>
-        <div id="cards-grid"></div>
+        <div class="cards-grid" id="cards-grid"></div>
         <div class="empty-state" id="empty-state">
             <div class="empty-icon">✂️</div>
             <p>Nenhum agendamento para este dia</p>
@@ -477,39 +457,15 @@
         if (filtroData === null && weekOffset === 0) { filtroData = fmtDate(today); renderDateChips(); }
     }
 
-    function buildCard(a, idx) {
-        const card = document.createElement('div');
-        card.className = 'appt-card';
-        card.style.animationDelay = `${idx * 0.04}s`;
-        card.innerHTML = `
-            <div class="card-main">
-                <span class="card-time">${a.horario}</span>
-                <span class="card-name">${a.nome}</span>
-            </div>
-            <div class="card-meta">
-                <span class="card-servico">${a.servico}</span>
-                <span class="card-tel">${a.telefone}</span>
-            </div>
-            <div class="card-actions">
-                <a href="/editar/${a.id}" class="btn-edit"><i class="fa-solid fa-pen"></i> Editar</a>
-                <a href="/deletar/${a.id}" class="btn-del" onclick="return confirm('Excluir agendamento de ${a.nome}?')">
-                    <i class="fa fa-trash"></i> Excluir
-                </a>
-            </div>`;
-        return card;
-    }
-
     function renderCards() {
-        const grid   = document.getElementById('cards-grid');
-        const empty  = document.getElementById('empty-state');
-        const title  = document.getElementById('section-title');
-        const sub    = document.getElementById('section-sub');
-
+        const grid = document.getElementById('cards-grid');
+        const empty = document.getElementById('empty-state');
+        const title = document.getElementById('section-title');
+        const sub = document.getElementById('section-sub');
         let lista = todosAgendamentos;
         if (filtroData) lista = lista.filter(a => a.data === filtroData);
         if (filtroBarbeiro !== 'todos') lista = lista.filter(a => a.barbeiro === filtroBarbeiro);
         lista = lista.sort((a, b) => a.horario.localeCompare(b.horario));
-
         if (filtroData) {
             const [dd, mm, yy] = filtroData.split('/');
             const d = new Date(yy, mm-1, dd);
@@ -517,36 +473,28 @@
         }
         sub.textContent = lista.length ? `${lista.length} agendamento${lista.length > 1 ? 's' : ''}` : '';
         grid.innerHTML = '';
-        grid.className = '';
-
         if (lista.length === 0) { empty.classList.add('visible'); return; }
         empty.classList.remove('visible');
-
-        // ── KANBAN: agrupa por barbeiro quando filtro = "todos"
-        if (filtroBarbeiro === 'todos') {
-            grid.className = 'kanban-board';
-            // coleta barbeiros na ordem que aparecem
-            const barbeirosOrdem = [...new Set(lista.map(a => a.barbeiro || 'Sem barbeiro'))];
-            barbeirosOrdem.forEach(nome => {
-                const col = document.createElement('div');
-                col.className = 'kanban-col';
-                const agendsBarbeiro = lista.filter(a => (a.barbeiro || 'Sem barbeiro') === nome);
-                col.innerHTML = `
-                    <div class="kanban-col-header">
-                        <span class="kanban-col-name">${nome}</span>
-                        <span class="kanban-col-badge">${agendsBarbeiro.length}</span>
-                    </div>
-                    <div class="kanban-col-body"></div>`;
-                const body = col.querySelector('.kanban-col-body');
-                agendsBarbeiro.forEach((a, idx) => body.appendChild(buildCard(a, idx)));
-                grid.appendChild(col);
-            });
-
-        // ── LISTA: barbeiro específico → agenda vertical
-        } else {
-            grid.className = 'agenda-list';
-            lista.forEach((a, idx) => grid.appendChild(buildCard(a, idx)));
-        }
+        lista.forEach((a, idx) => {
+            const card = document.createElement('div');
+            card.className = 'appt-card';
+            card.style.animationDelay = `${idx * 0.05}s`;
+            card.innerHTML = `
+                <div class="card-time">${a.horario}</div>
+                <div class="card-name">${a.nome}</div>
+                <div class="card-tel">${a.telefone}</div>
+                <div class="card-tags">
+                    <span class="tag">${a.servico}</span>
+                    ${a.barbeiro ? `<span class="tag barbeiro">${a.barbeiro}</span>` : ''}
+                </div>
+                <div class="card-actions">
+                    <a href="/editar/${a.id}" class="btn-edit"><i class="fa-solid fa-pen"></i> Editar</a>
+                    <a href="/deletar/${a.id}" class="btn-del" onclick="return confirm('Excluir agendamento de ${a.nome}?')">
+                        <i class="fa fa-trash"></i> Excluir
+                    </a>
+                </div>`;
+            grid.appendChild(card);
+        });
     }
 
     function renderStats() {

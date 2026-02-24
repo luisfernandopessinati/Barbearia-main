@@ -28,8 +28,15 @@ const Agendamento = sequelize.define('Agendamentos', {
     servico: {
         type: DataTypes.STRING,
         allowNull: false
-    }    
+    },
+    valor: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,   // true para não quebrar agendamentos antigos
+        defaultValue: 0
+    }
 });
-//Agendamento.sync ({force:true})
-module.exports = Agendamento
 
+// Para adicionar a coluna sem apagar dados existentes, use alter:true
+// Agendamento.sync({ alter: true });
+
+module.exports = Agendamento;

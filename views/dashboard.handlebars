@@ -1,0 +1,387 @@
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+        --gold: #b8860b; --gold-light: #d4a012; --gold-dim: #b8860b33;
+        --bg: #090909; --bg2: #111111; --bg3: #181818;
+        --border: #222222; --text: #e8e8e8; --muted: #555;
+        --danger: #c0392b; --danger-dim: #c0392b22;
+    }
+
+    body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; }
+
+    /* ── Header ── */
+    .dash-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 40px; border-bottom: 1px solid var(--border); background: var(--bg2); position: sticky; top: 0; z-index: 100; }
+    .dash-header-left { display: flex; align-items: center; gap: 20px; }
+    .dash-back { color: var(--muted); text-decoration: none; font-size: 18px; transition: color 0.2s; }
+    .dash-back:hover { color: var(--gold); }
+    .dash-logo { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px; color: var(--gold); text-decoration: none; }
+    .dash-header-center { font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 4px; color: var(--muted); text-transform: uppercase; }
+
+    /* ── Body ── */
+    .dash-body { padding: 36px 40px; max-width: 1400px; margin: 0 auto; }
+
+    /* ── Período ── */
+    .periodo-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+    .periodo-bar label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+    .periodo-bar input[type="date"] { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 9px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); outline: none; transition: border-color 0.2s; }
+    .periodo-bar input[type="date"]:focus { border-color: var(--gold); }
+    .btn-filtrar { background: var(--gold); border: none; color: #000; padding: 9px 24px; border-radius: 8px; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; cursor: pointer; transition: background 0.2s; }
+    .btn-filtrar:hover { background: var(--gold-light); }
+    .periodo-sep { width: 1px; height: 28px; background: var(--border); }
+    .btn-periodo { background: var(--bg2); border: 1px solid var(--border); color: var(--muted); padding: 8px 16px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; letter-spacing: 1px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; }
+    .btn-periodo:hover, .btn-periodo.active { border-color: var(--gold); color: var(--gold); }
+
+    /* ── KPIs ── */
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+    .kpi-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; position: relative; overflow: hidden; transition: border-color 0.2s; }
+    .kpi-card:hover { border-color: #2a2a2a; }
+    .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--gold); opacity: 0.4; }
+    .kpi-card.destaque::before { opacity: 1; }
+    .kpi-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+    .kpi-value { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--text); line-height: 1; margin-bottom: 4px; }
+    .kpi-value.gold { color: var(--gold); }
+    .kpi-sub { font-size: 11px; color: var(--muted); }
+
+    /* ── Grid gráficos ── */
+    .charts-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+
+    .chart-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+    .chart-card-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 24px; }
+    .chart-card-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; color: var(--text); }
+    .chart-card-sub { font-size: 11px; color: var(--muted); }
+
+    .chart-wrap { position: relative; width: 100%; }
+    .chart-wrap.line { height: 300px; }
+
+    /* Pizza grid */
+    .pizza-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+    .pizza-item { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .pizza-item-name { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 2px; color: var(--text); }
+    .pizza-wrap { position: relative; width: 180px; height: 180px; }
+    .pizza-legend { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+    .pizza-legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+    .pizza-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .pizza-legend-label { flex: 1; }
+    .pizza-legend-val { font-weight: 500; color: var(--text); }
+
+    /* Loading */
+    .dash-loading { display: flex; align-items: center; justify-content: center; padding: 80px; color: var(--muted); gap: 12px; font-size: 13px; }
+    .dash-loading::before { content: ''; width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .dash-erro { text-align: center; padding: 80px; color: var(--danger); font-size: 13px; }
+
+    @media (max-width: 900px) {
+        .dash-body { padding: 20px 16px; }
+        .dash-header { padding: 14px 16px; }
+        .dash-header-center { display: none; }
+        .kpis { grid-template-columns: 1fr 1fr; gap: 10px; }
+        .kpi-value { font-size: 28px; }
+        .pizza-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 500px) {
+        .kpis { grid-template-columns: 1fr 1fr; }
+        .pizza-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<div class="dash-header">
+    <div class="dash-header-left">
+        <a href="/admin" class="dash-back"><i class="fa-solid fa-arrow-left"></i></a>
+        <a href="/" class="dash-logo">Barbearia</a>
+    </div>
+    <div class="dash-header-center">Dashboard</div>
+</div>
+
+<div class="dash-body">
+
+    <!-- Período -->
+    <div class="periodo-bar">
+        <label>De</label>
+        <input type="date" id="input-inicio">
+        <label>Até</label>
+        <input type="date" id="input-fim">
+        <button class="btn-filtrar" id="btn-filtrar">Filtrar</button>
+        <div class="periodo-sep"></div>
+        <button class="btn-periodo" data-dias="7">7 dias</button>
+        <button class="btn-periodo active" data-dias="30">30 dias</button>
+        <button class="btn-periodo" data-dias="90">90 dias</button>
+        <button class="btn-periodo" data-dias="365">1 ano</button>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpis" id="kpis">
+        <div class="dash-loading" style="grid-column:1/-1"></div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="charts-grid" id="charts-grid">
+        <div class="dash-loading"></div>
+    </div>
+
+</div>
+
+<script>
+(function () {
+
+    // ── Paleta de cores por barbeiro ──────────────────────
+    const CORES = [
+        '#b8860b', '#3b82f6', '#10b981', '#f59e0b',
+        '#8b5cf6', '#ef4444', '#06b6d4', '#ec4899'
+    ];
+    const CORES_PIZZA = [
+        '#b8860b','#d4a012','#f59e0b','#3b82f6','#10b981',
+        '#8b5cf6','#ef4444','#06b6d4','#ec4899','#6366f1'
+    ];
+
+    let chartLine = null;
+    const chartsPizza = {};
+
+    // ── Período inicial: últimos 30 dias ─────────────────
+    function hoje() { return new Date().toISOString().split('T')[0]; }
+    function diasAtras(n) {
+        const d = new Date();
+        d.setDate(d.getDate() - n);
+        return d.toISOString().split('T')[0];
+    }
+
+    const inputInicio = document.getElementById('input-inicio');
+    const inputFim    = document.getElementById('input-fim');
+    inputInicio.value = diasAtras(30);
+    inputFim.value    = hoje();
+
+    // ── Atalhos de período ────────────────────────────────
+    document.querySelectorAll('.btn-periodo').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.btn-periodo').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const dias = parseInt(btn.dataset.dias);
+            inputInicio.value = diasAtras(dias);
+            inputFim.value    = hoje();
+            carregar();
+        });
+    });
+
+    document.getElementById('btn-filtrar').addEventListener('click', () => {
+        document.querySelectorAll('.btn-periodo').forEach(b => b.classList.remove('active'));
+        carregar();
+    });
+
+    // ── Formata moeda ─────────────────────────────────────
+    function fmtBRL(v) {
+        return parseFloat(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    // ── Carregar dados ────────────────────────────────────
+    async function carregar() {
+        const inicio = inputInicio.value;
+        const fim    = inputFim.value;
+
+        document.getElementById('kpis').innerHTML        = '<div class="dash-loading" style="grid-column:1/-1"></div>';
+        document.getElementById('charts-grid').innerHTML = '<div class="dash-loading"></div>';
+
+        try {
+            const res  = await fetch(`/admin/dashboard/dados?inicio=${inicio}&fim=${fim}`);
+            const json = await res.json();
+            if (!res.ok) throw new Error(json.erro || 'Erro desconhecido');
+            renderKPIs(json.kpis);
+            renderGraficos(json);
+        } catch (e) {
+            document.getElementById('kpis').innerHTML        = `<div class="dash-erro" style="grid-column:1/-1">⚠ ${e.message}</div>`;
+            document.getElementById('charts-grid').innerHTML = '';
+        }
+    }
+
+    // ── KPIs ──────────────────────────────────────────────
+    function renderKPIs(kpis) {
+        document.getElementById('kpis').innerHTML = `
+            <div class="kpi-card destaque">
+                <div class="kpi-label">Agendamentos</div>
+                <div class="kpi-value gold">${kpis.totalAgendamentos}</div>
+                <div class="kpi-sub">no período</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Faturamento</div>
+                <div class="kpi-value">${fmtBRL(kpis.faturamentoTotal)}</div>
+                <div class="kpi-sub">estimado no período</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Top Barbeiro</div>
+                <div class="kpi-value" style="font-size:26px;">${kpis.topBarbeiro ? kpis.topBarbeiro.nome : '—'}</div>
+                <div class="kpi-sub">${kpis.topBarbeiro ? kpis.topBarbeiro.count + ' agendamentos' : ''}</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Serviço popular</div>
+                <div class="kpi-value" style="font-size:22px;">${kpis.topServico ? kpis.topServico.nome : '—'}</div>
+                <div class="kpi-sub">${kpis.topServico ? kpis.topServico.count + ' vezes' : ''}</div>
+            </div>`;
+    }
+
+    // ── Gráficos ──────────────────────────────────────────
+    function renderGraficos(dados) {
+        const grid = document.getElementById('charts-grid');
+        grid.innerHTML = '';
+
+        // ── LINHA: evolução por barbeiro ──────────────────
+        const barbeiros = [...new Set(
+            Object.values(dados.evolucao).flatMap(d => Object.keys(d))
+        )].sort();
+
+        const dias = Object.keys(dados.evolucao).sort();
+
+        const lineCard = document.createElement('div');
+        lineCard.className = 'chart-card';
+        lineCard.innerHTML = `
+            <div class="chart-card-header">
+                <span class="chart-card-title">Movimentação por Barbeiro</span>
+                <span class="chart-card-sub">agendamentos por dia</span>
+            </div>
+            <div class="chart-wrap line"><canvas id="chart-line"></canvas></div>`;
+        grid.appendChild(lineCard);
+
+        if (chartLine) chartLine.destroy();
+
+        const lineCtx = document.getElementById('chart-line').getContext('2d');
+        chartLine = new Chart(lineCtx, {
+            type: 'line',
+            data: {
+                labels: dias.map(d => {
+                    const [y, m, dia] = d.split('-');
+                    return `${dia}/${m}`;
+                }),
+                datasets: barbeiros.map((barb, i) => ({
+                    label: barb,
+                    data: dias.map(d => dados.evolucao[d]?.[barb] || 0),
+                    borderColor: CORES[i % CORES.length],
+                    backgroundColor: CORES[i % CORES.length] + '22',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
+                    tension: 0.4,
+                    fill: false
+                }))
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: {
+                        labels: { color: '#888', font: { family: 'DM Sans', size: 12 }, boxWidth: 12, padding: 16 }
+                    },
+                    tooltip: {
+                        backgroundColor: '#1a1a1a',
+                        borderColor: '#333',
+                        borderWidth: 1,
+                        titleColor: '#e8e8e8',
+                        bodyColor: '#888',
+                        padding: 10
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#555', font: { family: 'DM Sans', size: 11 }, maxTicksLimit: 14 },
+                        grid: { color: '#1a1a1a' }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: { color: '#555', font: { family: 'DM Sans', size: 11 }, stepSize: 1 },
+                        grid: { color: '#1a1a1a' }
+                    }
+                }
+            }
+        });
+
+        // ── PIZZA: serviços por barbeiro ──────────────────
+        const pizzaCard = document.createElement('div');
+        pizzaCard.className = 'chart-card';
+        pizzaCard.innerHTML = `
+            <div class="chart-card-header">
+                <span class="chart-card-title">Serviços por Barbeiro</span>
+                <span class="chart-card-sub">distribuição no período</span>
+            </div>
+            <div class="pizza-grid" id="pizza-grid"></div>`;
+        grid.appendChild(pizzaCard);
+
+        const pizzaGrid = document.getElementById('pizza-grid');
+
+        Object.entries(dados.servicosPorBarbeiro).forEach(([barb, servicos]) => {
+            const labels = Object.keys(servicos);
+            const valores = Object.values(servicos);
+            const total   = valores.reduce((s, v) => s + v, 0);
+            const canvasId = `pizza-${barb.replace(/\s/g, '-')}`;
+
+            const item = document.createElement('div');
+            item.className = 'pizza-item';
+            item.innerHTML = `
+                <div class="pizza-item-name">${barb}</div>
+                <div class="pizza-wrap"><canvas id="${canvasId}"></canvas></div>
+                <div class="pizza-legend" id="legend-${canvasId}"></div>`;
+            pizzaGrid.appendChild(item);
+
+            // Legenda
+            const legendEl = item.querySelector(`#legend-${canvasId}`);
+            labels.forEach((lbl, i) => {
+                const pct = ((valores[i] / total) * 100).toFixed(0);
+                legendEl.innerHTML += `
+                    <div class="pizza-legend-item">
+                        <span class="pizza-legend-dot" style="background:${CORES_PIZZA[i % CORES_PIZZA.length]}"></span>
+                        <span class="pizza-legend-label">${lbl}</span>
+                        <span class="pizza-legend-val">${valores[i]} <span style="color:var(--muted)">(${pct}%)</span></span>
+                    </div>`;
+            });
+
+            // Destroi chart anterior se existir
+            if (chartsPizza[canvasId]) chartsPizza[canvasId].destroy();
+
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            chartsPizza[canvasId] = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels,
+                    datasets: [{
+                        data: valores,
+                        backgroundColor: CORES_PIZZA.slice(0, labels.length),
+                        borderColor: '#111',
+                        borderWidth: 2,
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    cutout: '60%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1a1a1a',
+                            borderColor: '#333',
+                            borderWidth: 1,
+                            titleColor: '#e8e8e8',
+                            bodyColor: '#888',
+                            padding: 10,
+                            callbacks: {
+                                label: ctx => ` ${ctx.parsed} agendamentos (${((ctx.parsed/total)*100).toFixed(0)}%)`
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        // Mensagem se não houver dados
+        if (Object.keys(dados.servicosPorBarbeiro).length === 0) {
+            pizzaGrid.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:40px;text-align:center;grid-column:1/-1;">Nenhum agendamento no período</div>';
+        }
+    }
+
+    // ── Init ──────────────────────────────────────────────
+    carregar();
+
+})();
+</script>

@@ -303,13 +303,13 @@ async function verificarConflito(barbeiro, data, horario, idIgnorar = null) {
 }
 
 // CLIENTE AGENDA
+// CLIENTE AGENDA
 app.post('/agendar', async function (req, res) {
     const { barbeiro, data, horario, servico } = req.body;
 
-    // Pega nome e telefone da sessão do cliente logado
-    const nome = req.session.clienteNome;
+    const nome     = req.session.clienteNome;
     const telefone = req.session.clienteTelefone;
-    const email = req.session.clienteEmail;
+    const email    = req.session.clienteEmail;
 
     try {
         const ocupado = await verificarConflito(barbeiro, data, horario);
@@ -319,8 +319,12 @@ app.post('/agendar', async function (req, res) {
             });
         }
 
-        await Agendamento.create({ barbeiro, nome, email, telefone, data, horario, servico });
-        // Monta link do whatsapp
+        // Busca o valor atual do serviço
+        const servicoObj = await Servico.findOne({ where: { nome: servico } });
+        const valor = servicoObj ? parseFloat(servicoObj.valor) : 0;
+
+        await Agendamento.create({ barbeiro, nome, email, telefone, data, horario, servico, valor });
+
         const mensagem = encodeURIComponent(
             `Olá! Seu agendamento foi confirmado ✅\n\n` +
             `✂️ Serviço: ${servico}\n` +
@@ -331,10 +335,7 @@ app.post('/agendar', async function (req, res) {
         );
         const whatsappLink = `https://wa.me/5517981043899?text=${mensagem}`;
 
-        res.render('agendar', {
-            Sucesso: 'Agendamento confirmado!',
-            whatsappLink
-        });
+        res.render('agendar', { Sucesso: 'Agendamento confirmado!', whatsappLink });
 
     } catch (error) {
         res.render('agendar', { erro: "Erro: " + error.message });
@@ -353,14 +354,19 @@ app.post('/agendar/admin', isAdminAuthenticated, async (req, res) => {
             });
         }
 
-        await Agendamento.create({ barbeiro, nome, email: null, telefone, data, horario, servico });
+        // Busca o valor atual do serviço
+        const servicoObj = await Servico.findOne({ where: { nome: servico } });
+        const valor = servicoObj ? parseFloat(servicoObj.valor) : 0;
 
-        return res.status(200).json({ sucesso: true });  // ← JSON, não redirect!
+        await Agendamento.create({ barbeiro, nome, email: null, telefone, data, horario, servico, valor });
+
+        return res.status(200).json({ sucesso: true });
 
     } catch (error) {
         return res.status(500).json({ erro: error.message });
     }
 });
+
 
 // BUSCAR AGENDAMENTOS - ADMINS e SERVICOS
 app.get('/admin', isAdminAuthenticated, async (req, res) => {
@@ -402,6 +408,104 @@ app.get('/admin', isAdminAuthenticated, async (req, res) => {
     }
 });
 
+// GET /admin/dashboard/dados — dados agregados para o dashboard
+// Query params: ?inicio=2024-01-01&fim=2024-12-31
+app.get('/admin/dashboard/dados', isAdminAuthenticated, async (req, res) => {
+    try {
+        const { Op } = require('sequelize');
+
+        // Período — padrão: últimos 30 dias
+        const fim    = req.query.fim    ? new Date(req.query.fim)    : new Date();
+        const inicio = req.query.inicio ? new Date(req.query.inicio) : new Date(fim.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+        // Ajusta fim para o final do dia
+        fim.setHours(23, 59, 59, 999);
+        inicio.setHours(0, 0, 0, 0);
+
+        const agendamentos = await Agendamento.findAll({
+            where: { data: { [Op.between]: [inicio, fim] } },
+            order: [['data', 'ASC']]
+        });
+
+        const lista = agendamentos.map(a => a.get({ plain: true }));
+
+        // ── 1. Evolução diária por barbeiro ───────────────────
+        // { "2024-01-15": { "Eré": 3, "Guilherme": 2 }, ... }
+        const evolucao = {};
+        lista.forEach(a => {
+            const d = new Date(a.data);
+            d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+            const dia = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            if (!evolucao[dia]) evolucao[dia] = {};
+            const barb = a.barbeiro || 'Sem barbeiro';
+            evolucao[dia][barb] = (evolucao[dia][barb] || 0) + 1;
+        });
+
+        // ── 2. Serviços por barbeiro (para pizza) ────────────
+        // { "Eré": { "Corte": 10, "Barba": 5 }, ... }
+        const servicosPorBarbeiro = {};
+        lista.forEach(a => {
+            const barb = a.barbeiro || 'Sem barbeiro';
+            if (!servicosPorBarbeiro[barb]) servicosPorBarbeiro[barb] = {};
+            servicosPorBarbeiro[barb][a.servico] = (servicosPorBarbeiro[barb][a.servico] || 0) + 1;
+        });
+
+        // ── 3. KPIs ───────────────────────────────────────────
+        const totalAgendamentos = lista.length;
+        const faturamentoTotal  = lista.reduce((sum, a) => sum + parseFloat(a.valor || 0), 0);
+
+        // Barbeiro mais movimentado
+        const porBarbeiro = {};
+        lista.forEach(a => {
+            const barb = a.barbeiro || 'Sem barbeiro';
+            porBarbeiro[barb] = (porBarbeiro[barb] || 0) + 1;
+        });
+        const topBarbeiro = Object.entries(porBarbeiro).sort((a, b) => b[1] - a[1])[0];
+
+        // Serviço mais popular
+        const porServico = {};
+        lista.forEach(a => { porServico[a.servico] = (porServico[a.servico] || 0) + 1; });
+        const topServico = Object.entries(porServico).sort((a, b) => b[1] - a[1])[0];
+
+        // Faturamento por barbeiro
+        const faturamentoPorBarbeiro = {};
+        lista.forEach(a => {
+            const barb = a.barbeiro || 'Sem barbeiro';
+            faturamentoPorBarbeiro[barb] = (faturamentoPorBarbeiro[barb] || 0) + parseFloat(a.valor || 0);
+        });
+
+        res.json({
+            periodo: {
+                inicio: inicio.toISOString().split('T')[0],
+                fim: fim.toISOString().split('T')[0]
+            },
+            kpis: {
+                totalAgendamentos,
+                faturamentoTotal: faturamentoTotal.toFixed(2),
+                topBarbeiro: topBarbeiro ? { nome: topBarbeiro[0], count: topBarbeiro[1] } : null,
+                topServico:  topServico  ? { nome: topServico[0],  count: topServico[1]  } : null
+            },
+            evolucao,          // evolução diária por barbeiro
+            servicosPorBarbeiro, // pizza por barbeiro
+            faturamentoPorBarbeiro,
+            porBarbeiro
+        });
+
+    } catch (error) {
+        res.status(500).json({ erro: error.message });
+    }
+});
+
+// GET /admin/dashboard — renderiza a view
+app.get('/admin/dashboard', isAdminAuthenticated, async (req, res) => {
+    try {
+        const admins = await Admin.findAll({ attributes: ['nome'] });
+        const barbeiros = admins.map(a => a.nome);
+        res.render('dashboard', { barbeiros });
+    } catch (error) {
+        res.status(500).send('Erro: ' + error.message);
+    }
+});
 
 // GET - lista feriados (público, cliente também acessa)
 app.get('/feriados', async (req, res) => {

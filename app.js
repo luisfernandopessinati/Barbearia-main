@@ -327,7 +327,7 @@ app.get('/horarios-ocupados', async (req, res) => {
 });
 
 // FUNÇÃO AUXILIAR - verifica conflito de horário
-async function verificarConflito(barbeiro, data, horario, idIgnorar = null) {
+async function verificarConflito(barbeiro, data, horario, idEmpresa, idIgnorar = null) {
     const inicioDia = new Date(`${data}T00:00:00.000Z`);
     const proximoDia = new Date(`${data}T00:00:00.000Z`);
     proximoDia.setUTCDate(proximoDia.getUTCDate() + 1);
@@ -335,6 +335,7 @@ async function verificarConflito(barbeiro, data, horario, idIgnorar = null) {
     const where = {
         barbeiro,
         horario,
+        idEmpresa,
         data: {
             [Op.gte]: inicioDia,
             [Op.lt]: proximoDia
@@ -417,18 +418,42 @@ app.post('/agendar/admin', isAdminAuthenticated, async (req, res) => {
     const { barbeiro, nome, telefone, data, horario, servico } = req.body;
 
     try {
-        const ocupado = await verificarConflito(barbeiro, data, horario);
+        const idEmpresa = req.session.adminIdEmpresa;
+
+        if (!idEmpresa) {
+            return res.status(403).json({ erro: 'Empresa não identificada.' });
+        }
+
+        // 🔥 Verifica conflito já filtrando por empresa
+        const ocupado = await verificarConflito(barbeiro, data, horario, idEmpresa);
+
         if (ocupado) {
             return res.status(409).json({
                 erro: `${barbeiro} já tem agendamento às ${horario} neste dia.`
             });
         }
 
-        // Busca o valor atual do serviço
-        const servicoObj = await Servico.findOne({ where: { nome: servico } });
+        // 🔥 Busca serviço apenas da empresa correta
+        const servicoObj = await Servico.findOne({
+            where: { 
+                nome: servico,
+                idEmpresa 
+            }
+        });
+
         const valor = servicoObj ? parseFloat(servicoObj.valor) : 0;
 
-        await Agendamento.create({ barbeiro, nome, email: null, telefone, data, horario, servico, valor });
+        await Agendamento.create({
+            barbeiro,
+            nome,
+            email: null,
+            telefone,
+            data,
+            horario,
+            servico,
+            valor,
+            idEmpresa   // 👈 ESSENCIAL
+        });
 
         return res.status(200).json({ sucesso: true });
 

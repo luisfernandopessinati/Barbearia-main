@@ -65,15 +65,35 @@ app.get('/', (req, res) => {
 
 app.get('/agendar', async (req, res) => {
     try {
-        const dominio = req.hostname; // 👈 pega o domínio direto do request
-        const empresa = await Empresa.findOne({ where: { dominio } });
-        if (!empresa) return res.status(404).send('Empresa não encontrada');
+
+        const dominio = req.hostname.toLowerCase().trim();
+
+        const empresa = await Empresa.findOne({
+            where: { dominio }
+        });
+
+        if (!empresa) {
+            return res.status(404).send('Empresa não encontrada');
+        }
+
         const idEmpresa = empresa.id;
 
+        // 👇 SALVA A EMPRESA NA SESSÃO (IMPORTANTE)
+        req.session.empresaId = idEmpresa;
+
         const [agendamentos, servicos, admins] = await Promise.all([
-            Agendamento.findAll({ where: { idEmpresa }, attributes: ['data', 'horario'] }),
-            Servico.findAll({ where: { ativo: true, idEmpresa }, order: [['nome', 'ASC']] }),
-            Admin.findAll({ where: { idEmpresa }, attributes: ['nome'] })
+            Agendamento.findAll({
+                where: { idEmpresa },
+                attributes: ['data', 'horario']
+            }),
+            Servico.findAll({
+                where: { ativo: true, idEmpresa },
+                order: [['nome', 'ASC']]
+            }),
+            Admin.findAll({
+                where: { idEmpresa },
+                attributes: ['nome']
+            })
         ]);
 
         const horariosOcupados = agendamentos.map(a => ({
@@ -83,12 +103,14 @@ app.get('/agendar', async (req, res) => {
 
         const servicosFormatados = servicos.map(s => ({
             nome: s.nome,
-            valor: parseFloat(s.valor).toFixed(2).replace('.', ',')
+            valor: parseFloat(s.valor)
+                .toFixed(2)
+                .replace('.', ',')
         }));
 
         const barbeiros = admins.map(a => a.nome);
 
-        return res.render('agendar', {  // ← IMPORTANTE
+        return res.render('agendar', {
             horariosOcupados,
             servicos: servicosFormatados,
             barbeiros
@@ -96,7 +118,7 @@ app.get('/agendar', async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        return res.render('agendar', { erro: 'Erro ao carregar.' }); // ← IMPORTANTE
+        return res.render('agendar', { erro: 'Erro ao carregar.' });
     }
 });
 
@@ -125,7 +147,7 @@ async function criarEmpresa() {
         const nome = 'BARBEARIA LP';
         const fantasia = 'BARBEARIA';
         const cnpj = '123456789';
-        const dominio = 'rootssalao.com';
+        const dominio = 'localhost';
         const ativo = 'S';
 
         const empresaExistente = await Empresa.findOne({ where: { cnpj } });
@@ -418,7 +440,7 @@ app.post('/agendar/admin', isAdminAuthenticated, async (req, res) => {
     const { barbeiro, nome, telefone, data, horario, servico } = req.body;
 
     try {
-        const idEmpresa = req.session.adminIdEmpresa;
+        const idEmpresa = req.session.clienteEmpresaId || req.session.empresaId;
 
         if (!idEmpresa) {
             return res.status(403).json({ erro: 'Empresa não identificada.' });
@@ -435,9 +457,9 @@ app.post('/agendar/admin', isAdminAuthenticated, async (req, res) => {
 
         // 🔥 Busca serviço apenas da empresa correta
         const servicoObj = await Servico.findOne({
-            where: { 
+            where: {
                 nome: servico,
-                idEmpresa 
+                idEmpresa
             }
         });
 

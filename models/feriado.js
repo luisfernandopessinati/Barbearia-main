@@ -3,6 +3,10 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
 const Feriado = sequelize.define('Feriados', {
+    idEmpresa: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
     data: {
         type: DataTypes.DATEONLY,  // só a data, sem horário
         allowNull: false,

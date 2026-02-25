@@ -11,6 +11,7 @@ const Cliente = require('./models/Cliente');
 const Admin = require('./models/Admin');
 const Feriado = require('./models/feriado');
 const Servico = require('./models/servico');
+const Empresa = require('./models/Empresas');
 
 const passport = require('passport');
 const session = require('express-session');
@@ -64,10 +65,15 @@ app.get('/', (req, res) => {
 
 app.get('/agendar', async (req, res) => {
     try {
+        const dominio = req.hostname; // 👈 pega o domínio direto do request
+        const empresa = await Empresa.findOne({ where: { dominio } });
+        if (!empresa) return res.status(404).send('Empresa não encontrada');
+        const idEmpresa = empresa.id;
+
         const [agendamentos, servicos, admins] = await Promise.all([
-            Agendamento.findAll({ attributes: ['data', 'horario'] }),
-            Servico.findAll({ where: { ativo: true }, order: [['nome', 'ASC']] }),
-            Admin.findAll({ attributes: ['nome'] })
+            Agendamento.findAll({ where: { idEmpresa }, attributes: ['data', 'horario'] }),
+            Servico.findAll({ where: { ativo: true, idEmpresa }, order: [['nome', 'ASC']] }),
+            Admin.findAll({ where: { idEmpresa }, attributes: ['nome'] })
         ]);
 
         const horariosOcupados = agendamentos.map(a => ({
@@ -112,6 +118,37 @@ app.get('/logout', (req, res) => {
         res.redirect('/');
     });
 });
+
+// CRIAR empresa Padrão 
+async function criarEmpresa() {
+    try {
+        const nome = 'BARBEARIA LP';
+        const fantasia = 'BARBEARIA';
+        const cnpj = '123456789';
+        const dominio = 'rootssalao.com';
+        const ativo = 'S';
+
+        const empresaExistente = await Empresa.findOne({ where: { cnpj } });
+
+        if (empresaExistente) {
+            console.log('Empresa já existe.');
+            return;
+        }
+
+        await Empresa.create({
+            nome,
+            fantasia,
+            cnpj,
+            dominio,
+            ativo
+        });
+
+        console.log('Empresa criada com sucesso.');
+    } catch (error) {
+        console.error('Erro ao criar empresa:', error.message);
+    }
+}
+criarEmpresa();
 
 // CRIAR USUARIO ADMIN
 async function criarAdmin() {
@@ -176,13 +213,14 @@ async function criarServicosIniciais() {
 criarServicosIniciais();
 
 // ============================================================
-// ROTAS ADMINS — adicionar no app.js após a rota GET /admin
+// ROTAS ADMINS
 // ============================================================
 
 // GET /admins — lista todos os admins (para o modal)
 app.get('/admins', isAdminAuthenticated, async (req, res) => {
     try {
         const admins = await Admin.findAll({
+            where: { idEmpresa: req.user.idEmpresa },
             attributes: ['id', 'nome', 'email', 'role'],
             order: [['nome', 'ASC']]
         });
@@ -217,6 +255,7 @@ app.post('/admins', isAdminAuthenticated, async (req, res) => {
             nome: nome.trim(),
             email: emailNormalizado,
             senha: hashSenha,
+            idEmpresa: req.user.idEmpresa,
             role: role === 'owner' ? 'owner' : 'admin'   // só aceita os dois valores válidos
         });
 
@@ -231,7 +270,9 @@ app.delete('/admins/:id', isAdminAuthenticated, async (req, res) => {
     try {
         const { id } = req.params;
 
-        const admin = await Admin.findByPk(id);
+        const admin = await Admin.findOne({
+            where: { id, idEmpresa: req.user.idEmpresa } // 👈 garante que é da mesma empresa
+        });
         if (!admin) {
             return res.status(404).json({ erro: 'Admin não encontrado.' });
         }
@@ -256,6 +297,9 @@ app.get('/horarios-ocupados', async (req, res) => {
     const { barbeiro, data } = req.query;
 
     try {
+        const empresa = await Empresa.findOne({ where: { dominio: req.hostname } });
+        if (!empresa) return res.status(404).json({ erro: 'Empresa não encontrada' });
+
         const inicioDia = new Date(`${data}T00:00:00.000Z`);
         const proximoDia = new Date(`${data}T00:00:00.000Z`);
         proximoDia.setUTCDate(proximoDia.getUTCDate() + 1);
@@ -266,7 +310,8 @@ app.get('/horarios-ocupados', async (req, res) => {
                 data: {
                     [Op.gte]: inicioDia,
                     [Op.lt]: proximoDia
-                }
+                },
+                idEmpresa: empresa.id
             },
             attributes: ['horario']
         });
@@ -303,15 +348,24 @@ async function verificarConflito(barbeiro, data, horario, idIgnorar = null) {
 }
 
 // CLIENTE AGENDA
-// CLIENTE AGENDA
 app.post('/agendar', async function (req, res) {
     const { barbeiro, data, horario, servico } = req.body;
 
-    const nome     = req.session.clienteNome;
+    const nome = req.session.clienteNome;
     const telefone = req.session.clienteTelefone;
-    const email    = req.session.clienteEmail;
+    const email = req.session.clienteEmail;
 
     try {
+        // 🔥 Descobre a empresa pelo domínio
+        const dominio = req.hostname;
+        const empresa = await Empresa.findOne({ where: { dominio } });
+
+        if (!empresa) {
+            return res.status(404).send('Empresa não encontrada');
+        }
+
+        const idEmpresa = empresa.id;
+
         const ocupado = await verificarConflito(barbeiro, data, horario);
         if (ocupado) {
             return res.render('agendar', {
@@ -319,11 +373,23 @@ app.post('/agendar', async function (req, res) {
             });
         }
 
-        // Busca o valor atual do serviço
-        const servicoObj = await Servico.findOne({ where: { nome: servico } });
+        const servicoObj = await Servico.findOne({
+            where: { nome: servico, idEmpresa }  // 👈 importante
+        });
+
         const valor = servicoObj ? parseFloat(servicoObj.valor) : 0;
 
-        await Agendamento.create({ barbeiro, nome, email, telefone, data, horario, servico, valor });
+        await Agendamento.create({
+            barbeiro,
+            nome,
+            email,
+            telefone,
+            data,
+            horario,
+            servico,
+            valor,
+            idEmpresa // 👈 AGORA SIM
+        });
 
         const mensagem = encodeURIComponent(
             `Olá! Seu agendamento foi confirmado ✅\n\n` +
@@ -333,9 +399,13 @@ app.post('/agendar', async function (req, res) {
             `🕐 Horário: ${horario}\n\n` +
             `Obrigado pela preferência!`
         );
+
         const whatsappLink = `https://wa.me/5517981043899?text=${mensagem}`;
 
-        res.render('agendar', { Sucesso: 'Agendamento confirmado!', whatsappLink });
+        res.render('agendar', {
+            Sucesso: 'Agendamento confirmado!',
+            whatsappLink
+        });
 
     } catch (error) {
         res.render('agendar', { erro: "Erro: " + error.message });
@@ -371,10 +441,12 @@ app.post('/agendar/admin', isAdminAuthenticated, async (req, res) => {
 // BUSCAR AGENDAMENTOS - ADMINS e SERVICOS
 app.get('/admin', isAdminAuthenticated, async (req, res) => {
     try {
+        const idEmpresa = req.user.idEmpresa;
+
         const [agendamentos, admins, servicos] = await Promise.all([
-            Agendamento.findAll(),
-            Admin.findAll({ attributes: ['nome'] }),
-            Servico.findAll({ where: { ativo: true }, order: [['nome', 'ASC']] })
+            Agendamento.findAll({ where: { idEmpresa } }),
+            Admin.findAll({ where: { idEmpresa }, attributes: ['nome'] }),
+            Servico.findAll({ where: { ativo: true, idEmpresa }, order: [['nome', 'ASC']] })
         ]);
 
         const barbeiros = admins.map(a => a.nome);
@@ -415,7 +487,7 @@ app.get('/admin/dashboard/dados', isAdminAuthenticated, async (req, res) => {
         const { Op } = require('sequelize');
 
         // Período — padrão: últimos 30 dias
-        const fim    = req.query.fim    ? new Date(req.query.fim)    : new Date();
+        const fim = req.query.fim ? new Date(req.query.fim) : new Date();
         const inicio = req.query.inicio ? new Date(req.query.inicio) : new Date(fim.getTime() - 30 * 24 * 60 * 60 * 1000);
 
         // Ajusta fim para o final do dia
@@ -423,8 +495,9 @@ app.get('/admin/dashboard/dados', isAdminAuthenticated, async (req, res) => {
         inicio.setHours(0, 0, 0, 0);
 
         const agendamentos = await Agendamento.findAll({
-            where: { data: { [Op.between]: [inicio, fim] } },
-            order: [['data', 'ASC']]
+            where: { data: { [Op.between]: [inicio, fim] }, idEmpresa: req.user.idEmpresa },
+            order: [['data', 'ASC']],
+
         });
 
         const lista = agendamentos.map(a => a.get({ plain: true }));
@@ -435,7 +508,7 @@ app.get('/admin/dashboard/dados', isAdminAuthenticated, async (req, res) => {
         lista.forEach(a => {
             const d = new Date(a.data);
             d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-            const dia = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            const dia = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
             if (!evolucao[dia]) evolucao[dia] = {};
             const barb = a.barbeiro || 'Sem barbeiro';
             evolucao[dia][barb] = (evolucao[dia][barb] || 0) + 1;
@@ -452,7 +525,7 @@ app.get('/admin/dashboard/dados', isAdminAuthenticated, async (req, res) => {
 
         // ── 3. KPIs ───────────────────────────────────────────
         const totalAgendamentos = lista.length;
-        const faturamentoTotal  = lista.reduce((sum, a) => sum + parseFloat(a.valor || 0), 0);
+        const faturamentoTotal = lista.reduce((sum, a) => sum + parseFloat(a.valor || 0), 0);
 
         // Barbeiro mais movimentado
         const porBarbeiro = {};
@@ -483,7 +556,7 @@ app.get('/admin/dashboard/dados', isAdminAuthenticated, async (req, res) => {
                 totalAgendamentos,
                 faturamentoTotal: faturamentoTotal.toFixed(2),
                 topBarbeiro: topBarbeiro ? { nome: topBarbeiro[0], count: topBarbeiro[1] } : null,
-                topServico:  topServico  ? { nome: topServico[0],  count: topServico[1]  } : null
+                topServico: topServico ? { nome: topServico[0], count: topServico[1] } : null
             },
             evolucao,          // evolução diária por barbeiro
             servicosPorBarbeiro, // pizza por barbeiro
@@ -499,7 +572,7 @@ app.get('/admin/dashboard/dados', isAdminAuthenticated, async (req, res) => {
 // GET /admin/dashboard — renderiza a view
 app.get('/admin/dashboard', isAdminAuthenticated, async (req, res) => {
     try {
-        const admins = await Admin.findAll({ attributes: ['nome'] });
+        const admins = await Admin.findAll({ attributes: ['nome'], where: { idEmpresa: req.user.idEmpresa } });
         const barbeiros = admins.map(a => a.nome);
         res.render('dashboard', { barbeiros });
     } catch (error) {
@@ -509,15 +582,37 @@ app.get('/admin/dashboard', isAdminAuthenticated, async (req, res) => {
 
 // GET - lista feriados (público, cliente também acessa)
 app.get('/feriados', async (req, res) => {
-    const feriados = await Feriado.findAll({ attributes: ['data', 'descricao'] });
-    res.json({ feriados: feriados.map(f => ({ data: f.data, descricao: f.descricao })) });
+    try {
+        const dominio = req.hostname;
+        const empresa = await Empresa.findOne({ where: { dominio } });
+
+        if (!empresa) {
+            return res.status(404).json({ erro: 'Empresa não encontrada' });
+        }
+
+        const feriados = await Feriado.findAll({
+            attributes: ['data', 'descricao'],
+            where: { idEmpresa: empresa.id }
+        });
+
+        res.json({
+            feriados: feriados.map(f => ({
+                data: f.data,
+                descricao: f.descricao
+            }))
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ erro: 'Erro ao buscar feriados' });
+    }
 });
 
 // POST - admin cadastra feriado
 app.post('/feriados', isAdminAuthenticated, async (req, res) => {
     const { data, descricao } = req.body;
     try {
-        await Feriado.create({ data, descricao });
+        await Feriado.create({ data, descricao, idEmpresa: req.user.idEmpresa });
         res.json({ sucesso: true });
     } catch (error) {
         res.status(500).json({ erro: 'Data já cadastrada ou erro ao salvar.' });
@@ -527,7 +622,7 @@ app.post('/feriados', isAdminAuthenticated, async (req, res) => {
 // DELETE - admin remove feriado
 app.delete('/feriados/:data', isAdminAuthenticated, async (req, res) => {
     try {
-        await Feriado.destroy({ where: { data: req.params.data } });
+        await Feriado.destroy({ where: { data: req.params.data, idEmpresa: req.user.idEmpresa } });
         res.json({ sucesso: true });
     } catch (error) {
         res.status(500).json({ erro: 'Erro ao remover.' });
@@ -538,11 +633,12 @@ app.delete('/feriados/:data', isAdminAuthenticated, async (req, res) => {
 app.get('/editar/:id', isAdminAuthenticated, async (req, res) => {
     try {
         const id = req.params.id;
+        const idEmpresa = req.user.idEmpresa;
 
         const [agendamento, admins, servicos] = await Promise.all([
-            Agendamento.findByPk(id),
-            Admin.findAll({ attributes: ['nome'] }),
-            Servico.findAll({ where: { ativo: true }, order: [['nome', 'ASC']] })
+            Agendamento.findByPk(id, { where: { idEmpresa } }),
+            Admin.findAll({ where: { idEmpresa }, attributes: ['nome'] }),
+            Servico.findAll({ where: { ativo: true, idEmpresa }, order: [['nome', 'ASC']] })
         ]);
 
         if (!agendamento) return res.status(404).send('Agendamento não encontrado');
@@ -552,7 +648,7 @@ app.get('/editar/:id', isAdminAuthenticated, async (req, res) => {
         // Formata a data para yyyy-mm-dd (valor do input date)
         const data = new Date(plain.data);
         data.setMinutes(data.getMinutes() + data.getTimezoneOffset());
-        plain.data = `${data.getFullYear()}-${String(data.getMonth()+1).padStart(2,'0')}-${String(data.getDate()).padStart(2,'0')}`;
+        plain.data = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}-${String(data.getDate()).padStart(2, '0')}`;
 
         const barbeiros = admins.map(a => a.nome);
         const servicosFormatados = servicos.map(s => ({
@@ -573,7 +669,7 @@ app.get('/editar/:id', isAdminAuthenticated, async (req, res) => {
 
 // LISTA TODOS OS SERVIÇOS (admin — inclui inativos)
 app.get('/servicos/admin', isAdminAuthenticated, async (req, res) => {
-    const servicos = await Servico.findAll({ order: [['nome', 'ASC']] });
+    const servicos = await Servico.findAll({ where: { idEmpresa: req.user.idEmpresa }, order: [['nome', 'ASC']] });
     res.json({ servicos: servicos.map(s => ({ id: s.id, nome: s.nome, valor: s.valor, ativo: s.ativo })) });
 });
 
@@ -581,7 +677,7 @@ app.get('/servicos/admin', isAdminAuthenticated, async (req, res) => {
 app.post('/servicos', isAdminAuthenticated, async (req, res) => {
     const { nome, valor } = req.body;
     try {
-        await Servico.create({ nome, valor });
+        await Servico.create({ nome, valor, idEmpresa: req.user.idEmpresa });
         res.json({ sucesso: true });
     } catch (e) {
         res.status(500).json({ erro: e.message });
@@ -619,9 +715,9 @@ app.post('/editar/:id', isAdminAuthenticated, (req, res) => {
             data: req.body.data,
             horario: req.body.horario,
             servico: req.body.servico,
-            barbeiro: req.body.barbeiro  
+            barbeiro: req.body.barbeiro
         },
-        { where: { id: id } }
+        { where: { id: id, idEmpresa: req.user.idEmpresa } }
     ).then(() => {
         res.redirect('/admin');
     }).catch(error => {
@@ -634,17 +730,31 @@ app.post('/loginUsuario', async (req, res) => {
     const { nome, telefone } = req.body;
 
     try {
-        // Busca pelo telefone, se não existir cria automaticamente
-        let cliente = await Cliente.findOne({ where: { telefone } });
+        const dominio = req.hostname;
+        const empresa = await Empresa.findOne({ where: { dominio } });
 
-        if (!cliente) {
-            cliente = await Cliente.create({ nome, telefone });
+        if (!empresa) {
+            return res.status(404).send('Empresa não encontrada');
         }
 
+        const idEmpresa = empresa.id;
+
+        let cliente = await Cliente.findOne({
+            where: { telefone, idEmpresa }
+        });
+
+        if (!cliente) {
+            cliente = await Cliente.create({
+                nome,
+                telefone,
+                idEmpresa
+            });
+        }
         // Salva os dados do cliente na sessão
         req.session.clienteId = cliente.id;
         req.session.clienteNome = cliente.nome;
         req.session.clienteTelefone = cliente.telefone;
+        req.session.clienteEmpresaId = idEmpresa;
 
         res.redirect('/agendar');
 

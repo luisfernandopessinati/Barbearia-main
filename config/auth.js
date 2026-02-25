@@ -1,39 +1,46 @@
 const bcrypt = require('bcryptjs');
 const localStrategy = require('passport-local').Strategy;
 const Admin = require('../models/Admin');
+const Empresa = require('../models/Empresas'); // 👈 importa o model
 
 module.exports = function (passport) {
     passport.use('admin-local', new localStrategy({
         usernameField: 'email',
-        passwordField: 'senha'
-    }, async (email, senha, done) => {
+        passwordField: 'senha',
+        passReqToCallback: true // 👈 permite acessar req (e o dominio)
+    }, async (req, email, senha, done) => {
         try {
-            console.log('Tentativa de autenticação para o email:', email);
+            const dominio = req.body.dominio || 'localhost';
+            console.log('Domínio recebido:', dominio);
 
-            // Procurar o usuário pelo email no banco de dados
-            const user = await Admin.findOne({ where: { email } });
+            // 1. Valida a empresa pelo domínio
+            const empresa = await Empresa.findOne({ where: { dominio } });
+            if (!empresa) {
+                console.log('Empresa não encontrada para o domínio:', dominio);
+                return done(null, false, { message: 'Empresa não encontrada.' });
+            }
+
+            console.log('Empresa encontrada:', empresa.id);
+
+            // 2. Busca o admin dentro dessa empresa
+            const user = await Admin.findOne({ 
+                where: { email, idEmpresa: empresa.id } 
+            });
 
             if (!user) {
-                console.log('Usuário não encontrado para o email:', email);
+                console.log('Usuário não encontrado:', email);
                 return done(null, false, { message: 'Usuário não encontrado.' });
             }
 
-            console.log('Usuário encontrado:', user);
-
-            // Comparar a senha fornecida com a senha armazenada utilizando bcrypt
+            // 3. Valida a senha
             const isValidPassword = await bcrypt.compare(senha, user.senha);
-
-           // console.log('Senha digitada:', senha);
-           // console.log('Senha armazenada no banco:', user.senha);
-           // console.log('Comparação de senhas válida?', isValidPassword);
-
             if (!isValidPassword) {
-                console.log('Senha incorreta para o email:', email);
                 return done(null, false, { message: 'Senha incorreta.' });
             }
 
-            console.log('Autenticação bem-sucedida para o email:', email);
+            console.log('Autenticação bem-sucedida! Empresa:', empresa.idEmpresa);
             return done(null, user);
+
         } catch (error) {
             console.error('Erro durante a autenticação:', error);
             return done(error, false);
@@ -49,7 +56,6 @@ module.exports = function (passport) {
             const user = await Admin.findByPk(id);
             done(null, user);
         } catch (error) {
-            console.error('Erro ao desserializar o usuário:', error);
             done(error, null);
         }
     });

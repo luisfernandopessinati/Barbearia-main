@@ -2,6 +2,10 @@ const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/db'); 
 
 const Agendamento = sequelize.define('Agendamentos', {
+    idEmpresa: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
     barbeiro: {
         type: DataTypes.STRING 
     },

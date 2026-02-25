@@ -1,0 +1,379 @@
+<div class="adm-content">
+
+  <!-- HEADER DA PÁGINA -->
+  <div class="prod-header">
+    <button class="btn-gold" onclick="abrirModal()">+ Incluir Produto</button>
+  </div>
+
+  <div class="section-head">
+    <h2>Produtos</h2>
+    <span>{{totalProdutos}} itens cadastrados</span>
+  </div>
+
+  <!-- FILTROS -->
+  <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+    <input
+      type="text"
+      id="buscaProd"
+      placeholder="Buscar por descrição..."
+      oninput="filtrarTabela()"
+      style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:9px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;flex:1;min-width:200px;"
+    >
+    <select id="filtroProdGrupo" onchange="filtrarTabela()" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:9px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;">
+      <option value="">Todos os grupos</option>
+      {{#each grupos}}
+        <option value="{{this}}">{{this}}</option>
+      {{/each}}
+    </select>
+    <select id="filtroProdAtivo" onchange="filtrarTabela()" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:9px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;">
+      <option value="">Todos status</option>
+      <option value="1">Ativo</option>
+      <option value="0">Inativo</option>
+    </select>
+  </div>
+
+  <!-- TABELA -->
+  <div class="prod-card">
+    <table class="prod-table" id="prodTable">
+      <thead>
+        <tr>
+          <th>Imagem</th>
+          <th>Empresa</th>
+          <th>ID</th>
+          <th>Descrição</th>
+          <th>Grupo</th>
+          <th>Status</th>
+          <th>Custo</th>
+          <th>Preço</th>
+          <th>Estoque</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="prodBody">
+        {{#each produtos}}
+        <tr
+          data-desc="{{descricao}}"
+          data-grupo="{{grupo}}"
+          data-ativo="{{ativo}}"
+          data-id="{{id}}"
+        >
+          <td>
+            {{#if imagem}}
+              <img src="{{imagem}}" class="prod-thumb" alt="{{descricao}}">
+            {{else}}
+              <div class="prod-thumb placeholder">📦</div>
+            {{/if}}
+          </td>
+          <td style="color:var(--muted);font-size:12px;">{{idempresa}}</td>
+          <td style="font-family:'Bebas Neue',sans-serif;color:var(--gold);letter-spacing:1px;">{{id}}</td>
+          <td class="prod-desc">{{descricao}}</td>
+          <td style="color:var(--muted);">{{grupo}}</td>
+          <td>
+            <span class="status {{#if ativo}}ativo{{else}}inativo{{/if}}">
+              {{#if ativo}}Ativo{{else}}Inativo{{/if}}
+            </span>
+          </td>
+          <td style="color:var(--muted);">R$ {{formatMoeda custo}}</td>
+          <td style="font-family:'Bebas Neue',sans-serif;font-size:16px;">R$ {{formatMoeda preco}}</td>
+          <td>
+            <span class="estoque-badge {{#if (eq estoque 0)}}zerado{{/if}}">{{estoque}}</span>
+          </td>
+          <td>
+            <div style="display:flex;gap:6px;">
+              <button class="btn-icon" title="Alterar"
+                onclick="abrirModalEditar('{{id}}','{{idempresa}}','{{descricao}}','{{grupo}}','{{ativo}}','{{custo}}','{{preco}}','{{estoque}}','{{imagem}}')">
+                ✏️
+              </button>
+              <button class="btn-icon" title="Alterar Estoque"
+                onclick="abrirModalEstoque('{{id}}','{{descricao}}','{{estoque}}')">
+                📦
+              </button>
+              <button class="btn-icon delete" title="Excluir"
+                onclick="abrirModalExcluir('{{id}}','{{descricao}}')">
+                🗑
+              </button>
+            </div>
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+
+    {{#unless produtos}}
+    <div style="text-align:center;padding:60px 20px;color:var(--muted);">
+      <div style="font-size:40px;margin-bottom:12px;opacity:.3;">📦</div>
+      <p style="font-size:13px;">Nenhum produto cadastrado ainda.</p>
+    </div>
+    {{/unless}}
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     MODAL INCLUIR / ALTERAR
+════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalProduto">
+  <div class="modal" style="max-width:520px;">
+    <button class="modal-close" onclick="fecharModal('modalProduto')">✕</button>
+    <div class="modal-title" id="modalProdTitulo">Incluir Produto</div>
+    <div class="modal-sub">Preencha os dados do produto</div>
+
+    <div class="modal-grid">
+      <div class="modal-field">
+        <label>ID Empresa</label>
+        <input type="text" id="p_idempresa" placeholder="001">
+      </div>
+      <div class="modal-field">
+        <label>ID Produto</label>
+        <input type="text" id="p_id" placeholder="Automático">
+      </div>
+      <div class="modal-field full">
+        <label>Descrição</label>
+        <input type="text" id="p_descricao" placeholder="Nome do produto">
+      </div>
+      <div class="modal-field">
+        <label>Grupo</label>
+        <select id="p_grupo">
+          {{#each grupos}}
+            <option value="{{this}}">{{this}}</option>
+          {{/each}}
+        </select>
+      </div>
+      <div class="modal-field">
+        <label>Status</label>
+        <select id="p_ativo">
+          <option value="1">Ativo</option>
+          <option value="0">Inativo</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label>Custo (R$)</label>
+        <input type="number" id="p_custo" placeholder="0.00" step="0.01" min="0">
+      </div>
+      <div class="modal-field">
+        <label>Preço (R$)</label>
+        <input type="number" id="p_preco" placeholder="0.00" step="0.01" min="0">
+      </div>
+      <div class="modal-field">
+        <label>Estoque</label>
+        <input type="number" id="p_estoque" placeholder="0" min="0">
+      </div>
+      <div class="modal-field">
+        <label>Imagem (URL)</label>
+        <input type="text" id="p_imagem" placeholder="https://...">
+      </div>
+    </div>
+
+    <div id="modalProdErro" class="modal-erro"></div>
+
+    <div class="modal-actions">
+      <button class="btn-cancelar" onclick="fecharModal('modalProduto')">Cancelar</button>
+      <button class="btn-confirmar" onclick="salvarProduto()">SALVAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     MODAL ESTOQUE
+════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalEstoque">
+  <div class="modal" style="max-width:360px;text-align:center;">
+    <button class="modal-close" onclick="fecharModal('modalEstoque')">✕</button>
+    <div class="modal-title">Alterar Estoque</div>
+    <div class="modal-sub" id="estoqueProdNome">Produto</div>
+
+    <div style="margin:20px 0;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:56px;color:var(--gold);line-height:1;" id="estoqueAtualDisplay">0</div>
+      <div style="font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:4px;">Estoque atual</div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;justify-content:center;">
+      <button onclick="alterarQtd(-1)" style="width:40px;height:40px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-size:22px;cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">−</button>
+      <input type="number" id="estoqueNovoValor" value="0" min="0"
+        style="width:90px;text-align:center;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--text);outline:none;">
+      <button onclick="alterarQtd(1)" style="width:40px;height:40px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-size:22px;cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">+</button>
+    </div>
+
+    <div class="modal-actions" style="margin-top:24px;">
+      <button class="btn-cancelar" onclick="fecharModal('modalEstoque')">Cancelar</button>
+      <button class="btn-confirmar" onclick="salvarEstoque()">ATUALIZAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     MODAL EXCLUIR
+════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalExcluir">
+  <div class="modal" style="max-width:400px;">
+    <button class="modal-close" onclick="fecharModal('modalExcluir')">✕</button>
+    <div class="modal-title" style="color:var(--danger);">Excluir Produto</div>
+    <div class="modal-sub">Esta ação não pode ser desfeita.</div>
+    <p style="font-size:13px;color:var(--muted);line-height:1.7;">
+      Tem certeza que deseja excluir o produto<br>
+      <strong style="color:var(--text);" id="excluirNome"></strong>?
+    </p>
+    <div class="modal-actions" style="margin-top:24px;">
+      <button class="btn-cancelar" onclick="fecharModal('modalExcluir')">Cancelar</button>
+      <button class="btn-confirmar" style="background:var(--danger);" onclick="confirmarExcluir()">EXCLUIR</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════════════ -->
+<script>
+  let _editId = null;
+  let _estoqueId = null;
+  let _excluirId = null;
+
+  /* ── Modais ── */
+  function abrirModal() {
+    _editId = null;
+    limparForm();
+    document.getElementById('modalProdTitulo').textContent = 'Incluir Produto';
+    document.getElementById('modalProduto').classList.add('open');
+  }
+
+  function abrirModalEditar(id, idempresa, desc, grupo, ativo, custo, preco, estoque, imagem) {
+    _editId = id;
+    document.getElementById('p_id').value = id;
+    document.getElementById('p_idempresa').value = idempresa;
+    document.getElementById('p_descricao').value = desc;
+    document.getElementById('p_grupo').value = grupo;
+    document.getElementById('p_ativo').value = ativo;
+    document.getElementById('p_custo').value = custo;
+    document.getElementById('p_preco').value = preco;
+    document.getElementById('p_estoque').value = estoque;
+    document.getElementById('p_imagem').value = imagem || '';
+    document.getElementById('modalProdTitulo').textContent = 'Alterar Produto';
+    document.getElementById('modalProdErro').textContent = '';
+    document.getElementById('modalProduto').classList.add('open');
+  }
+
+  function abrirModalEstoque(id, nome, estoqueAtual) {
+    _estoqueId = id;
+    document.getElementById('estoqueProdNome').textContent = nome;
+    document.getElementById('estoqueAtualDisplay').textContent = estoqueAtual;
+    document.getElementById('estoqueNovoValor').value = estoqueAtual;
+    document.getElementById('modalEstoque').classList.add('open');
+  }
+
+  function abrirModalExcluir(id, nome) {
+    _excluirId = id;
+    document.getElementById('excluirNome').textContent = nome;
+    document.getElementById('modalExcluir').classList.add('open');
+  }
+
+  function fecharModal(id) {
+    document.getElementById(id).classList.remove('open');
+  }
+
+  function limparForm() {
+    ['p_id','p_idempresa','p_descricao','p_custo','p_preco','p_estoque','p_imagem'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('p_ativo').value = '1';
+    document.getElementById('modalProdErro').textContent = '';
+  }
+
+  /* ── Estoque +/- ── */
+  function alterarQtd(delta) {
+    const inp = document.getElementById('estoqueNovoValor');
+    inp.value = Math.max(0, (parseInt(inp.value) || 0) + delta);
+  }
+
+  /* ── Filtro ── */
+  function filtrarTabela() {
+    const busca  = document.getElementById('buscaProd').value.toLowerCase();
+    const grupo  = document.getElementById('filtroProdGrupo').value;
+    const ativo  = document.getElementById('filtroProdAtivo').value;
+
+    document.querySelectorAll('#prodBody tr').forEach(tr => {
+      const desc  = (tr.dataset.desc  || '').toLowerCase();
+      const tid   = (tr.dataset.id    || '').toLowerCase();
+      const tgrp  = tr.dataset.grupo  || '';
+      const tativ = tr.dataset.ativo  || '';
+
+      const okBusca = !busca  || desc.includes(busca) || tid.includes(busca);
+      const okGrupo = !grupo  || tgrp  === grupo;
+      const okAtivo = ativo === '' || tativ === ativo;
+
+      tr.style.display = (okBusca && okGrupo && okAtivo) ? '' : 'none';
+    });
+  }
+
+  /* ── Salvar produto (POST / PUT via fetch) ── */
+  async function salvarProduto() {
+    const desc = document.getElementById('p_descricao').value.trim();
+    if (!desc) {
+      document.getElementById('modalProdErro').textContent = 'Informe a descrição do produto.';
+      return;
+    }
+
+    const payload = {
+      idempresa : document.getElementById('p_idempresa').value.trim(),
+      id        : document.getElementById('p_id').value.trim(),
+      descricao : desc,
+      grupo     : document.getElementById('p_grupo').value,
+      ativo     : parseInt(document.getElementById('p_ativo').value),
+      custo     : parseFloat(document.getElementById('p_custo').value) || 0,
+      preco     : parseFloat(document.getElementById('p_preco').value) || 0,
+      estoque   : parseInt(document.getElementById('p_estoque').value) || 0,
+      imagem    : document.getElementById('p_imagem').value.trim(),
+    };
+
+    const url    = _editId ? `/admin/produtos/${_editId}` : '/admin/produtos';
+    const method = _editId ? 'PUT' : 'POST';
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error('Erro ao salvar.');
+      fecharModal('modalProduto');
+      location.reload();
+    } catch (e) {
+      document.getElementById('modalProdErro').textContent = e.message;
+    }
+  }
+
+  /* ── Salvar estoque ── */
+  async function salvarEstoque() {
+    const novoEstoque = parseInt(document.getElementById('estoqueNovoValor').value) || 0;
+    try {
+      const res = await fetch(`/admin/produtos/${_estoqueId}/estoque`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estoque: novoEstoque })
+      });
+      if (!res.ok) throw new Error('Erro ao atualizar estoque.');
+      fecharModal('modalEstoque');
+      location.reload();
+    } catch (e) {
+      alert(e.message);
+    }
+  }
+
+  /* ── Excluir ── */
+  async function confirmarExcluir() {
+    try {
+      const res = await fetch(`/admin/produtos/${_excluirId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Erro ao excluir.');
+      fecharModal('modalExcluir');
+      location.reload();
+    } catch (e) {
+      alert(e.message);
+    }
+  }
+
+  /* Fechar ao clicar fora */
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.classList.remove('open');
+    });
+  });
+</script>

@@ -783,3 +783,125 @@ footer p {
 .btn-toggle-pass:hover {
     color: var(--gold);
 }
+
+
+.prod-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.btn-gold {
+    background: var(--gold);
+    color: #000;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-gold:hover {
+    background: var(--gold-light);
+}
+
+.prod-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.prod-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.prod-table th {
+    text-align: left;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-bottom: 14px;
+}
+
+.prod-table td {
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+}
+
+.prod-thumb {
+    width: 45px;
+    height: 45px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: var(--bg3);
+}
+
+.prod-thumb.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+}
+
+.prod-desc {
+    font-weight: 500;
+}
+
+.status {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.status.ativo {
+    background: var(--gold-dim);
+    color: var(--gold);
+}
+
+.status.inativo {
+    background: var(--danger-dim);
+    color: var(--danger);
+}
+
+.btn-icon {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+.btn-icon.delete:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.estoque-badge {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.estoque-badge.zerado {
+    border-color: var(--danger);
+    color: var(--danger);
+}

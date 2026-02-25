@@ -1,4 +1,4 @@
-/*
+
  const Sequelize = require('sequelize')
 const sequelize = new Sequelize('barbearia', 'root', '123@qwe', {
     host: 'localhost',
@@ -14,8 +14,8 @@ sequelize.authenticate().then(function () {
 
 module.exports = sequelize;
 
-*/
- 
+
+/* 
 const Sequelize = require('sequelize')
 const sequelize = new Sequelize(
     process.env.DB_NAME,
@@ -36,3 +36,4 @@ sequelize.authenticate().then(function () {
 }) 
 
 module.exports = sequelize;
+*/

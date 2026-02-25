@@ -54,6 +54,9 @@ cd Barbearia
 3. Instale as dependências do projeto usando npm:
 ```
 npm install
+
+npm install multer
+
 ```
 4. Configure as variáveis de ambiente no arquivo .env
 ```

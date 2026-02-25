@@ -48,6 +48,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(express.static('public'));
 
+app.use('/', require('./routes/produtoRoutes'));
+
 function isAdminAuthenticated(req, res, next) {
     if (req.isAuthenticated()) return next();
     res.redirect('/loginAdmin');
@@ -109,13 +111,16 @@ app.get('/agendar', async (req, res) => {
         }));
 
         const barbeiros = admins.map(a => a.nome);
+        const agendamentoSucesso = req.session.agendamentoSucesso || null;
+        req.session.agendamentoSucesso = null; // limpa após usar
 
         return res.render('agendar', {
             horariosOcupados,
             servicos: servicosFormatados,
-            barbeiros
+            barbeiros,
+            Sucesso: agendamentoSucesso?.mensagem || null,
+            whatsappLink: agendamentoSucesso?.whatsappLink || null
         });
-
     } catch (error) {
         console.error(error);
         return res.render('agendar', { erro: 'Erro ao carregar.' });
@@ -414,11 +419,22 @@ app.post('/agendar', async function (req, res) {
             valor,
             idEmpresa
         });
+        // 👇 Monta o link do WhatsApp
+        const telefoneEmpresa = empresa.celular;
+        const mensagem = encodeURIComponent(
+            `Olá! Acabei de agendar:\n` +
+            `📅 Data: ${data}\n` +
+            `⏰ Horário: ${horario}\n` +
+            `✂️ Serviço: ${servico}\n` +
+            `👤 Profissional: ${barbeiro}`
+        );
+        const whatsappLink = `https://wa.me/55${telefoneEmpresa.replace(/\D/g, '')}?text=${mensagem}`;
 
-        return res.render('agendar', {
-            Sucesso: 'Agendamento confirmado!'
-        });
-
+        req.session.agendamentoSucesso = {
+            mensagem: 'Agendamento confirmado!',
+            whatsappLink
+        };
+        return res.redirect('/agendar');
     } catch (error) {
         return res.render('agendar', {
             erro: 'Erro: ' + error.message
@@ -431,8 +447,15 @@ app.post('/agendar/admin', isAdminAuthenticated, async (req, res) => {
     const { barbeiro, nome, telefone, data, horario, servico } = req.body;
 
     try {
-        const idEmpresa = req.session.clienteEmpresaId || req.session.empresaId;
+        const dominio = req.hostname.replace('www.', '').toLowerCase();
+        const empresa = await Empresa.findOne({ where: { dominio } });
 
+        if (!empresa) {
+            return res.status(404).send('Empresa não encontrada');
+        }
+
+        const idEmpresa = empresa.id;
+        
         if (!idEmpresa) {
             return res.status(403).json({ erro: 'Empresa não identificada.' });
         }

@@ -240,6 +240,7 @@
     .item-label span { font-size: 13px; font-weight: 500; color: inherit; }
     .item-label small { font-size: 10px; color: var(--muted); font-weight: 400; }
     .item-badge { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; background: var(--gold-dim); color: var(--gold); border: 1px solid var(--gold); padding: 1px 6px; border-radius: 10px; }
+    .item-badgeBlock { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; background: var(--danger-dim); color: var(--danger); border: 1px solid var(--danger); padding: 1px 6px; border-radius: 10px; }
 </style>
 
 <div class="adm-header">
@@ -277,6 +278,18 @@
                     <span class="item-icon">📊</span>
                     <span class="item-label"><span>Dashboard</span><small>Análises e relatórios</small></span>
                     <span class="item-badge">Novo</span>
+                </button>
+                <button class="config-dropdown-item" id="menu-vendas">
+                    <span class="item-icon">🛍️</span>
+                    <span class="item-label"><span>Vendas</span><small>Area de vendas</small></span>
+                    <span class="item-badgeBlock">Bloc</span>
+                </button>
+                <div class="config-dropdown-sep"></div>
+                <div class="config-dropdown-label">Cadastros</div>
+                <button class="config-dropdown-item" id="menu-produtos">
+                    <span class="item-icon">📦</span>
+                    <span class="item-label"><span>Produtos</span><small>Produtos</small></span>
+                    <span class="item-badgeBlock">Block</span>
                 </button>
             </div>
         </div>
@@ -956,6 +969,16 @@
     document.getElementById('menu-dashboard').addEventListener('click', () => {
         toggleDropdown(false);
         window.location.href = '/admin/dashboard'; // ← ajuste a rota se necessário
+    });
+
+    document.getElementById('menu-produtos').addEventListener('click', () => {
+        toggleDropdown(false);
+        window.location.href = '/admin/produtos'; // ← ajuste a rota se necessário
+    });
+
+    document.getElementById('menu-vendas').addEventListener('click', () => {
+        toggleDropdown(false);
+        window.location.href = '/admin/vendas'; // ← ajuste a rota se necessário
     });
 
     // ── Mobile barber chips ──────────────────────────────

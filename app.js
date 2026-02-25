@@ -373,14 +373,10 @@ async function verificarConflito(barbeiro, data, horario, idEmpresa, idIgnorar =
 // CLIENTE AGENDA
 app.post('/agendar', async function (req, res) {
     const { barbeiro, data, horario, servico } = req.body;
-
-    const nome = req.session.clienteNome;
-    const telefone = req.session.clienteTelefone;
-    const email = req.session.clienteEmail;
-
     try {
-        // 🔥 Descobre a empresa pelo domínio
-        const dominio = req.hostname;
+
+        // 🔎 Descobre empresa pelo domínio
+        const dominio = req.hostname.replace('www.', '').toLowerCase();
         const empresa = await Empresa.findOne({ where: { dominio } });
 
         if (!empresa) {
@@ -389,49 +385,44 @@ app.post('/agendar', async function (req, res) {
 
         const idEmpresa = empresa.id;
 
-        const ocupado = await verificarConflito(barbeiro, data, horario);
+        const ocupado = await verificarConflito(
+            barbeiro,
+            data,
+            horario,
+            idEmpresa
+        );
+
         if (ocupado) {
             return res.render('agendar', {
-                erro: `${barbeiro} já tem agendamento às ${horario} neste dia. Escolha outro horário.`
+                erro: `${barbeiro} já tem agendamento às ${horario} neste dia.`
             });
         }
 
         const servicoObj = await Servico.findOne({
-            where: { nome: servico, idEmpresa }  // 👈 importante
+            where: { nome: servico, idEmpresa }
         });
 
         const valor = servicoObj ? parseFloat(servicoObj.valor) : 0;
 
         await Agendamento.create({
             barbeiro,
-            nome,
-            email,
-            telefone,
+            nome: req.session.clienteNome,
+            telefone: req.session.clienteTelefone,
             data,
             horario,
             servico,
             valor,
-            idEmpresa // 👈 AGORA SIM
+            idEmpresa
         });
 
-        const mensagem = encodeURIComponent(
-            `Olá! Seu agendamento foi confirmado ✅\n\n` +
-            `✂️ Serviço: ${servico}\n` +
-            `👤 Barbeiro: ${barbeiro}\n` +
-            `📅 Data: ${data}\n` +
-            `🕐 Horário: ${horario}\n\n` +
-            `Obrigado pela preferência!`
-        );
-
-        const whatsappLink = `https://wa.me/5517981043899?text=${mensagem}`;
-
-        res.render('agendar', {
-            Sucesso: 'Agendamento confirmado!',
-            whatsappLink
+        return res.render('agendar', {
+            Sucesso: 'Agendamento confirmado!'
         });
 
     } catch (error) {
-        res.render('agendar', { erro: "Erro: " + error.message });
+        return res.render('agendar', {
+            erro: 'Erro: ' + error.message
+        });
     }
 });
 

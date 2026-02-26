@@ -1,17 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const produtoController = require('../controllers/produtoController');
-// const upload = require('../config/multer'); // se estiver usando upload
+const upload = require('../config/multer');
 
-// listar
-router.get('/admin/produtos', produtoController.listar);
+// Middleware de autenticação
+function isAdminAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) return next();
+    res.redirect('/loginAdmin');
+}
 
-// criar
-router.post('/produtos', produtoController.criar);
-// se for usar upload:
-// router.post('/produtos', upload.single('imagem'), produtoController.criar);
-
-// excluir
-router.post('/produtos/excluir/:id', produtoController.excluir);
+router.get('/admin/produtos', isAdminAuthenticated, produtoController.listar);
+router.post('/produtos', isAdminAuthenticated, upload.single('imagem'), produtoController.criar);
+router.post('/produtos/excluir/:id', isAdminAuthenticated, produtoController.excluir);
+router.post('/produtos/editar/:id', isAdminAuthenticated, upload.single('imagem'), produtoController.editar);
 
 module.exports = router;

@@ -49,7 +49,21 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(express.static('public'));
 
+// Rota para cadastro de produtos 
 app.use('/', require('./routes/produtoRoutes'));
+
+
+app.engine('handlebars', engine({
+    helpers: {
+        substr: (str, start, len) => {
+            if (!str) return '';
+            return str.substring(start, start + len).toUpperCase();
+        },
+        eq: (a, b) => a === b,
+        lt: (a, b) => a < b , 
+        json: (obj) => JSON.stringify(obj) 
+    }
+}));
 
 function isAdminAuthenticated(req, res, next) {
     if (req.isAuthenticated()) return next();
@@ -135,7 +149,7 @@ app.get('/loginAdmin', (req, res) => {
 
 app.get('/loginUsuario/:token', async (req, res) => {
     const { token } = req.params;
-    
+
     const empresa = await Empresa.findOne({ where: { token_agendamento: token } });
     if (!empresa) return res.status(404).send('Empresa não encontrada');
 
@@ -144,7 +158,7 @@ app.get('/loginUsuario/:token', async (req, res) => {
 
 app.get('/loginUsuarioNovo/:token', async (req, res) => {
     const { token } = req.params;
-    
+
     const empresa = await Empresa.findOne({ where: { token_agendamento: token } });
     if (!empresa) return res.status(404).send('Empresa não encontrada');
     res.render('loginUsuarioNovo', { token });
@@ -403,11 +417,11 @@ async function verificarConflito(barbeiro, data, horario, idEmpresa, idIgnorar =
 app.post('/agendar/:token', async function (req, res) {
     const { barbeiro, data, horario, servico } = req.body;
     const { token } = req.params; // 👈 pega o token
-console.log('Token recebido:', token); // 👈 ver o que está chegando
- const empresa = await Empresa.findOne({ where: { token_agendamento: token } });
-    
+    console.log('Token recebido:', token); // 👈 ver o que está chegando
+    const empresa = await Empresa.findOne({ where: { token_agendamento: token } });
+
     console.log('Empresa encontrada:', empresa); // 👈 ver se achou
-        try {
+    try {
 
         const empresa = await Empresa.findOne({ where: { token_agendamento: token } }); // 👈 busca pelo token
 
@@ -470,7 +484,7 @@ console.log('Token recebido:', token); // 👈 ver o que está chegando
 app.post('/admin/agendar', isAdminAuthenticated, async (req, res) => {
     const { barbeiro, nome, telefone, data, horario, servico } = req.body;
     const idEmpresa = req.user.idEmpresa;
-    try {       
+    try {
         if (!idEmpresa) {
             return res.status(403).json({ erro: 'Empresa não identificada.' });
         }

@@ -87,6 +87,8 @@ const sequelize = new Sequelize('barbearia', 'root', 'root', {
 ```
 npm run dev
 ```
+npm install multer
+
 7. Abra o navegador e acesse:
 ```
 http://localhost:3333

@@ -85,3 +85,110 @@ http://localhost:3333
 
 ![]()
 
+
+
+# Cloudflare DDNS - Atualização Automática de IP
+
+Script que monitora seu IP público e atualiza automaticamente os registros DNS no Cloudflare quando ele mudar.
+
+---
+
+## 1. Pré-requisitos
+
+- Node.js instalado
+- Domínio configurado no Cloudflare
+
+---
+
+## 2. Pegando os IDs necessários
+
+### API Token
+1. Acesse cloudflare.com → **My Profile** → **API Tokens**
+2. Clique em **Create Token**
+3. Use o template **Edit zone DNS**
+4. Copie o token gerado
+
+### Zone ID
+1. Acesse cloudflare.com → clique no seu domínio
+2. Na página inicial do domínio, role para baixo no lado direito
+3. Copie o **Zone ID**
+
+### Record ID (ID do registro A)
+Rode este comando no terminal substituindo seus dados:
+
+```bash
+curl -X GET "https://api.cloudflare.com/client/v4/zones/SEU_ZONE_ID/dns_records?type=A" \
+  -H "Authorization: Bearer SEU_API_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+Procure o campo `"id"` do registro com o seu domínio.
+
+---
+
+## 3. Configurar o script
+
+Abra o `ddns.js` e preencha:
+
+```js
+const CONFIG = {
+  API_TOKEN: 'seu_api_token_aqui',
+  ZONE_ID: 'seu_zone_id_aqui',
+  REGISTROS: [
+    {
+      RECORD_ID: 'id_do_registro_A_aqui',
+      DOMINIO: 'seudominio.com'
+    }
+  ],
+  INTERVALO_MINUTOS: 5
+};
+```
+
+Para múltiplos domínios, adicione mais objetos no array `REGISTROS`.
+
+---
+
+## 4. Rodar o script
+
+```bash
+node ddns.js
+```
+
+---
+
+## 5. Rodar automaticamente com PM2 (recomendado)
+
+Para o script iniciar junto com o servidor e reiniciar se travar:
+
+```bash
+# Instalar PM2
+npm install -g pm2
+
+# Iniciar o script
+pm2 start ddns.js --name "cloudflare-ddns"
+
+# Salvar para iniciar no boot
+pm2 save
+pm2 startup
+```
+
+### Comandos úteis do PM2:
+```bash
+pm2 status                    # Ver se está rodando
+pm2 logs cloudflare-ddns      # Ver logs em tempo real
+pm2 restart cloudflare-ddns   # Reiniciar
+pm2 stop cloudflare-ddns      # Parar
+```
+
+---
+
+## 6. Logs
+
+O script gera um arquivo `ddns.log` na mesma pasta com o histórico de atualizações:
+
+```
+[25/02/2026, 10:00:00] 🚀 DDNS iniciado!
+[25/02/2026, 10:00:01] IP não mudou (189.x.x.x), nenhuma atualização necessária.
+[25/02/2026, 15:32:10] IP mudou! Antigo: 189.x.x.x → Novo: 201.x.x.x
+[25/02/2026, 15:32:11] ✅ seudominio.com atualizado para 201.x.x.x
+```

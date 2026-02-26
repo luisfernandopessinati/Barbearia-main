@@ -66,13 +66,13 @@ app.get('/', (req, res) => {
     res.render('home');
 });
 
-app.get('/agendar', async (req, res) => {
+app.get('/agendar/:token', async (req, res) => {
     try {
 
-        const dominio = req.hostname.toLowerCase().trim();
+        const { token } = req.params; // 👈 pega o token da URL
 
         const empresa = await Empresa.findOne({
-            where: { dominio }
+            where: { token_agendamento: token } // 👈 busca pelo token
         });
 
         if (!empresa) {
@@ -81,7 +81,7 @@ app.get('/agendar', async (req, res) => {
 
         const idEmpresa = empresa.id;
 
-        // 👇 SALVA A EMPRESA NA SESSÃO (IMPORTANTE)
+        // o resto permanece igual...
         req.session.empresaId = idEmpresa;
 
         const [agendamentos, servicos, admins] = await Promise.all([
@@ -113,14 +113,15 @@ app.get('/agendar', async (req, res) => {
 
         const barbeiros = admins.map(a => a.nome);
         const agendamentoSucesso = req.session.agendamentoSucesso || null;
-        req.session.agendamentoSucesso = null; // limpa após usar
+        req.session.agendamentoSucesso = null;
 
         return res.render('agendar', {
             horariosOcupados,
             servicos: servicosFormatados,
             barbeiros,
             Sucesso: agendamentoSucesso?.mensagem || null,
-            whatsappLink: agendamentoSucesso?.whatsappLink || null
+            whatsappLink: agendamentoSucesso?.whatsappLink || null,
+            token
         });
     } catch (error) {
         console.error(error);
@@ -132,12 +133,21 @@ app.get('/loginAdmin', (req, res) => {
     res.render('loginAdmin');
 });
 
-app.get('/loginUsuario', (req, res) => {
-    res.render('loginUsuario');
+app.get('/loginUsuario/:token', async (req, res) => {
+    const { token } = req.params;
+    
+    const empresa = await Empresa.findOne({ where: { token_agendamento: token } });
+    if (!empresa) return res.status(404).send('Empresa não encontrada');
+
+    res.render('loginUsuario', { token }); // 👈 passa o token para o EJS
 });
 
-app.get('/loginUsuarioNovo', (req, res) => {
-    res.render('loginUsuarioNovo');
+app.get('/loginUsuarioNovo/:token', async (req, res) => {
+    const { token } = req.params;
+    
+    const empresa = await Empresa.findOne({ where: { token_agendamento: token } });
+    if (!empresa) return res.status(404).send('Empresa não encontrada');
+    res.render('loginUsuarioNovo', { token });
 });
 
 app.get('/logout', (req, res) => {
@@ -201,24 +211,37 @@ async function criarAdmin() {
 criarAdmin();
 
 // CRIAR CLIENTES NO BANCO DE DADOS
-app.post('/loginUsuarioNovo', async (req, res) => {
-    const { nome, email, cpf, telefone, senha } = req.body;
+app.post('/loginUsuario/:token', async (req, res) => {
+    const { nome, telefone } = req.body;
+    const { token } = req.params;
 
     try {
-        // Verifique se o usuário já existe pelo email
-        const usuarioExistente = await Cliente.findOne({ where: { email } });
-        if (usuarioExistente) {
-            return res.render('loginUsuarioNovo', { errorMessage: 'Email já cadastrado.' });
-        }
-        // Crie um novo usuário
-        const hashSenha = await bcrypt.hash(senha, 10);
-        await Cliente.create({ nome, email, cpf, telefone, senha: hashSenha });
+        const empresa = await Empresa.findOne({ where: { token_agendamento: token } });
 
-        // Redirecione para a página de login após criar a conta com sucesso
-        res.render('loginUsuario', { Sucesso: 'Conta criada com sucesso!' });
+        if (!empresa) {
+            return res.status(404).send('Empresa não encontrada');
+        }
+
+        const idEmpresa = empresa.id;
+
+        let cliente = await Cliente.findOne({
+            where: { telefone, idEmpresa }
+        });
+
+        if (!cliente) {
+            cliente = await Cliente.create({ nome, telefone, idEmpresa });
+        }
+
+        req.session.clienteId = cliente.id;
+        req.session.clienteNome = cliente.nome;
+        req.session.clienteTelefone = cliente.telefone;
+        req.session.clienteEmpresaId = idEmpresa;
+
+        res.redirect(`/agendar/${token}`); // 👈 mantém o token no redirect
+
     } catch (error) {
-        console.error('Erro ao criar usuário:', error.message);
-        res.render('loginUsuarioNovo', { erro: 'Erro ao criar usuário. Tente novamente mais tarde.' });
+        console.error(error);
+        res.render('loginUsuario', { erro: 'Erro ao fazer login.', token });
     }
 });
 
@@ -322,10 +345,10 @@ app.delete('/admins/:id', isAdminAuthenticated, async (req, res) => {
 
 // RETORNA HORÁRIOS OCUPADOS POR BARBEIRO E DATA
 app.get('/horarios-ocupados', async (req, res) => {
-    const { barbeiro, data } = req.query;
+    const { barbeiro, data, token } = req.query;
 
     try {
-        const empresa = await Empresa.findOne({ where: { dominio: req.hostname } });
+        const empresa = await Empresa.findOne({ where: { token_agendamento: token } }); // 👈 busca pelo token
         if (!empresa) return res.status(404).json({ erro: 'Empresa não encontrada' });
 
         const inicioDia = new Date(`${data}T00:00:00.000Z`);
@@ -377,13 +400,16 @@ async function verificarConflito(barbeiro, data, horario, idEmpresa, idIgnorar =
 }
 
 // CLIENTE AGENDA
-app.post('/agendar', async function (req, res) {
+app.post('/agendar/:token', async function (req, res) {
     const { barbeiro, data, horario, servico } = req.body;
-    try {
+    const { token } = req.params; // 👈 pega o token
+console.log('Token recebido:', token); // 👈 ver o que está chegando
+ const empresa = await Empresa.findOne({ where: { token_agendamento: token } });
+    
+    console.log('Empresa encontrada:', empresa); // 👈 ver se achou
+        try {
 
-        // 🔎 Descobre empresa pelo domínio
-        const dominio = req.hostname.replace('www.', '').toLowerCase();
-        const empresa = await Empresa.findOne({ where: { dominio } });
+        const empresa = await Empresa.findOne({ where: { token_agendamento: token } }); // 👈 busca pelo token
 
         if (!empresa) {
             return res.status(404).send('Empresa não encontrada');
@@ -391,12 +417,7 @@ app.post('/agendar', async function (req, res) {
 
         const idEmpresa = empresa.id;
 
-        const ocupado = await verificarConflito(
-            barbeiro,
-            data,
-            horario,
-            idEmpresa
-        );
+        const ocupado = await verificarConflito(barbeiro, data, horario, idEmpresa);
 
         if (ocupado) {
             return res.render('agendar', {
@@ -420,7 +441,7 @@ app.post('/agendar', async function (req, res) {
             valor,
             idEmpresa
         });
-        // 👇 Monta o link do WhatsApp
+
         const telefoneEmpresa = empresa.celular;
         const mensagem = encodeURIComponent(
             `Olá! Acabei de agendar:\n` +
@@ -435,7 +456,9 @@ app.post('/agendar', async function (req, res) {
             mensagem: 'Agendamento confirmado!',
             whatsappLink
         };
-        return res.redirect('/agendar');
+
+        return res.redirect(`/agendar/${token}`); // 👈 redireciona mantendo o token
+
     } catch (error) {
         return res.render('agendar', {
             erro: 'Erro: ' + error.message
@@ -444,19 +467,10 @@ app.post('/agendar', async function (req, res) {
 });
 
 // ADMIN AGENDA
-app.post('/agendar/admin', isAdminAuthenticated, async (req, res) => {
+app.post('/admin/agendar', isAdminAuthenticated, async (req, res) => {
     const { barbeiro, nome, telefone, data, horario, servico } = req.body;
-
-    try {
-        const dominio = req.hostname.replace('www.', '').toLowerCase();
-        const empresa = await Empresa.findOne({ where: { dominio } });
-
-        if (!empresa) {
-            return res.status(404).send('Empresa não encontrada');
-        }
-
-        const idEmpresa = empresa.id;
-        
+    const idEmpresa = req.user.idEmpresa;
+    try {       
         if (!idEmpresa) {
             return res.status(403).json({ erro: 'Empresa não identificada.' });
         }
@@ -785,45 +799,6 @@ app.post('/editar/:id', isAdminAuthenticated, (req, res) => {
     }).catch(error => {
         res.status(500).send('Erro ao atualizar o agendamento: ' + error.message);
     });
-});
-
-// LOGIN DO USUÁRIO (CLIENTE)
-app.post('/loginUsuario', async (req, res) => {
-    const { nome, telefone } = req.body;
-
-    try {
-        const dominio = req.hostname;
-        const empresa = await Empresa.findOne({ where: { dominio } });
-
-        if (!empresa) {
-            return res.status(404).send('Empresa não encontrada');
-        }
-
-        const idEmpresa = empresa.id;
-
-        let cliente = await Cliente.findOne({
-            where: { telefone, idEmpresa }
-        });
-
-        if (!cliente) {
-            cliente = await Cliente.create({
-                nome,
-                telefone,
-                idEmpresa
-            });
-        }
-        // Salva os dados do cliente na sessão
-        req.session.clienteId = cliente.id;
-        req.session.clienteNome = cliente.nome;
-        req.session.clienteTelefone = cliente.telefone;
-        req.session.clienteEmpresaId = idEmpresa;
-
-        res.redirect('/agendar');
-
-    } catch (error) {
-        console.error(error);
-        res.render('loginUsuario', { erro: 'Erro ao fazer login.' });
-    }
 });
 
 // DELETAR AGENDAMENTOS NO BANCO DE DADOS

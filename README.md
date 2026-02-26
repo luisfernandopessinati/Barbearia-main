@@ -96,6 +96,10 @@ http://localhost:3333
 
 ![]()
 
+# Atualizar o projeto #
+git pull origin main
+npm install   # só se alterou dependências
+pm2 reload barbearia
 
 
 # Cloudflare DDNS - Atualização Automática de IP

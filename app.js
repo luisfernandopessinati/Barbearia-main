@@ -49,8 +49,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(express.static('public'));
 
-// Rota para cadastro de produtos 
+// Rotas  
 app.use('/', require('./routes/produtoRoutes'));
+
+const agendamentoRoutes = require('./routes/agendamentoRoutes');
+app.use('/api', agendamentoRoutes);
+
+const authRoutes = require('./routes/authRoutes');
+app.use('/api', authRoutes);
 
 
 app.engine('handlebars', engine({

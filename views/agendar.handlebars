@@ -511,7 +511,7 @@
     </div>
     {{/if}}
 
-    <form action="/agendar" method="post" id="form-agendar">
+    <form action="/agendar/{{token}}" method="post" id="form-agendar">
       <input type="hidden" name="barbeiro" id="input-barbeiro">
       <input type="hidden" name="data" id="input-data">
       <input type="hidden" name="horario" id="input-horario">
@@ -597,9 +597,9 @@
     grid.innerHTML = '<div class="horarios-loading">Carregando horários...</div>';
 
     try {
-      const res = await fetch(`/horarios-ocupados?barbeiro=${encodeURIComponent(state.barbeiro)}&data=${dataStr}`);
+      const res = await fetch(`/horarios-ocupados?barbeiro=${encodeURIComponent(state.barbeiro)}&data=${dataStr}&token={{token}}`);
       const json = await res.json();
-console.log('Horários ocupados:', json.ocupados);
+      console.log('Horários ocupados:', json.ocupados);
       horariosOcupados = json.ocupados || [];
     } catch (e) {
       horariosOcupados = [];
@@ -667,7 +667,7 @@ console.log('Horários ocupados:', json.ocupados);
           state.horario = null;
           document.getElementById('input-horario').value = '';
           renderCalendar();
-          await buscarHorariosOcupados();         
+          await buscarHorariosOcupados();
         });
       }
       grid.appendChild(el);

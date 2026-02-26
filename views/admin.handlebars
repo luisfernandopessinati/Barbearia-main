@@ -255,7 +255,7 @@
         <div class="config-menu-wrap">
             <button class="btn-config-menu" id="btn-config-menu">
                 <span class="menu-icon"><span></span><span></span><span></span></span>
-                Configurações
+                Menu
             </button>
             <div class="config-dropdown" id="config-dropdown">
                 <div class="config-dropdown-label">Agenda</div>
@@ -374,7 +374,7 @@
         <button class="modal-close" id="modal-close">✕</button>
         <div class="modal-title">Novo Agendamento</div>
         <p class="modal-sub">Cadastro rápido pelo admin</p>
-        <form action="/agendar/admin" method="post" id="form-admin">
+        <form action="/admin/agendar" method="post" id="form-admin">
             <div class="modal-grid">
                 <div class="modal-field full">
                     <label>Nome do cliente</label>
@@ -777,7 +777,7 @@
         btnConfirmar.textContent = 'Salvando...'; btnConfirmar.disabled = true;
         const dados = new URLSearchParams(new FormData(formAdmin));
         try {
-            const res  = await fetch('/agendar/admin', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: dados.toString() });
+            const res  = await fetch('/admin/agendar/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: dados.toString() });
             const json = await res.json();
             if (res.ok && json.sucesso) { fecharModal(); window.location.reload(); }
             else modalErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar agendamento.');

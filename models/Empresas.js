@@ -48,6 +48,11 @@ const Empresa = sequelize.define('Empresa', {
         type: DataTypes.STRING,
         allowNull: true,
         unique: true
+    },
+    token_agendamento: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true
     }
 }, {
     tableName: 'empresas',

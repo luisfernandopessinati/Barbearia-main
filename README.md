@@ -37,6 +37,17 @@ Bem-vindo ao sistema de agendamentos da barbearia! Este projeto foi desenvolvido
 8. Interface Intuitiva
 - O sistema possui uma interface de usuário simples e intuitiva, facilitando a navegação e uso do sistema.
 
+## commits 
+homologacao
+
+git add .
+git commit -m "update"
+git push origin main
+
+p´roducao
+git pull origin main
+pm2 restart all
+
 ## Pré-requisitos
 Antes de começar, certifique-se de ter as seguintes ferramentas instaladas em seu ambiente de desenvolvimento:
 - Node.js
@@ -54,8 +65,6 @@ cd Barbearia
 3. Instale as dependências do projeto usando npm:
 ```
 npm install
-
-npm install multer
 
 ```
 4. Configure as variáveis de ambiente no arquivo .env

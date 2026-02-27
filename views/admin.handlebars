@@ -87,6 +87,7 @@
     .cal-popup { position: fixed; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; z-index: 500; min-width: 200px; box-shadow: 0 16px 40px #00000099; display: none; }
     .cal-popup.open { display: block; }
     .cal-popup-nome { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+    .cal-popup-telefone { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
     .cal-popup-meta { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
     .cal-popup-actions { display: flex; gap: 8px; }
 
@@ -207,7 +208,7 @@
     .horario-prof-select { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
     .horario-prof-chip { background: var(--bg3); border: 1px solid var(--border); color: var(--muted); padding: 6px 14px; border-radius: 20px; font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.18s; }
     .horario-prof-chip.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
-    .horario-dias-grid { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+    .horario-dias-grid { gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
     .horario-dia-btn { background: var(--bg3); border: 1px solid var(--border); color: var(--muted); padding: 6px 12px; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.18s; }
     .horario-dia-btn.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
     .horarios-sep { height: 1px; background: var(--border); margin: 20px 0; }
@@ -521,6 +522,7 @@
     popup.className = 'cal-popup';
     popup.innerHTML = `
         <div class="cal-popup-nome" id="popup-nome"></div>
+        <div class="cal-popup-telefone" id="popup-telefone"></div>
         <div class="cal-popup-meta" id="popup-meta"></div>
         <div class="cal-popup-actions">
             <a id="popup-editar" href="#" class="btn-edit"><i class="fa-solid fa-pen"></i> Editar</a>
@@ -537,6 +539,7 @@
     function abrirPopup(e, a) {
         e.stopPropagation();
         document.getElementById('popup-nome').textContent = a.nome;
+        document.getElementById('popup-telefone').textContent = a.telefone;
         document.getElementById('popup-meta').textContent = `${a.horario} · ${a.servico} · ${a.barbeiro}`;
         document.getElementById('popup-editar').href = `/editar/${a.id}`;
         document.getElementById('popup-excluir').href = `/deletar/${a.id}`;
@@ -619,6 +622,7 @@
                         const ev = document.createElement('div');
                         ev.className = 'cal-event';
                         ev.innerHTML = `
+                            <span class="cal-event-nome">${a.barbeiro}</span>
                             <span class="cal-event-nome">${a.nome}</span>
                             <span class="cal-event-tel">${a.telefone}</span>`;
                         ev.addEventListener('click', e => abrirPopup(e, a));

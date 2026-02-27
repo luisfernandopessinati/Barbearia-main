@@ -13,6 +13,8 @@ const Admin = require('./models/Admin');
 const Feriado = require('./models/feriado');
 const Servico = require('./models/servico');
 const Empresa = require('./models/Empresas');
+const HorarioFuncionamento = require('./models/HorarioFuncionamento');
+const { getSlotsDisponiveis, minutesToTime, temColisao, timeToMinutes } = require('./services/slotService');
 
 const passport = require('passport');
 const session = require('express-session');
@@ -66,8 +68,8 @@ app.engine('handlebars', engine({
             return str.substring(start, start + len).toUpperCase();
         },
         eq: (a, b) => a === b,
-        lt: (a, b) => a < b , 
-        json: (obj) => JSON.stringify(obj) 
+        lt: (a, b) => a < b,
+        json: (obj) => JSON.stringify(obj)
     }
 }));
 
@@ -86,13 +88,80 @@ app.get('/', (req, res) => {
     res.render('home');
 });
 
+app.get('/slots', async (req, res) => {
+    const { profissional_id, servico_id, data, token } = req.query;
+
+    try {
+        const empresa = await Empresa.findOne({ where: { token_agendamento: token } });
+        if (!empresa) return res.status(404).json({ erro: 'Empresa não encontrada' });
+
+        const slots = await getSlotsDisponiveis({
+            profissional_id: parseInt(profissional_id),
+            servico_id: parseInt(servico_id),
+            data,
+            idEmpresa: empresa.id
+        });
+
+        res.json({ slots });
+
+    } catch (error) {
+        console.error(error);
+        res.json({ slots: [] });
+    }
+});
+
+// GET /admin/slots — para o painel admin, sem validação de horário de funcionamento
+app.get('/admin/slots', isAdminAuthenticated, async (req, res) => {
+    const { profissional_id, servico_id, data } = req.query;
+    const idEmpresa = req.user.idEmpresa;
+
+    try {
+        const servico = await Servico.findOne({ where: { id: servico_id, idEmpresa } });
+        if (!servico) return res.status(404).json({ erro: 'Serviço não encontrado' });
+
+        const duracao = servico.duracao_minutos;
+
+        // Gera slots das 07:00 às 22:00
+        const slots = [];
+        let atual = 7 * 60;
+        const fim = 22 * 60;
+        while (atual + duracao <= fim) {
+            slots.push({
+                hora_inicio: minutesToTime(atual),
+                hora_fim: minutesToTime(atual + duracao)
+            });
+            atual += duracao;
+        }
+
+        // Verifica conflitos
+        const agendamentos = await Agendamento.findAll({
+            where: {
+                profissional_id,
+                idEmpresa,
+                data,
+                status: { [Op.notIn]: ['cancelado'] },
+                hora_inicio: { [Op.not]: null }
+            },
+            attributes: ['hora_inicio', 'hora_fim']
+        });
+
+        const resultado = slots.map(slot => {
+            const ocupado = agendamentos.some(a => temColisao(slot, a));
+            return { ...slot, status: ocupado ? 'indisponivel' : 'disponivel' };
+        });
+
+        res.json({ slots: resultado });
+
+    } catch (e) {
+        res.status(500).json({ erro: e.message });
+    }
+});
+
 app.get('/agendar/:token', async (req, res) => {
     try {
-
-        const { token } = req.params; // 👈 pega o token da URL
-
+        const { token } = req.params;
         const empresa = await Empresa.findOne({
-            where: { token_agendamento: token } // 👈 busca pelo token
+            where: { token_agendamento: token }
         });
 
         if (!empresa) {
@@ -100,8 +169,6 @@ app.get('/agendar/:token', async (req, res) => {
         }
 
         const idEmpresa = empresa.id;
-
-        // o resto permanece igual...
         req.session.empresaId = idEmpresa;
 
         const [agendamentos, servicos, admins] = await Promise.all([
@@ -114,8 +181,8 @@ app.get('/agendar/:token', async (req, res) => {
                 order: [['nome', 'ASC']]
             }),
             Admin.findAll({
-                where: { idEmpresa },
-                attributes: ['nome']
+                where: { idEmpresa, ativo: 'S' },
+                attributes: ['id', 'nome'] // 👈 adicionamos id aqui
             })
         ]);
 
@@ -125,13 +192,17 @@ app.get('/agendar/:token', async (req, res) => {
         }));
 
         const servicosFormatados = servicos.map(s => ({
+            id: s.id,                       // 👈 adicionamos id
             nome: s.nome,
-            valor: parseFloat(s.valor)
-                .toFixed(2)
-                .replace('.', ',')
+            valor: parseFloat(s.valor).toFixed(2).replace('.', ','),
+            duracao_minutos: s.duracao_minutos  // 👈 adicionamos duração
         }));
 
-        const barbeiros = admins.map(a => a.nome);
+        const barbeiros = admins.map(a => ({
+            id: a.id,       // 👈 agora é objeto com id e nome
+            nome: a.nome
+        }));
+
         const agendamentoSucesso = req.session.agendamentoSucesso || null;
         req.session.agendamentoSucesso = null;
 
@@ -143,6 +214,7 @@ app.get('/agendar/:token', async (req, res) => {
             whatsappLink: agendamentoSucesso?.whatsappLink || null,
             token
         });
+
     } catch (error) {
         console.error(error);
         return res.render('agendar', { erro: 'Erro ao carregar.' });
@@ -292,7 +364,7 @@ app.get('/admins', isAdminAuthenticated, async (req, res) => {
     try {
         const admins = await Admin.findAll({
             where: { idEmpresa: req.user.idEmpresa },
-            attributes: ['id', 'nome', 'email', 'role'],
+            attributes: ['id', 'nome', 'email', 'role', 'ativo'],
             order: [['nome', 'ASC']]
         });
         res.json({ admins });
@@ -356,12 +428,38 @@ app.delete('/admins/:id', isAdminAuthenticated, async (req, res) => {
             return res.status(403).json({ erro: 'Você não pode remover sua própria conta.' });
         }
 
-        await admin.destroy();
+        await admin.update({ ativo: false });
         res.json({ sucesso: true });
     } catch (error) {
         res.status(500).json({ erro: 'Erro ao remover admin: ' + error.message });
     }
 });
+
+//reativar admin
+app.patch('/admins/:id/reativar', isAdminAuthenticated, async (req, res) => {
+    try {
+        const admin = await Admin.findOne({ where: { id: req.params.id, idEmpresa: req.user.idEmpresa } });
+        if (!admin) return res.status(404).json({ erro: 'Admin não encontrado.' });
+        await admin.update({ ativo: 'S' });
+        res.json({ sucesso: true });
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao reativar: ' + error.message });
+    }
+});
+
+// alterar o admin
+app.patch('/admins/:id/nome', isAdminAuthenticated, async (req, res) => {
+    try {
+        const { nome } = req.body;
+        if (!nome || nome.trim().length < 2) return res.status(400).json({ erro: 'Nome inválido.' });
+        const admin = await Admin.findOne({ where: { id: req.params.id, idEmpresa: req.user.idEmpresa } });
+        if (!admin) return res.status(404).json({ erro: 'Admin não encontrado.' });
+        await admin.update({ nome: nome.trim() });
+        res.json({ sucesso: true });
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao atualizar nome: ' + error.message });
+    }
+}); 
 
 // RETORNA HORÁRIOS OCUPADOS POR BARBEIRO E DATA
 app.get('/horarios-ocupados', async (req, res) => {
@@ -419,17 +517,63 @@ async function verificarConflito(barbeiro, data, horario, idEmpresa, idIgnorar =
     return !!conflito;
 }
 
-// CLIENTE AGENDA
-app.post('/agendar/:token', async function (req, res) {
-    const { barbeiro, data, horario, servico } = req.body;
-    const { token } = req.params; // 👈 pega o token
-    console.log('Token recebido:', token); // 👈 ver o que está chegando
-    const empresa = await Empresa.findOne({ where: { token_agendamento: token } });
-
-    console.log('Empresa encontrada:', empresa); // 👈 ver se achou
+// GET — lista horários de um profissional
+app.get('/horarios-funcionamento', isAdminAuthenticated, async (req, res) => {
+    const { profissional_id } = req.query;
     try {
+        const horarios = await HorarioFuncionamento.findAll({
+            where: { profissional_id, idEmpresa: req.user.idEmpresa },
+            order: [['dia_semana', 'ASC']]
+        });
+        res.json({ horarios });
+    } catch (e) {
+        res.status(500).json({ erro: e.message });
+    }
+});
 
-        const empresa = await Empresa.findOne({ where: { token_agendamento: token } }); // 👈 busca pelo token
+// POST — cria novo horário
+app.post('/horarios-funcionamento', isAdminAuthenticated, async (req, res) => {
+    const { profissional_id, dia_semana, hora_inicio, hora_fim } = req.body;
+    const idEmpresa = req.user.idEmpresa;
+    try {
+        // Verifica se já existe esse dia para esse profissional
+        const existente = await HorarioFuncionamento.findOne({
+            where: { profissional_id, dia_semana, idEmpresa }
+        });
+        if (existente) {
+            return res.status(409).json({ erro: 'Já existe um horário para este dia. Remova o anterior primeiro.' });
+        }
+        await HorarioFuncionamento.create({
+            profissional_id, dia_semana, hora_inicio, hora_fim, idEmpresa, ativo: true
+        });
+        res.json({ sucesso: true });
+    } catch (e) {
+        res.status(500).json({ erro: e.message });
+    }
+});
+
+// DELETE — remove um horário
+app.delete('/horarios-funcionamento/:id', isAdminAuthenticated, async (req, res) => {
+    try {
+        await HorarioFuncionamento.destroy({
+            where: { id: req.params.id, idEmpresa: req.user.idEmpresa }
+        });
+        res.json({ sucesso: true });
+    } catch (e) {
+        res.status(500).json({ erro: e.message });
+    }
+});
+
+// CLIENTE AGENDAapp.post('/agendar/:token', async function (req, res) {
+app.post('/agendar/:token', async function (req, res) {
+    const { barbeiro, data, horario, servico, profissional_id, hora_inicio, hora_fim, servico_id } = req.body; // 👈 adicionamos os novos
+    const { token } = req.params;
+    console.log('Token recebido:', token);
+    const empresa = await Empresa.findOne({ where: { token_agendamento: token } });
+    console.log('Empresa encontrada:', empresa);
+
+    try {
+        const empresa = await Empresa.findOne({ where: { token_agendamento: token } });
 
         if (!empresa) {
             return res.status(404).send('Empresa não encontrada');
@@ -459,7 +603,12 @@ app.post('/agendar/:token', async function (req, res) {
             horario,
             servico,
             valor,
-            idEmpresa
+            idEmpresa,
+            profissional_id: profissional_id || null,   // 👈 novo
+            hora_inicio: hora_inicio || horario || null, // 👈 novo (fallback para horario antigo)
+            hora_fim: hora_fim || null,                  // 👈 novo
+            servico_id: servico_id || null,              // 👈 novo
+            status: 'pendente'                           // 👈 novo
         });
 
         const telefoneEmpresa = empresa.celular;
@@ -477,7 +626,7 @@ app.post('/agendar/:token', async function (req, res) {
             whatsappLink
         };
 
-        return res.redirect(`/agendar/${token}`); // 👈 redireciona mantendo o token
+        return res.redirect(`/agendar/${token}`);
 
     } catch (error) {
         return res.render('agendar', {
@@ -488,14 +637,14 @@ app.post('/agendar/:token', async function (req, res) {
 
 // ADMIN AGENDA
 app.post('/admin/agendar', isAdminAuthenticated, async (req, res) => {
-    const { barbeiro, nome, telefone, data, horario, servico } = req.body;
+    const { barbeiro, nome, telefone, data, horario, servico, profissional_id, hora_inicio, hora_fim, servico_id } = req.body; // 👈 adicionamos os novos
     const idEmpresa = req.user.idEmpresa;
+
     try {
         if (!idEmpresa) {
             return res.status(403).json({ erro: 'Empresa não identificada.' });
         }
 
-        // 🔥 Verifica conflito já filtrando por empresa
         const ocupado = await verificarConflito(barbeiro, data, horario, idEmpresa);
 
         if (ocupado) {
@@ -504,12 +653,8 @@ app.post('/admin/agendar', isAdminAuthenticated, async (req, res) => {
             });
         }
 
-        // 🔥 Busca serviço apenas da empresa correta
         const servicoObj = await Servico.findOne({
-            where: {
-                nome: servico,
-                idEmpresa
-            }
+            where: { nome: servico, idEmpresa }
         });
 
         const valor = servicoObj ? parseFloat(servicoObj.valor) : 0;
@@ -523,7 +668,12 @@ app.post('/admin/agendar', isAdminAuthenticated, async (req, res) => {
             horario,
             servico,
             valor,
-            idEmpresa   // 👈 ESSENCIAL
+            idEmpresa,
+            profissional_id: profissional_id || null,    // 👈 novo
+            hora_inicio: hora_inicio || horario || null,  // 👈 novo
+            hora_fim: hora_fim || null,                   // 👈 novo
+            servico_id: servico_id || null,               // 👈 novo
+            status: 'pendente'                            // 👈 novo
         });
 
         return res.status(200).json({ sucesso: true });
@@ -533,7 +683,6 @@ app.post('/admin/agendar', isAdminAuthenticated, async (req, res) => {
     }
 });
 
-
 // BUSCAR AGENDAMENTOS - ADMINS e SERVICOS
 app.get('/admin', isAdminAuthenticated, async (req, res) => {
     try {
@@ -541,14 +690,14 @@ app.get('/admin', isAdminAuthenticated, async (req, res) => {
 
         const [agendamentos, admins, servicos] = await Promise.all([
             Agendamento.findAll({ where: { idEmpresa } }),
-            Admin.findAll({ where: { idEmpresa }, attributes: ['nome'] }),
+            Admin.findAll({ where: { idEmpresa }, attributes: ['id', 'nome', 'email', 'role', 'ativo'] }), 
             Servico.findAll({ where: { ativo: true, idEmpresa }, order: [['nome', 'ASC']] })
         ]);
 
-        const barbeiros = admins.map(a => a.nome);
+        const barbeiros = admins.map(a => ({ id: a.id, nome: a.nome })); // 👈 agora é objeto
 
-        // ← aqui dentro, depois do Promise.all
         const servicosFormatados = servicos.map(s => ({
+            id: s.id,
             nome: s.nome,
             valor: parseFloat(s.valor).toFixed(2).replace('.', ',')
         }));
@@ -669,7 +818,7 @@ app.get('/admin/dashboard/dados', isAdminAuthenticated, async (req, res) => {
 app.get('/admin/dashboard', isAdminAuthenticated, async (req, res) => {
     try {
         const admins = await Admin.findAll({ attributes: ['nome'], where: { idEmpresa: req.user.idEmpresa } });
-        const barbeiros = admins.map(a => a.nome);
+        const barbeiros = admins.map(a => ({ id: a.id, nome: a.nome }));
         res.render('dashboard', { barbeiros });
     } catch (error) {
         res.status(500).send('Erro: ' + error.message);
@@ -733,7 +882,7 @@ app.get('/editar/:id', isAdminAuthenticated, async (req, res) => {
 
         const [agendamento, admins, servicos] = await Promise.all([
             Agendamento.findByPk(id, { where: { idEmpresa } }),
-            Admin.findAll({ where: { idEmpresa }, attributes: ['nome'] }),
+            Admin.findAll({ where: { idEmpresa }, attributes: ['id', 'nome'] }),
             Servico.findAll({ where: { ativo: true, idEmpresa }, order: [['nome', 'ASC']] })
         ]);
 
@@ -746,7 +895,7 @@ app.get('/editar/:id', isAdminAuthenticated, async (req, res) => {
         data.setMinutes(data.getMinutes() + data.getTimezoneOffset());
         plain.data = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}-${String(data.getDate()).padStart(2, '0')}`;
 
-        const barbeiros = admins.map(a => a.nome);
+        const barbeiros = admins.map(a => ({ id: a.id, nome: a.nome }));
         const servicosFormatados = servicos.map(s => ({
             nome: s.nome,
             valor: parseFloat(s.valor).toFixed(2).replace('.', ',')
@@ -811,7 +960,8 @@ app.post('/editar/:id', isAdminAuthenticated, (req, res) => {
             data: req.body.data,
             horario: req.body.horario,
             servico: req.body.servico,
-            barbeiro: req.body.barbeiro
+            barbeiro: req.body.barbeiro,
+            profissional_id: req.body.profissional_id  // adiciona aqui
         },
         { where: { id: id, idEmpresa: req.user.idEmpresa } }
     ).then(() => {

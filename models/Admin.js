@@ -19,6 +19,10 @@ const Admin = sequelize.define('Admin', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    ativo: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     senha: {
         type: DataTypes.STRING,
         allowNull: false

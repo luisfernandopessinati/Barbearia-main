@@ -905,3 +905,94 @@ footer p {
     border-color: var(--danger);
     color: var(--danger);
 }
+
+/* ── Horários de Funcionamento ── */
+.horario-prof-select {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+.horario-prof-chip {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.18s;
+}
+.horario-prof-chip:hover { border-color: var(--gold-dim); color: var(--text); }
+.horario-prof-chip.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+
+.horario-dias-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 16px;
+}
+.horario-dia-btn {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 4px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.18s;
+    text-align: center;
+}
+.horario-dia-btn:hover { border-color: var(--gold-dim); color: var(--text); }
+.horario-dia-btn.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+
+.horario-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+    max-height: 240px;
+    overflow-y: auto;
+}
+.horario-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    gap: 10px;
+}
+.horario-item-dia {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 15px;
+    color: var(--gold);
+    letter-spacing: 1px;
+    min-width: 36px;
+}
+.horario-item-range {
+    font-size: 13px;
+    color: var(--text);
+    flex: 1;
+}
+.horario-item-prof {
+    font-size: 11px;
+    color: var(--muted);
+}
+.horario-del {
+    background: none;
+    border: none;
+    color: var(--danger);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+    opacity: 0.6;
+}
+.horario-del:hover { background: var(--danger-dim); opacity: 1; }
+.horarios-empty { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
+.horarios-sep { height: 1px; background: var(--border); margin: 20px 0; }

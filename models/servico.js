@@ -17,7 +17,13 @@ const Servico = sequelize.define('Servicos', {
     ativo: {
         type: DataTypes.BOOLEAN,
         defaultValue: true
-    }
+    },
+    duracao_minutos: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 60,
+    comment: 'Duração do serviço em minutos'
+}
 });
 
 //Servico.sync({ force: true });

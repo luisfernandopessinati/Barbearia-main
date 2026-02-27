@@ -1,114 +1,673 @@
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
 
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    :root {
-        --gold: #b8860b; --gold-light: #d4a012; --gold-dim: #b8860b33;
-        --bg: #090909; --bg2: #111111; --bg3: #181818;
-        --border: #222222; --text: #e8e8e8; --muted: #555;
-        --danger: #c0392b; --danger-dim: #c0392b22;
+    *,
+    *::before,
+    *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
 
-    body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; }
+    :root {
+        --gold: #b8860b;
+        --gold-light: #d4a012;
+        --gold-dim: #b8860b33;
+        --bg: #090909;
+        --bg2: #111111;
+        --bg3: #181818;
+        --border: #222222;
+        --text: #e8e8e8;
+        --muted: #555;
+        --danger: #c0392b;
+        --danger-dim: #c0392b22;
+    }
 
-    .adm-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 40px; border-bottom: 1px solid var(--border); background: var(--bg2); position: sticky; top: 0; z-index: 100; }
-    .adm-header-left { display: flex; align-items: center; gap: 20px; }
-    .adm-back { color: var(--muted); text-decoration: none; font-size: 18px; transition: color 0.2s; }
-    .adm-back:hover { color: var(--gold); }
-    .adm-logo { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px; color: var(--gold); text-decoration: none; }
-    .adm-header-center { font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 4px; color: var(--muted); text-transform: uppercase; }
-    .btn-sair { background: none; border: 1px solid var(--border); color: var(--muted); padding: 8px 20px; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
-    .btn-sair:hover { border-color: var(--danger); color: var(--danger); }
-    .adm-body { display: flex; min-height: calc(100vh - 65px); }
-    .sidebar { width: 220px; flex-shrink: 0; border-right: 1px solid var(--border); padding: 32px 0; background: var(--bg2); }
-    .sidebar-label { font-size: 10px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; padding: 0 24px; margin-bottom: 16px; }
-    .barber-tab { display: flex; align-items: center; gap: 12px; padding: 12px 24px; cursor: pointer; border-left: 3px solid transparent; transition: all 0.2s; background: none; border-right: none; border-top: none; border-bottom: none; width: 100%; text-align: left; color: var(--muted); font-family: 'DM Sans', sans-serif; }
-    .barber-tab:hover { background: var(--bg3); color: var(--text); }
-    .barber-tab.active { border-left-color: var(--gold); background: var(--bg3); color: var(--text); }
-    .barber-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #6b4c00); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 14px; color: #fff; flex-shrink: 0; }
-    .barber-tab.active .barber-avatar { background: linear-gradient(135deg, var(--gold-light), var(--gold)); }
-    .barber-name { font-size: 13px; font-weight: 500; }
-    .barber-count { margin-left: auto; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; font-size: 10px; padding: 2px 7px; color: var(--muted); }
-    .barber-tab.active .barber-count { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
-    .sidebar-sep { height: 1px; background: var(--border); margin: 20px 0; }
-    .tab-todos { display: flex; align-items: center; gap: 12px; padding: 12px 24px; cursor: pointer; border-left: 3px solid transparent; transition: all 0.2s; background: none; border-right: none; border-top: none; border-bottom: none; width: 100%; text-align: left; font-family: 'DM Sans', sans-serif; color: var(--muted); font-size: 13px; }
-    .tab-todos:hover, .tab-todos.active { background: var(--bg3); color: var(--text); border-left-color: var(--gold); }
-    .adm-content { flex: 1; padding: 36px 40px; overflow-x: auto; }
-    .date-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 32px; }
-    .date-nav-btn { background: var(--bg2); border: 1px solid var(--border); color: var(--muted); width: 34px; height: 34px; border-radius: 6px; font-size: 16px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
-    .date-nav-btn:hover { border-color: var(--gold); color: var(--gold); }
-    .date-chips { display: flex; gap: 6px; overflow-x: auto; flex: 1; padding-bottom: 2px; scrollbar-width: none; }
-    .date-chips::-webkit-scrollbar { display: none; }
-    .date-chip { flex-shrink: 0; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; cursor: pointer; transition: all 0.2s; text-align: center; min-width: 56px; }
-    .date-chip:hover { border-color: var(--gold-dim); }
-    .date-chip.active { background: var(--gold); border-color: var(--gold); }
-    .date-chip .chip-day { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; display: block; }
-    .date-chip.active .chip-day { color: #000; }
-    .date-chip .chip-num { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--text); line-height: 1.1; display: block; }
-    .date-chip.active .chip-num { color: #000; }
-    .date-chip.has-appt { position: relative; }
-    .date-chip.has-appt::after { content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: var(--gold); }
-    .date-chip.active.has-appt::after { background: #000; }
-    .section-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 20px; }
-    .section-head h2 { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--text); letter-spacing: 1px; }
-    .section-head span { font-size: 12px; color: var(--muted); letter-spacing: 1px; }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    body {
+        background: var(--bg);
+        font-family: 'DM Sans', sans-serif;
+        color: var(--text);
+        min-height: 100vh;
+    }
+
+    .adm-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 40px;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg2);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .adm-header-left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .adm-back {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 18px;
+        transition: color 0.2s;
+    }
+
+    .adm-back:hover {
+        color: var(--gold);
+    }
+
+    .adm-logo {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 20px;
+        letter-spacing: 3px;
+        color: var(--gold);
+        text-decoration: none;
+    }
+
+    .adm-header-center {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 13px;
+        letter-spacing: 4px;
+        color: var(--muted);
+        text-transform: uppercase;
+    }
+
+    .btn-sair {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 8px 20px;
+        border-radius: 6px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-sair:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+    }
+
+    .adm-body {
+        display: flex;
+        min-height: calc(100vh - 65px);
+    }
+
+    .sidebar {
+        width: 220px;
+        flex-shrink: 0;
+        border-right: 1px solid var(--border);
+        padding: 32px 0;
+        background: var(--bg2);
+    }
+
+    .sidebar-label {
+        font-size: 10px;
+        letter-spacing: 3px;
+        color: var(--muted);
+        text-transform: uppercase;
+        padding: 0 24px;
+        margin-bottom: 16px;
+    }
+
+    .barber-tab {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 24px;
+        cursor: pointer;
+        border-left: 3px solid transparent;
+        transition: all 0.2s;
+        background: none;
+        border-right: none;
+        border-top: none;
+        border-bottom: none;
+        width: 100%;
+        text-align: left;
+        color: var(--muted);
+        font-family: 'DM Sans', sans-serif;
+    }
+
+    .barber-tab:hover {
+        background: var(--bg3);
+        color: var(--text);
+    }
+
+    .barber-tab.active {
+        border-left-color: var(--gold);
+        background: var(--bg3);
+        color: var(--text);
+    }
+
+    .barber-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--gold), #6b4c00);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 14px;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .barber-tab.active .barber-avatar {
+        background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    }
+
+    .barber-name {
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .barber-count {
+        margin-left: auto;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 10px;
+        padding: 2px 7px;
+        color: var(--muted);
+    }
+
+    .barber-tab.active .barber-count {
+        background: var(--gold-dim);
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .sidebar-sep {
+        height: 1px;
+        background: var(--border);
+        margin: 20px 0;
+    }
+
+    .tab-todos {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 24px;
+        cursor: pointer;
+        border-left: 3px solid transparent;
+        transition: all 0.2s;
+        background: none;
+        border-right: none;
+        border-top: none;
+        border-bottom: none;
+        width: 100%;
+        text-align: left;
+        font-family: 'DM Sans', sans-serif;
+        color: var(--muted);
+        font-size: 13px;
+    }
+
+    .tab-todos:hover,
+    .tab-todos.active {
+        background: var(--bg3);
+        color: var(--text);
+        border-left-color: var(--gold);
+    }
+
+    .adm-content {
+        flex: 1;
+        padding: 36px 40px;
+        overflow-x: auto;
+    }
+
+    .date-nav {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 32px;
+    }
+
+    .date-nav-btn {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        width: 34px;
+        height: 34px;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .date-nav-btn:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .date-chips {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        flex: 1;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+    }
+
+    .date-chips::-webkit-scrollbar {
+        display: none;
+    }
+
+    .date-chip {
+        flex-shrink: 0;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+        min-width: 56px;
+    }
+
+    .date-chip:hover {
+        border-color: var(--gold-dim);
+    }
+
+    .date-chip.active {
+        background: var(--gold);
+        border-color: var(--gold);
+    }
+
+    .date-chip .chip-day {
+        font-size: 10px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: block;
+    }
+
+    .date-chip.active .chip-day {
+        color: #000;
+    }
+
+    .date-chip .chip-num {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 22px;
+        color: var(--text);
+        line-height: 1.1;
+        display: block;
+    }
+
+    .date-chip.active .chip-num {
+        color: #000;
+    }
+
+    .date-chip.has-appt {
+        position: relative;
+    }
+
+    .date-chip.has-appt::after {
+        content: '';
+        position: absolute;
+        bottom: 5px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--gold);
+    }
+
+    .date-chip.active.has-appt::after {
+        background: #000;
+    }
+
+    .section-head {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .section-head h2 {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 32px;
+        color: var(--text);
+        letter-spacing: 1px;
+    }
+
+    .section-head span {
+        font-size: 12px;
+        color: var(--muted);
+        letter-spacing: 1px;
+    }
+
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 
     /* ── KANBAN (modo Todos) ── */
-    .kanban-board { display: flex; gap: 16px; align-items: flex-start; overflow-x: auto; padding-bottom: 12px; }
-    .kanban-board::-webkit-scrollbar { height: 4px; }
-    .kanban-board::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-    .kanban-col { flex: 0 0 230px; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-    .kanban-col-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .kanban-col-name { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 2px; color: var(--text); }
-    .kanban-col-badge { font-family: 'Bebas Neue', sans-serif; font-size: 15px; color: var(--gold); background: var(--gold-dim); border: 1px solid var(--gold); border-radius: 20px; padding: 0 8px; line-height: 1.7; flex-shrink: 0; }
-    .kanban-col-body { padding: 8px; display: flex; flex-direction: column; gap: 6px; min-height: 60px; }
-    .kanban-empty { text-align: center; color: var(--muted); font-size: 11px; padding: 18px 0; opacity: 0.5; }
+    .kanban-board {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+        overflow-x: auto;
+        padding-bottom: 12px;
+    }
+
+    .kanban-board::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    .kanban-board::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 2px;
+    }
+
+    .kanban-col {
+        flex: 0 0 230px;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .kanban-col-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .kanban-col-name {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 15px;
+        letter-spacing: 2px;
+        color: var(--text);
+    }
+
+    .kanban-col-badge {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 15px;
+        color: var(--gold);
+        background: var(--gold-dim);
+        border: 1px solid var(--gold);
+        border-radius: 20px;
+        padding: 0 8px;
+        line-height: 1.7;
+        flex-shrink: 0;
+    }
+
+    .kanban-col-body {
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-height: 60px;
+    }
+
+    .kanban-empty {
+        text-align: center;
+        color: var(--muted);
+        font-size: 11px;
+        padding: 18px 0;
+        opacity: 0.5;
+    }
 
     /* ── Card compacto ── */
-    .appt-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px 9px 15px; transition: border-color 0.15s; animation: fadeUp 0.25s ease both; position: relative; overflow: hidden; }
-    .appt-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--gold); border-radius: 2px 0 0 2px; }
-    .appt-card:hover { border-color: #2a2a2a; }
-    .card-main { display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; }
-    .card-time { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--gold); letter-spacing: 1px; line-height: 1; flex-shrink: 0; }
-    .card-name { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .card-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 7px; overflow: hidden; }
-    .card-servico { font-size: 11px; color: var(--muted); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .card-tel { font-size: 11px; color: var(--muted); flex-shrink: 0; }
-    .card-actions { display: flex; gap: 5px; }
-    .btn-edit, .btn-del { flex: 1; padding: 4px 6px; border-radius: 5px; font-size: 11px; font-family: 'DM Sans', sans-serif; cursor: pointer; text-decoration: none; text-align: center; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 3px; }
-    .btn-edit { background: var(--bg2); border: 1px solid var(--border); color: var(--muted); }
-    .btn-edit:hover { border-color: var(--gold); color: var(--gold); }
-    .btn-del { background: var(--danger-dim); border: 1px solid var(--danger); color: var(--danger); }
-    .btn-del:hover { background: var(--danger); color: #fff; }
+    .appt-card {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 9px 12px 9px 15px;
+        transition: border-color 0.15s;
+        animation: fadeUp 0.25s ease both;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .appt-card::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: var(--gold);
+        border-radius: 2px 0 0 2px;
+    }
+
+    .appt-card:hover {
+        border-color: #2a2a2a;
+    }
+
+    .card-main {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 2px;
+    }
+
+    .card-time {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 20px;
+        color: var(--gold);
+        letter-spacing: 1px;
+        line-height: 1;
+        flex-shrink: 0;
+    }
+
+    .card-name {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .card-meta {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 7px;
+        overflow: hidden;
+    }
+
+    .card-servico {
+        font-size: 11px;
+        color: var(--muted);
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .card-tel {
+        font-size: 11px;
+        color: var(--muted);
+        flex-shrink: 0;
+    }
+
+    .card-actions {
+        display: flex;
+        gap: 5px;
+    }
+
+    .btn-edit,
+    .btn-del {
+        flex: 1;
+        padding: 4px 6px;
+        border-radius: 5px;
+        font-size: 11px;
+        font-family: 'DM Sans', sans-serif;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+    }
+
+    .btn-edit {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        color: var(--muted);
+    }
+
+    .btn-edit:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .btn-del {
+        background: var(--danger-dim);
+        border: 1px solid var(--danger);
+        color: var(--danger);
+    }
+
+    .btn-del:hover {
+        background: var(--danger);
+        color: #fff;
+    }
 
     /* ── Lista (modo barbeiro único) ── */
-    .agenda-list { display: flex; flex-direction: column; gap: 6px; max-width: 520px; }
-    .agenda-list .appt-card { background: var(--bg2); padding: 11px 14px 11px 17px; }
-    .agenda-list .card-time { font-size: 26px; }
-    .agenda-list .card-name { font-size: 15px; }
-    .agenda-list .card-tel { font-size: 12px; }
-    .agenda-list .card-servico { font-size: 12px; }
-    .empty-state { text-align: center; padding: 80px 20px; color: var(--muted); display: none; }
-    .empty-state.visible { display: block; }
-    .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
-    .empty-state p { font-size: 14px; }
-    .stats-bar { display: flex; gap: 16px; margin-bottom: 28px; }
-    .stat-item { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; flex: 1; }
-    .stat-label { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
-    .stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--text); line-height: 1; }
-    .stat-value.gold { color: var(--gold); }
+    .agenda-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        max-width: 520px;
+    }
+
+    .agenda-list .appt-card {
+        background: var(--bg2);
+        padding: 11px 14px 11px 17px;
+    }
+
+    .agenda-list .card-time {
+        font-size: 26px;
+    }
+
+    .agenda-list .card-name {
+        font-size: 15px;
+    }
+
+    .agenda-list .card-tel {
+        font-size: 12px;
+    }
+
+    .agenda-list .card-servico {
+        font-size: 12px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        color: var(--muted);
+        display: none;
+    }
+
+    .empty-state.visible {
+        display: block;
+    }
+
+    .empty-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+        opacity: 0.3;
+    }
+
+    .empty-state p {
+        font-size: 14px;
+    }
+
+    .stats-bar {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .stat-item {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px 20px;
+        flex: 1;
+    }
+
+    .stat-label {
+        font-size: 10px;
+        letter-spacing: 2px;
+        color: var(--muted);
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+
+    .stat-value {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 28px;
+        color: var(--text);
+        line-height: 1;
+    }
+
+    .stat-value.gold {
+        color: var(--gold);
+    }
+
     @media (max-width: 900px) {
-        .sidebar { display: none; }
-        .adm-content { padding: 16px; }
-        .adm-header { padding: 14px 16px; }
-        .adm-header-center { display: none; }
-        .stats-bar { flex-wrap: wrap; gap: 8px; }
-        .stat-item { padding: 10px 14px; }
-        .stat-value { font-size: 22px; }
-        .mobile-barbers { display: flex !important; }
-        .kanban-col { flex: 0 0 200px; }
+        .sidebar {
+            display: none;
+        }
+
+        .adm-content {
+            padding: 16px;
+        }
+
+        .adm-header {
+            padding: 14px 16px;
+        }
+
+        .adm-header-center {
+            display: none;
+        }
+
+        .stats-bar {
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .stat-item {
+            padding: 10px 14px;
+        }
+
+        .stat-value {
+            font-size: 22px;
+        }
+
+        .mobile-barbers {
+            display: flex !important;
+        }
+
+        .kanban-col {
+            flex: 0 0 200px;
+        }
     }
 
     /* ── Mobile barbeiros chips ── */
@@ -121,7 +680,11 @@
         background: var(--bg2);
         scrollbar-width: none;
     }
-    .mobile-barbers::-webkit-scrollbar { display: none; }
+
+    .mobile-barbers::-webkit-scrollbar {
+        display: none;
+    }
+
     .mobile-barber-chip {
         display: inline-flex;
         align-items: center;
@@ -139,108 +702,706 @@
         transition: all 0.18s;
         white-space: nowrap;
     }
-    .mobile-barber-chip:hover { border-color: var(--gold-dim); color: var(--text); }
-    .mobile-barber-chip.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+
+    .mobile-barber-chip:hover {
+        border-color: var(--gold-dim);
+        color: var(--text);
+    }
+
+    .mobile-barber-chip.active {
+        background: var(--gold-dim);
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
     .mobile-barber-chip .chip-avatar {
-        width: 22px; height: 22px; border-radius: 50%;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
         background: linear-gradient(135deg, var(--gold), #6b4c00);
-        display: flex; align-items: center; justify-content: center;
-        font-family: 'Bebas Neue', sans-serif; font-size: 11px; color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 11px;
+        color: #fff;
         flex-shrink: 0;
     }
-    .mobile-barber-chip.active .chip-avatar { background: linear-gradient(135deg, var(--gold-light), var(--gold)); }
+
+    .mobile-barber-chip.active .chip-avatar {
+        background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    }
+
     .mobile-barber-chip .chip-count {
-        background: var(--bg); border: 1px solid var(--border);
-        border-radius: 10px; font-size: 10px; padding: 1px 6px; color: var(--muted);
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 10px;
+        padding: 1px 6px;
+        color: var(--muted);
         margin-left: 2px;
     }
-    .mobile-barber-chip.active .chip-count { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
-    .btn-novo { margin-left: auto; background: var(--gold); border: none; color: #000; width: 36px; height: 36px; border-radius: 8px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.15s; flex-shrink: 0; line-height: 1; }
-    .btn-novo:hover { background: var(--gold-light); transform: scale(1.08); }
-    .modal-overlay { position: fixed; inset: 0; background: #000000cc; backdrop-filter: blur(4px); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
-    .modal-overlay.open { opacity: 1; pointer-events: all; }
-    .modal { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 36px; width: 100%; max-width: 480px; transform: translateY(16px); transition: transform 0.25s; position: relative; }
-    .modal-overlay.open .modal { transform: translateY(0); }
-    .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--text); letter-spacing: 1px; margin-bottom: 4px; }
-    .modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 28px; }
-    .modal-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; transition: color 0.2s; }
-    .modal-close:hover { color: var(--text); }
-    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-    .modal-grid .full { grid-column: 1 / -1; }
-    .modal-field { display: flex; flex-direction: column; gap: 6px; }
-    .modal-field label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
-    .modal-field input, .modal-field select { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); outline: none; transition: border-color 0.2s; width: 100%; }
-    .modal-field input:focus, .modal-field select:focus { border-color: var(--gold); }
-    .modal-field select option { background: var(--bg3); }
-    .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
-    .btn-cancelar { flex: 1; background: none; border: 1px solid var(--border); color: var(--muted); padding: 12px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.2s; }
-    .btn-cancelar:hover { border-color: var(--danger); color: var(--danger); }
-    .btn-confirmar { flex: 2; background: var(--gold); border: none; color: #000; padding: 12px; border-radius: 8px; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; cursor: pointer; transition: background 0.2s; }
-    .btn-confirmar:hover { background: var(--gold-light); }
-    .modal-erro { font-size: 12px; color: var(--danger); margin-top: 10px; text-align: center; min-height: 16px; }
+
+    .mobile-barber-chip.active .chip-count {
+        background: var(--gold-dim);
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .btn-novo {
+        margin-left: auto;
+        background: var(--gold);
+        border: none;
+        color: #000;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        font-size: 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s, transform 0.15s;
+        flex-shrink: 0;
+        line-height: 1;
+    }
+
+    .btn-novo:hover {
+        background: var(--gold-light);
+        transform: scale(1.08);
+    }
+
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: #000000cc;
+        backdrop-filter: blur(4px);
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+    }
+
+    .modal-overlay.open {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    .modal {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 36px;
+        width: 100%;
+        max-width: 480px;
+        transform: translateY(16px);
+        transition: transform 0.25s;
+        position: relative;
+    }
+
+    .modal-overlay.open .modal {
+        transform: translateY(0);
+    }
+
+    .modal-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 28px;
+        color: var(--text);
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+    }
+
+    .modal-sub {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 28px;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: none;
+        border: none;
+        color: var(--muted);
+        font-size: 20px;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .modal-close:hover {
+        color: var(--text);
+    }
+
+    .modal-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 14px;
+    }
+
+    .modal-grid .full {
+        grid-column: 1 / -1;
+    }
+
+    .modal-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .modal-field label {
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .modal-field input,
+    .modal-field select {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        color: var(--text);
+        outline: none;
+        transition: border-color 0.2s;
+        width: 100%;
+    }
+
+    .modal-field input:focus,
+    .modal-field select:focus {
+        border-color: var(--gold);
+    }
+
+    .modal-field select option {
+        background: var(--bg3);
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 24px;
+    }
+
+    .btn-cancelar {
+        flex: 1;
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 12px;
+        border-radius: 8px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-cancelar:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+    }
+
+    .btn-confirmar {
+        flex: 2;
+        background: var(--gold);
+        border: none;
+        color: #000;
+        padding: 12px;
+        border-radius: 8px;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 18px;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-confirmar:hover {
+        background: var(--gold-light);
+    }
+
+    .modal-erro {
+        font-size: 12px;
+        color: var(--danger);
+        margin-top: 10px;
+        text-align: center;
+        min-height: 16px;
+    }
 
     /* Listas modais */
-    .feriado-lista { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; max-height: 220px; overflow-y: auto; }
-    .feriado-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; }
-    .feriado-item-info { display: flex; flex-direction: column; gap: 2px; }
-    .feriado-item-data { font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: var(--gold); letter-spacing: 1px; }
-    .feriado-item-desc { font-size: 12px; color: var(--muted); }
-    .feriado-del { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 14px; padding: 4px 8px; border-radius: 4px; transition: background 0.2s; opacity: 0.6; }
-    .feriado-del:hover { background: var(--danger-dim); opacity: 1; }
-    .feriados-empty, .servicos-empty, .admins-empty { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
-    .feriados-sep, .servicos-sep, .admins-sep { height: 1px; background: var(--border); margin: 20px 0; }
-    .servico-lista { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; max-height: 260px; overflow-y: auto; }
-    .servico-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; gap: 10px; }
-    .servico-item.inativo { opacity: 0.4; }
-    .servico-item-nome { font-size: 13px; font-weight: 500; color: var(--text); flex: 1; }
-    .servico-item-valor { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--gold); letter-spacing: 1px; min-width: 70px; text-align: right; }
-    .servico-item-actions { display: flex; gap: 6px; flex-shrink: 0; }
-    .btn-servico-edit { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 11px; padding: 4px 8px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
-    .btn-servico-edit:hover { border-color: var(--gold); color: var(--gold); }
-    .btn-servico-toggle { background: none; border: 1px solid #27ae6055; color: #27ae60; background: #27ae6011; font-size: 11px; padding: 4px 8px; border-radius: 4px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-    .btn-servico-toggle.inativo { border-color: var(--danger); color: var(--danger); background: var(--danger-dim); }
-    .btn-servico-toggle:hover { opacity: 0.8; }
-    .servico-edit-row { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
-    .servico-edit-row input { background: var(--bg); border: 1px solid var(--gold); border-radius: 6px; padding: 4px 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--text); outline: none; width: 80px; }
+    .feriado-lista {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 16px;
+        max-height: 220px;
+        overflow-y: auto;
+    }
+
+    .feriado-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 14px;
+    }
+
+    .feriado-item-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .feriado-item-data {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 16px;
+        color: var(--gold);
+        letter-spacing: 1px;
+    }
+
+    .feriado-item-desc {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .feriado-del {
+        background: none;
+        border: none;
+        color: var(--danger);
+        cursor: pointer;
+        font-size: 14px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: background 0.2s;
+        opacity: 0.6;
+    }
+
+    .feriado-del:hover {
+        background: var(--danger-dim);
+        opacity: 1;
+    }
+
+    .feriados-empty,
+    .servicos-empty,
+    .admins-empty {
+        text-align: center;
+        color: var(--muted);
+        font-size: 12px;
+        padding: 20px;
+    }
+
+    .feriados-sep,
+    .servicos-sep,
+    .admins-sep {
+        height: 1px;
+        background: var(--border);
+        margin: 20px 0;
+    }
+
+    .servico-lista {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 16px;
+        max-height: 260px;
+        overflow-y: auto;
+    }
+
+    .servico-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 14px;
+        gap: 10px;
+    }
+
+    .servico-item.inativo {
+        opacity: 0.4;
+    }
+
+    .servico-item-nome {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+        flex: 1;
+    }
+
+    .servico-item-valor {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 18px;
+        color: var(--gold);
+        letter-spacing: 1px;
+        min-width: 70px;
+        text-align: right;
+    }
+
+    .servico-item-actions {
+        display: flex;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    .btn-servico-edit {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-servico-edit:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .btn-servico-toggle {
+        background: none;
+        border: 1px solid #27ae6055;
+        color: #27ae60;
+        background: #27ae6011;
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-servico-toggle.inativo {
+        border-color: var(--danger);
+        color: var(--danger);
+        background: var(--danger-dim);
+    }
+
+    .btn-servico-toggle:hover {
+        opacity: 0.8;
+    }
+
+    .servico-edit-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-top: 4px;
+    }
+
+    .servico-edit-row input {
+        background: var(--bg);
+        border: 1px solid var(--gold);
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        color: var(--text);
+        outline: none;
+        width: 80px;
+    }
 
     /* ── Admins ── */
-    .admin-lista { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; max-height: 240px; overflow-y: auto; }
-    .admin-item { display: flex; align-items: center; gap: 12px; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; }
-    .admin-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #6b4c00); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: #fff; flex-shrink: 0; }
-    .admin-item-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-    .admin-item-nome { font-size: 13px; font-weight: 500; color: var(--text); }
-    .admin-item-email { font-size: 11px; color: var(--muted); }
-    .admin-item-role { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; padding: 2px 8px; border-radius: 10px; border: 1px solid var(--border); color: var(--muted); background: var(--bg); white-space: nowrap; }
-    .admin-item-role.owner { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
-    .admin-del { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 14px; padding: 4px 8px; border-radius: 4px; transition: background 0.2s; opacity: 0.6; }
-    .admin-del:hover { background: var(--danger-dim); opacity: 1; }
-    .input-pass-wrap { position: relative; }
-    .input-pass-wrap input { padding-right: 40px !important; }
-    .btn-toggle-pass { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; font-size: 13px; padding: 2px; line-height: 1; transition: color 0.2s; }
-    .btn-toggle-pass:hover { color: var(--gold); }
+    .admin-lista {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 16px;
+        max-height: 240px;
+        overflow-y: auto;
+    }
+
+    .admin-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 14px;
+    }
+
+    .admin-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--gold), #6b4c00);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 13px;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .admin-item-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .admin-item-nome {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+    }
+
+    .admin-item-email {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .admin-item-role {
+        font-size: 10px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 2px 8px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        background: var(--bg);
+        white-space: nowrap;
+    }
+
+    .admin-item-role.owner {
+        background: var(--gold-dim);
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .admin-del {
+        background: none;
+        border: none;
+        color: var(--danger);
+        cursor: pointer;
+        font-size: 14px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: background 0.2s;
+        opacity: 0.6;
+    }
+
+    .admin-del:hover {
+        background: var(--danger-dim);
+        opacity: 1;
+    }
+
+    .input-pass-wrap {
+        position: relative;
+    }
+
+    .input-pass-wrap input {
+        padding-right: 40px !important;
+    }
+
+    .btn-toggle-pass {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 13px;
+        padding: 2px;
+        line-height: 1;
+        transition: color 0.2s;
+    }
+
+    .btn-toggle-pass:hover {
+        color: var(--gold);
+    }
 
     /* ── Menu Configurações ── */
-    .config-menu-wrap { position: relative; display: inline-block; flex-shrink: 0; }
-    .btn-config-menu { background: none; border: 1px solid var(--border); color: var(--muted); padding: 8px 16px; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; width: auto; white-space: nowrap; }
-    .btn-config-menu:hover, .btn-config-menu.open { border-color: var(--gold); color: var(--gold); }
-    .menu-icon { display: flex; flex-direction: column; gap: 3px; width: 14px; }
-    .menu-icon span { display: block; height: 1.5px; background: currentColor; border-radius: 2px; transition: all 0.2s; }
-    .btn-config-menu.open .menu-icon span:nth-child(1) { transform: translateY(4.5px) rotate(45deg); }
-    .btn-config-menu.open .menu-icon span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-    .btn-config-menu.open .menu-icon span:nth-child(3) { transform: translateY(-4.5px) rotate(-45deg); }
-    .config-dropdown { position: absolute; top: calc(100% + 8px); right: 0; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; min-width: 220px; padding: 6px; z-index: 150; opacity: 0; pointer-events: none; transform: translateY(-6px) scale(0.98); transform-origin: top right; transition: opacity 0.18s ease, transform 0.18s ease; box-shadow: 0 16px 40px #00000088; }
-    .config-dropdown.open { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
-    .config-dropdown-label { font-size: 9px; letter-spacing: 2.5px; color: var(--muted); text-transform: uppercase; padding: 8px 10px 4px; }
-    .config-dropdown-sep { height: 1px; background: var(--border); margin: 4px 0; }
-    .config-dropdown-item { display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 9px 10px; border-radius: 7px; cursor: pointer; transition: all 0.15s; text-align: left; }
-    .config-dropdown-item:hover { background: var(--bg3); color: var(--text); }
-    .item-icon { width: 28px; height: 28px; border-radius: 6px; background: var(--bg3); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; transition: all 0.15s; }
-    .config-dropdown-item:hover .item-icon { background: var(--gold-dim); border-color: var(--gold); }
-    .item-label { display: flex; flex-direction: column; gap: 1px; flex: 1; }
-    .item-label span { font-size: 13px; font-weight: 500; color: inherit; }
-    .item-label small { font-size: 10px; color: var(--muted); font-weight: 400; }
-    .item-badge { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; background: var(--gold-dim); color: var(--gold); border: 1px solid var(--gold); padding: 1px 6px; border-radius: 10px; }
-    .item-badgeBlock { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; background: var(--danger-dim); color: var(--danger); border: 1px solid var(--danger); padding: 1px 6px; border-radius: 10px; }
+    .config-menu-wrap {
+        position: relative;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+
+    .btn-config-menu {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        width: auto;
+        white-space: nowrap;
+    }
+
+    .btn-config-menu:hover,
+    .btn-config-menu.open {
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .menu-icon {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        width: 14px;
+    }
+
+    .menu-icon span {
+        display: block;
+        height: 1.5px;
+        background: currentColor;
+        border-radius: 2px;
+        transition: all 0.2s;
+    }
+
+    .btn-config-menu.open .menu-icon span:nth-child(1) {
+        transform: translateY(4.5px) rotate(45deg);
+    }
+
+    .btn-config-menu.open .menu-icon span:nth-child(2) {
+        opacity: 0;
+        transform: scaleX(0);
+    }
+
+    .btn-config-menu.open .menu-icon span:nth-child(3) {
+        transform: translateY(-4.5px) rotate(-45deg);
+    }
+
+    .config-dropdown {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        min-width: 220px;
+        padding: 6px;
+        z-index: 150;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-6px) scale(0.98);
+        transform-origin: top right;
+        transition: opacity 0.18s ease, transform 0.18s ease;
+        box-shadow: 0 16px 40px #00000088;
+    }
+
+    .config-dropdown.open {
+        opacity: 1;
+        pointer-events: all;
+        transform: translateY(0) scale(1);
+    }
+
+    .config-dropdown-label {
+        font-size: 9px;
+        letter-spacing: 2.5px;
+        color: var(--muted);
+        text-transform: uppercase;
+        padding: 8px 10px 4px;
+    }
+
+    .config-dropdown-sep {
+        height: 1px;
+        background: var(--border);
+        margin: 4px 0;
+    }
+
+    .config-dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        background: none;
+        border: none;
+        color: var(--muted);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        padding: 9px 10px;
+        border-radius: 7px;
+        cursor: pointer;
+        transition: all 0.15s;
+        text-align: left;
+    }
+
+    .config-dropdown-item:hover {
+        background: var(--bg3);
+        color: var(--text);
+    }
+
+    .item-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        flex-shrink: 0;
+        transition: all 0.15s;
+    }
+
+    .config-dropdown-item:hover .item-icon {
+        background: var(--gold-dim);
+        border-color: var(--gold);
+    }
+
+    .item-label {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        flex: 1;
+    }
+
+    .item-label span {
+        font-size: 13px;
+        font-weight: 500;
+        color: inherit;
+    }
+
+    .item-label small {
+        font-size: 10px;
+        color: var(--muted);
+        font-weight: 400;
+    }
+
+    .item-badge {
+        font-size: 9px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        background: var(--gold-dim);
+        color: var(--gold);
+        border: 1px solid var(--gold);
+        padding: 1px 6px;
+        border-radius: 10px;
+    }
+
+    .item-badgeBlock {
+        font-size: 9px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        background: var(--danger-dim);
+        color: var(--danger);
+        border: 1px solid var(--danger);
+        padding: 1px 6px;
+        border-radius: 10px;
+    }
 </style>
 
 <div class="adm-header">
@@ -266,6 +1427,10 @@
                 <button class="config-dropdown-item" id="menu-servicos">
                     <span class="item-icon">✂️</span>
                     <span class="item-label"><span>Serviços</span><small>Preços e catálogo</small></span>
+                </button>
+                <button class="config-dropdown-item" id="menu-horarios">
+                    <span class="item-icon">🕐</span>
+                    <span class="item-label"><span>Horários</span><small>Funcionamento por dia</small></span>
                 </button>
                 <div class="config-dropdown-sep"></div>
                 <div class="config-dropdown-label">Sistema</div>
@@ -308,10 +1473,10 @@
         <span class="chip-count" id="mobile-count-todos">0</span>
     </button>
     {{#each barbeiros}}
-    <button class="mobile-barber-chip" data-barbeiro="{{this}}">
-        <span class="chip-avatar">{{substr this 0 1}}</span>
+    <button class="mobile-barber-chip" data-barbeiro="{{nome}}">
+        <span class="chip-avatar">{{substr nome 0 1}}</span>
         {{this}}
-        <span class="chip-count" data-mobile-count="{{this}}">0</span>
+        <span class="chip-count" data-mobile-count="{{nome}}">0</span>
     </button>
     {{/each}}
 </div>
@@ -324,31 +1489,28 @@
         </button>
         <div class="sidebar-sep"></div>
         {{#each barbeiros}}
-        <button class="barber-tab" data-barbeiro="{{this}}">
-            <div class="barber-avatar">{{substr this 0 1}}</div>
-            <span class="barber-name">{{this}}</span>
-            <span class="barber-count" data-count-barbeiro="{{this}}">0</span>
+        <button class="barber-tab" data-barbeiro="{{nome}}">
+            <div class="barber-avatar">{{substr nome 0 1}}</div>
+            <span class="barber-name">{{nome}}</span>
+            <span class="barber-count" data-count-barbeiro="{{nome}}">0</span>
         </button>
         {{/each}}
-        <div id="sidebar-fallback" style="display:none">
-            <button class="barber-tab" data-barbeiro="Eré">
-                <div class="barber-avatar">E</div>
-                <span class="barber-name">Eré</span>
-                <span class="barber-count" data-count-barbeiro="Eré">0</span>
-            </button>
-            <button class="barber-tab" data-barbeiro="Guilherme">
-                <div class="barber-avatar">G</div>
-                <span class="barber-name">Guilherme</span>
-                <span class="barber-count" data-count-barbeiro="Guilherme">0</span>
-            </button>
-        </div>
     </aside>
 
     <main class="adm-content">
         <div class="stats-bar">
-            <div class="stat-item"><div class="stat-label">Total hoje</div><div class="stat-value gold" id="stat-hoje">0</div></div>
-            <div class="stat-item"><div class="stat-label">Esta semana</div><div class="stat-value" id="stat-semana">0</div></div>
-            <div class="stat-item"><div class="stat-label">Total geral</div><div class="stat-value" id="stat-total">0</div></div>
+            <div class="stat-item">
+                <div class="stat-label">Total hoje</div>
+                <div class="stat-value gold" id="stat-hoje">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Esta semana</div>
+                <div class="stat-value" id="stat-semana">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Este mês</div>
+                <div class="stat-value" id="stat-total">0</div>
+            </div>
         </div>
         <div class="date-nav">
             <button class="date-nav-btn" id="prev-week"><i class="fa-solid fa-chevron-left"></i></button>
@@ -384,38 +1546,39 @@
                     <label>Telefone</label>
                     <input type="tel" name="telefone" placeholder="(00) 00000-0000" required>
                 </div>
+                <div class="modal-field full">
+                    <label>Barbeiro</label>
+                    <select name="barbeiro" id="modal-barbeiro" required>
+                        <option value="">Selecione</option>
+                        {{#each barbeiros}}
+                        <option value="{{nome}}" data-id="{{id}}">{{nome}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="modal-field full">
+                    <label>Serviço</label>
+                    <select name="servico" id="modal-servico" required>
+                        <option value="">Selecione</option>
+                        {{#each servicos}}
+                        <option value="{{nome}}" data-id="{{id}}">{{nome}} — R$ {{valor}}</option>
+                        {{/each}}
+                    </select>
+                </div>
                 <div class="modal-field">
                     <label>Data</label>
                     <input type="date" name="data" id="modal-data" required>
                 </div>
                 <div class="modal-field">
                     <label>Horário</label>
-                    <select name="horario" required>
-                        <option value="">Selecione</option>
-                        <option>08:00</option><option>09:00</option><option>10:00</option>
-                        <option>11:00</option><option>12:00</option><option>13:00</option>
-                        <option>14:00</option><option>15:00</option><option>16:00</option>
-                        <option>17:00</option><option>18:00</option><option>19:00</option>
+                    <select name="horario" id="modal-horario" required>
+                        <option value="">Selecione barbeiro, serviço e data</option>
                     </select>
                 </div>
-                <div class="modal-field full">
-                    <label>Barbeiro</label>
-                    <select name="barbeiro" required>
-                        <option value="">Selecione</option>
-                        {{#each barbeiros}}
-                        <option value="{{this}}">{{this}}</option>
-                        {{/each}}
-                    </select>
-                </div>
-                <div class="modal-field full">
-                    <label>Serviço</label>
-                    <select name="servico" required>
-                        <option value="">Selecione</option>
-                        {{#each servicos}}
-                        <option value="{{nome}}">{{nome}} — R$ {{valor}}</option>
-                        {{/each}}
-                    </select>
-                </div>
+                <!-- hidden para os campos novos -->
+                <input type="hidden" name="profissional_id" id="modal-profissional-id">
+                <input type="hidden" name="hora_inicio" id="modal-hora-inicio">
+                <input type="hidden" name="hora_fim" id="modal-hora-fim">
+                <input type="hidden" name="servico_id" id="modal-servico-id">
             </div>
             <div class="modal-erro" id="modal-erro"></div>
             <div class="modal-actions">
@@ -443,11 +1606,13 @@
             </div>
         </div>
         <div style="margin-top:12px;">
-            <button class="btn-confirmar" id="btn-add-feriado" style="width:100%;font-size:15px;padding:10px;">+ Adicionar Feriado</button>
+            <button class="btn-confirmar" id="btn-add-feriado" style="width:100%;font-size:15px;padding:10px;">+
+                Adicionar Feriado</button>
         </div>
         <div class="modal-erro" id="feriado-erro"></div>
         <div class="feriados-sep"></div>
-        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">Feriados cadastrados</p>
+        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">
+            Feriados cadastrados</p>
         <div class="feriado-lista" id="feriado-lista">
             <div class="feriados-empty">Carregando...</div>
         </div>
@@ -471,12 +1636,14 @@
             </div>
             <div class="modal-field" style="justify-content:flex-end;">
                 <label>&nbsp;</label>
-                <button class="btn-confirmar" id="btn-add-servico" style="padding:10px 16px;font-size:15px;">+ Adicionar</button>
+                <button class="btn-confirmar" id="btn-add-servico" style="padding:10px 16px;font-size:15px;">+
+                    Adicionar</button>
             </div>
         </div>
         <div class="modal-erro" id="servico-erro"></div>
         <div class="servicos-sep"></div>
-        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">Serviços cadastrados</p>
+        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">
+            Serviços cadastrados</p>
         <div class="servico-lista" id="servico-lista">
             <div class="servicos-empty">Carregando...</div>
         </div>
@@ -514,13 +1681,70 @@
             </div>
         </div>
         <div style="margin-top:4px;">
-            <button class="btn-confirmar" id="btn-add-admin" style="width:100%;font-size:15px;padding:10px;">+ Adicionar Admin</button>
+            <button class="btn-confirmar" id="btn-add-admin" style="width:100%;font-size:15px;padding:10px;">+ Adicionar
+                Admin</button>
         </div>
         <div class="modal-erro" id="admin-erro"></div>
         <div class="admins-sep"></div>
-        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">Admins cadastrados</p>
+        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">
+            Admins cadastrados</p>
         <div class="admin-lista" id="admin-lista">
             <div class="admins-empty">Carregando...</div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL HORÁRIOS DE FUNCIONAMENTO -->
+<div class="modal-overlay" id="modal-horarios-overlay">
+    <div class="modal">
+        <button class="modal-close" id="modal-horarios-close">✕</button>
+        <div class="modal-title">Horários</div>
+        <p class="modal-sub">Configure os horários de atendimento por profissional</p>
+
+        <!-- Seleção do profissional -->
+        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">
+            Profissional</p>
+        <div class="horario-prof-select" id="horario-prof-select">
+            {{#each barbeiros}}
+            <button class="horario-prof-chip" data-id="{{id}}" data-nome="{{nome}}">{{nome}}</button>
+            {{/each}}
+        </div>
+
+        <!-- Seleção do dia da semana -->
+        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">Dia
+            da semana</p>
+        <div class="horario-dias-grid">
+            <button class="horario-dia-btn" data-dia="0">Dom</button>
+            <button class="horario-dia-btn" data-dia="1">Seg</button>
+            <button class="horario-dia-btn" data-dia="2">Ter</button>
+            <button class="horario-dia-btn" data-dia="3">Qua</button>
+            <button class="horario-dia-btn" data-dia="4">Qui</button>
+            <button class="horario-dia-btn" data-dia="5">Sex</button>
+            <button class="horario-dia-btn" data-dia="6">Sáb</button>
+        </div>
+
+        <!-- Horário de início e fim -->
+        <div class="modal-grid">
+            <div class="modal-field">
+                <label>Hora início</label>
+                <input type="time" id="horario-inicio-input">
+            </div>
+            <div class="modal-field">
+                <label>Hora fim</label>
+                <input type="time" id="horario-fim-input">
+            </div>
+        </div>
+
+        <div style="margin-top:12px;">
+            <button class="btn-confirmar" id="btn-add-horario" style="width:100%;font-size:15px;padding:10px;">+
+                Adicionar Horário</button>
+        </div>
+        <div class="modal-erro" id="horario-erro"></div>
+        <div class="horarios-sep"></div>
+        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">
+            Horários cadastrados</p>
+        <div class="horario-lista" id="horario-lista">
+            <div class="horarios-empty">Selecione um profissional acima</div>
         </div>
     </div>
 </div>
@@ -529,27 +1753,28 @@
     // ── Dados do backend ──────────────────────────────────
     const todosAgendamentos = [
         {{#each agendamentos}}
-        { id: {{id}}, nome: "{{nome}}", telefone: "{{telefone}}", data: "{{data}}", horario: "{{horario}}", servico: "{{servico}}", barbeiro: "{{barbeiro}}" },
-        {{/each}}
+    {id: {{id}}, nome: "{{nome}}", telefone: "{{telefone}}", data: "{{data}}", horario: "{{horario}}", servico: "{{servico}}", barbeiro: "{{barbeiro}}" },
+    {{/each}} 
     ];
 
     let filtroData = null;
     let filtroBarbeiro = 'todos';
     let weekOffset = 0;
 
-    const diasSemana = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-    const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
     function fmtDate(d) {
-        return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+        return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
     }
 
     const datasComAgendamento = new Set(todosAgendamentos.map(a => a.data));
+    const currentMonth = fmtDate(new Date()).slice(3, 10);
 
     function renderDateChips() {
         const chips = document.getElementById('date-chips');
         chips.innerHTML = '';
-        const today = new Date(); today.setHours(0,0,0,0);
+        const today = new Date(); today.setHours(0, 0, 0, 0);
         for (let i = 0; i < 7; i++) {
             const d = new Date(today);
             d.setDate(today.getDate() + weekOffset * 7 + i);
@@ -586,10 +1811,10 @@
     }
 
     function renderCards() {
-        const grid   = document.getElementById('cards-grid');
-        const empty  = document.getElementById('empty-state');
-        const title  = document.getElementById('section-title');
-        const sub    = document.getElementById('section-sub');
+        const grid = document.getElementById('cards-grid');
+        const empty = document.getElementById('empty-state');
+        const title = document.getElementById('section-title');
+        const sub = document.getElementById('section-sub');
 
         let lista = todosAgendamentos;
         if (filtroData) lista = lista.filter(a => a.data === filtroData);
@@ -598,8 +1823,8 @@
 
         if (filtroData) {
             const [dd, mm, yy] = filtroData.split('/');
-            const d = new Date(yy, mm-1, dd);
-            title.textContent = `${diasSemana[d.getDay()]}, ${dd} ${meses[mm-1]}`;
+            const d = new Date(yy, mm - 1, dd);
+            title.textContent = `${diasSemana[d.getDay()]}, ${dd} ${meses[mm - 1]}`;
         }
         sub.textContent = lista.length ? `${lista.length} agendamento${lista.length > 1 ? 's' : ''}` : '';
         grid.innerHTML = '';
@@ -628,7 +1853,7 @@
                 grid.appendChild(col);
             });
 
-        // ── LISTA: barbeiro específico → agenda vertical
+            // ── LISTA: barbeiro específico → agenda vertical
         } else {
             grid.className = 'agenda-list';
             lista.forEach((a, idx) => grid.appendChild(buildCard(a, idx)));
@@ -638,11 +1863,12 @@
     function renderStats() {
         const today = fmtDate(new Date());
         const weekDates = [];
-        const base = new Date(); base.setHours(0,0,0,0);
+        const base = new Date(); base.setHours(0, 0, 0, 0);
         for (let i = 0; i < 7; i++) { const d = new Date(base); d.setDate(base.getDate() + i); weekDates.push(fmtDate(d)); }
-        document.getElementById('stat-hoje').textContent   = todosAgendamentos.filter(a => a.data === today).length;
+        document.getElementById('stat-hoje').textContent = todosAgendamentos.filter(a => a.data === today).length;
         document.getElementById('stat-semana').textContent = todosAgendamentos.filter(a => weekDates.includes(a.data)).length;
-        document.getElementById('stat-total').textContent  = todosAgendamentos.length;
+        //document.getElementById('stat-total').textContent = todosAgendamentos.length;        
+        document.getElementById('stat-total').textContent = todosAgendamentos.filter(a => a.data.slice(3, 10) === currentMonth).length;
     }
 
     function renderCounts() {
@@ -669,7 +1895,7 @@
     document.getElementById('btn-sair').addEventListener('click', () => { window.location.href = '/logout'; });
 
     // ── Menu Configurações ────────────────────────────────
-    const btnMenu  = document.getElementById('btn-config-menu');
+    const btnMenu = document.getElementById('btn-config-menu');
     const dropdown = document.getElementById('config-dropdown');
 
     function toggleDropdown(force) {
@@ -691,19 +1917,19 @@
     }
 
     // ── Modal Feriados ─────────────────────────────────────
-    const feriadosOverlay  = document.getElementById('modal-feriados-overlay');
-    const feriadoLista     = document.getElementById('feriado-lista');
-    const feriadoErro      = document.getElementById('feriado-erro');
+    const feriadosOverlay = document.getElementById('modal-feriados-overlay');
+    const feriadoLista = document.getElementById('feriado-lista');
+    const feriadoErro = document.getElementById('feriado-erro');
     const feriadoDataInput = document.getElementById('feriado-data');
     const feriadoDescInput = document.getElementById('feriado-desc');
-    const btnAddFeriado    = document.getElementById('btn-add-feriado');
+    const btnAddFeriado = document.getElementById('btn-add-feriado');
 
     function fmtFeriadoData(str) { const [y, m, d] = str.split('-'); return `${d}/${m}/${y}`; }
 
     async function carregarFeriados() {
         feriadoLista.innerHTML = '<div class="feriados-empty">Carregando...</div>';
         try {
-            const res  = await fetch('/feriados');
+            const res = await fetch('/feriados');
             const json = await res.json();
             if (!json.feriados || json.feriados.length === 0) { feriadoLista.innerHTML = '<div class="feriados-empty">Nenhum feriado cadastrado</div>'; return; }
             feriadoLista.innerHTML = '';
@@ -735,7 +1961,7 @@
         if (!data || !descricao) { feriadoErro.textContent = '⚠ Preencha a data e a descrição.'; return; }
         btnAddFeriado.textContent = 'Salvando...'; btnAddFeriado.disabled = true;
         try {
-            const res  = await fetch('/feriados', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `data=${data}&descricao=${encodeURIComponent(descricao)}` });
+            const res = await fetch('/feriados', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `data=${data}&descricao=${encodeURIComponent(descricao)}` });
             const json = await res.json();
             if (json.sucesso) { feriadoDataInput.value = ''; feriadoDescInput.value = ''; carregarFeriados(); }
             else feriadoErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar.');
@@ -747,14 +1973,14 @@
     feriadosOverlay.addEventListener('click', e => { if (e.target === feriadosOverlay) feriadosOverlay.classList.remove('open'); });
 
     // ── Modal Novo Agendamento ─────────────────────────────
-    const overlay      = document.getElementById('modal-overlay');
-    const modalErro    = document.getElementById('modal-erro');
-    const modalData    = document.getElementById('modal-data');
-    const formAdmin    = document.getElementById('form-admin');
+    const overlay = document.getElementById('modal-overlay');
+    const modalErro = document.getElementById('modal-erro');
+    const modalData = document.getElementById('modal-data');
+    const formAdmin = document.getElementById('form-admin');
     const btnConfirmar = formAdmin.querySelector('.btn-confirmar');
 
-    const hoje    = new Date();
-    const minDate = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
+    const hoje = new Date();
+    const minDate = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
     modalData.setAttribute('min', minDate);
 
     function abrirModal() {
@@ -777,7 +2003,7 @@
         btnConfirmar.textContent = 'Salvando...'; btnConfirmar.disabled = true;
         const dados = new URLSearchParams(new FormData(formAdmin));
         try {
-            const res  = await fetch('/admin/agendar/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: dados.toString() });
+            const res = await fetch('/admin/agendar/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: dados.toString() });
             const json = await res.json();
             if (res.ok && json.sucesso) { fecharModal(); window.location.reload(); }
             else modalErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar agendamento.');
@@ -786,7 +2012,7 @@
     });
 
     // ── Fallback sidebar ───────────────────────────────────
-    const hasBarbeiros = {{#if barbeiros}}true{{else}}false{{/if}};
+    const hasBarbeiros = {{#if barbeiros}}true{{else}} false{{/if}};
     if (!hasBarbeiros) {
         document.getElementById('sidebar-fallback').style.display = 'block';
         document.querySelectorAll('.barber-tab').forEach(btn => {
@@ -800,17 +2026,17 @@
     }
 
     // ── Modal Serviços ────────────────────────────────────
-    const servicosOverlay   = document.getElementById('modal-servicos-overlay');
-    const servicoLista      = document.getElementById('servico-lista');
-    const servicoErro       = document.getElementById('servico-erro');
-    const servicoNomeInput  = document.getElementById('servico-nome-input');
+    const servicosOverlay = document.getElementById('modal-servicos-overlay');
+    const servicoLista = document.getElementById('servico-lista');
+    const servicoErro = document.getElementById('servico-erro');
+    const servicoNomeInput = document.getElementById('servico-nome-input');
     const servicoValorInput = document.getElementById('servico-valor-input');
-    const btnAddServico     = document.getElementById('btn-add-servico');
+    const btnAddServico = document.getElementById('btn-add-servico');
 
     async function carregarServicos() {
         servicoLista.innerHTML = '<div class="servicos-empty">Carregando...</div>';
         try {
-            const res  = await fetch('/servicos/admin');
+            const res = await fetch('/servicos/admin');
             const json = await res.json();
             if (!json.servicos || json.servicos.length === 0) { servicoLista.innerHTML = '<div class="servicos-empty">Nenhum serviço cadastrado</div>'; return; }
             servicoLista.innerHTML = '';
@@ -820,7 +2046,7 @@
                 item.dataset.id = s.id;
                 item.innerHTML = `
                     <span class="servico-item-nome">${s.nome}</span>
-                    <span class="servico-item-valor">R$ ${parseFloat(s.valor).toFixed(2).replace('.',',')}</span>
+                    <span class="servico-item-valor">R$ ${parseFloat(s.valor).toFixed(2).replace('.', ',')}</span>
                     <div class="servico-item-actions">
                         <button class="btn-servico-edit" data-id="${s.id}" data-nome="${s.nome}" data-valor="${s.valor}" title="Editar valor">✏️</button>
                         <button class="btn-servico-toggle ${s.ativo ? '' : 'inativo'}" data-id="${s.id}" data-ativo="${s.ativo}">
@@ -852,7 +2078,7 @@
                             const json = await res.json();
                             if (json.sucesso) carregarServicos();
                             else servicoErro.textContent = '⚠ Erro ao salvar.';
-                        } catch(e) { servicoErro.textContent = '⚠ Erro de conexão.'; }
+                        } catch (e) { servicoErro.textContent = '⚠ Erro de conexão.'; }
                     });
                 });
             });
@@ -863,24 +2089,24 @@
                         const res = await fetch(`/servicos/${btn.dataset.id}/toggle`, { method: 'PUT' });
                         const json = await res.json();
                         if (json.sucesso) carregarServicos();
-                    } catch(e) { servicoErro.textContent = '⚠ Erro ao atualizar.'; }
+                    } catch (e) { servicoErro.textContent = '⚠ Erro ao atualizar.'; }
                 });
             });
-        } catch(e) { servicoLista.innerHTML = '<div class="servicos-empty">Erro ao carregar.</div>'; }
+        } catch (e) { servicoLista.innerHTML = '<div class="servicos-empty">Erro ao carregar.</div>'; }
     }
 
     btnAddServico.addEventListener('click', async () => {
         servicoErro.textContent = '';
-        const nome  = servicoNomeInput.value.trim();
+        const nome = servicoNomeInput.value.trim();
         const valor = parseFloat(servicoValorInput.value);
         if (!nome || isNaN(valor) || valor < 0) { servicoErro.textContent = '⚠ Preencha nome e valor.'; return; }
         btnAddServico.textContent = 'Salvando...'; btnAddServico.disabled = true;
         try {
-            const res  = await fetch('/servicos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome, valor }) });
+            const res = await fetch('/servicos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome, valor }) });
             const json = await res.json();
             if (json.sucesso) { servicoNomeInput.value = ''; servicoValorInput.value = ''; carregarServicos(); }
             else servicoErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar.');
-        } catch(e) { servicoErro.textContent = '⚠ Erro de conexão.'; }
+        } catch (e) { servicoErro.textContent = '⚠ Erro de conexão.'; }
         finally { btnAddServico.textContent = '+ Adicionar'; btnAddServico.disabled = false; }
     });
 
@@ -888,11 +2114,11 @@
     servicosOverlay.addEventListener('click', e => { if (e.target === servicosOverlay) servicosOverlay.classList.remove('open'); });
 
     // ── Modal Admins ──────────────────────────────────────
-    const adminsOverlay   = document.getElementById('modal-admins-overlay');
-    const adminLista      = document.getElementById('admin-lista');
-    const adminErro       = document.getElementById('admin-erro');
-    const btnAddAdmin     = document.getElementById('btn-add-admin');
-    const btnTogglePass   = document.getElementById('btn-toggle-pass');
+    const adminsOverlay = document.getElementById('modal-admins-overlay');
+    const adminLista = document.getElementById('admin-lista');
+    const adminErro = document.getElementById('admin-erro');
+    const btnAddAdmin = document.getElementById('btn-add-admin');
+    const btnTogglePass = document.getElementById('btn-toggle-pass');
     const adminSenhaInput = document.getElementById('admin-senha-input');
 
     btnTogglePass.addEventListener('click', () => {
@@ -904,57 +2130,104 @@
     async function carregarAdmins() {
         adminLista.innerHTML = '<div class="admins-empty">Carregando...</div>';
         try {
-            const res  = await fetch('/admins');
+            const res = await fetch('/admins');
             const json = await res.json();
             if (!json.admins || json.admins.length === 0) { adminLista.innerHTML = '<div class="admins-empty">Nenhum admin cadastrado</div>'; return; }
             adminLista.innerHTML = '';
             json.admins.forEach(a => {
-                const item = document.createElement('div');
-                item.className = 'admin-item';
-                item.innerHTML = `
-                    <div class="admin-avatar">${a.nome.charAt(0).toUpperCase()}</div>
-                    <div class="admin-item-info">
-                        <span class="admin-item-nome">${a.nome}</span>
-                        <span class="admin-item-email">${a.email}</span>
-                    </div>
-                    <span class="admin-item-role ${a.role === 'owner' ? 'owner' : ''}">${a.role}</span>
-                    ${a.role !== 'owner' ? `<button class="admin-del" data-id="${a.id}" title="Remover">✕</button>` : ''}`;
-                adminLista.appendChild(item);
+            const item = document.createElement('div');
+            item.className = `admin-item ${a.ativo === 'S' ? '' : 'admin-inativo'}`;
+            item.innerHTML = `
+                <div class="admin-avatar" style="${a.ativo !== 'S' ? 'opacity:.4;filter:grayscale(1)' : ''}">${a.nome.charAt(0).toUpperCase()}</div>
+                <div class="admin-item-info">
+                    <span class="admin-item-nome" id="nome-label-${a.id}">${a.nome} ${a.ativo !== 'S' ? '<span style="font-size:10px;color:#c0392b;letter-spacing:1px;text-transform:uppercase;">● Inativo</span>' : ''}</span>
+                    <input id="nome-input-${a.id}" value="${a.nome}" style="display:none;background:#181818;border:1px solid #b8860b;border-radius:6px;padding:4px 8px;color:#e8e8e8;font-size:14px;width:140px;">
+                    <span class="admin-item-email">${a.email}</span>
+                </div>
+                <span class="admin-item-role ${a.role === 'owner' ? 'owner' : ''}">${a.role}</span>
+                <button class="admin-edit-nome" data-id="${a.id}" title="Editar nome" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;">✎</button>
+                ${a.role !== 'owner' ? `
+                    ${a.ativo !== 'S'
+                        ? `<button class="admin-reativar" data-id="${a.id}" title="Reativar" style="background:none;border:1px solid #b8860b;color:#b8860b;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;">↺ Reativar</button>`
+                        : `<button class="admin-del" data-id="${a.id}" title="Inativar" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;">✕</button>`
+                    }` : ''}`;
+            adminLista.appendChild(item);
+            });
+            // Editar nome
+            adminLista.querySelectorAll('.admin-edit-nome').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.dataset.id;
+                    const label = document.getElementById(`nome-label-${id}`);
+                    const input = document.getElementById(`nome-input-${id}`);
+
+                    // Toggle edição
+                    if (input.style.display === 'none') {
+                        label.style.display = 'none';
+                        input.style.display = 'inline-block';
+                        input.focus();
+                        btn.textContent = '✔';
+                        btn.style.color = '#b8860b';
+                    } else {
+                        const novoNome = input.value.trim();
+                        if (!novoNome) return;
+                        try {
+                            const res = await fetch(`/admins/${id}/nome`, {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ nome: novoNome })
+                            });
+                            const json = await res.json();
+                            if (json.sucesso) carregarAdmins();
+                            else adminErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar.');
+                        } catch (e) { adminErro.textContent = '⚠ Erro de conexão.'; }
+                    }
+                });
             });
             adminLista.querySelectorAll('.admin-del').forEach(btn => {
                 btn.addEventListener('click', async () => {
-                    if (!confirm('Remover este admin?')) return;
+                    if (!confirm('Inativar este admin? Ele não poderá mais acessar o sistema.')) return;
                     try {
                         const res = await fetch(`/admins/${btn.dataset.id}`, { method: 'DELETE' });
                         const json = await res.json();
                         if (json.sucesso) carregarAdmins();
-                        else adminErro.textContent = '⚠ ' + (json.erro || 'Erro ao remover.');
-                    } catch(e) { adminErro.textContent = '⚠ Erro de conexão.'; }
+                        else adminErro.textContent = '⚠ ' + (json.erro || 'Erro ao inativar.');
+                    } catch (e) { adminErro.textContent = '⚠ Erro de conexão.'; }
                 });
             });
-        } catch(e) { adminLista.innerHTML = '<div class="admins-empty">Erro ao carregar.</div>'; }
+            adminLista.querySelectorAll('.admin-reativar').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (!confirm('Reativar este admin?')) return;
+                    try {
+                        const res = await fetch(`/admins/${btn.dataset.id}/reativar`, { method: 'PATCH' });
+                        const json = await res.json();
+                        if (json.sucesso) carregarAdmins();
+                        else adminErro.textContent = '⚠ ' + (json.erro || 'Erro ao reativar.');
+                    } catch (e) { adminErro.textContent = '⚠ Erro de conexão.'; }
+                });
+            });
+        } catch (e) { adminLista.innerHTML = '<div class="admins-empty">Erro ao carregar.</div>'; }
     }
 
     btnAddAdmin.addEventListener('click', async () => {
         adminErro.textContent = '';
-        const nome  = document.getElementById('admin-nome-input').value.trim();
+        const nome = document.getElementById('admin-nome-input').value.trim();
         const email = document.getElementById('admin-email-input').value.trim();
         const senha = adminSenhaInput.value;
-        const role  = document.getElementById('admin-role-select').value;
+        const role = document.getElementById('admin-role-select').value;
         if (!nome || !email || !senha) { adminErro.textContent = '⚠ Preencha todos os campos.'; return; }
         if (senha.length < 6) { adminErro.textContent = '⚠ Senha mínima de 6 caracteres.'; return; }
         btnAddAdmin.textContent = 'Salvando...'; btnAddAdmin.disabled = true;
         try {
-            const res  = await fetch('/admins', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome, email, senha, role }) });
+            const res = await fetch('/admins', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome, email, senha, role }) });
             const json = await res.json();
             if (json.sucesso) {
-                document.getElementById('admin-nome-input').value  = '';
+                document.getElementById('admin-nome-input').value = '';
                 document.getElementById('admin-email-input').value = '';
                 adminSenhaInput.value = '';
                 document.getElementById('admin-role-select').value = 'admin';
                 carregarAdmins();
             } else { adminErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar.'); }
-        } catch(e) { adminErro.textContent = '⚠ Erro de conexão.'; }
+        } catch (e) { adminErro.textContent = '⚠ Erro de conexão.'; }
         finally { btnAddAdmin.textContent = '+ Adicionar Admin'; btnAddAdmin.disabled = false; }
     });
 
@@ -962,9 +2235,10 @@
     adminsOverlay.addEventListener('click', e => { if (e.target === adminsOverlay) adminsOverlay.classList.remove('open'); });
 
     // ── Vincular itens do dropdown aos modais ─────────────
-    bindMenuItemToModal('menu-feriados',  'modal-feriados-overlay',  carregarFeriados);
-    bindMenuItemToModal('menu-servicos',  'modal-servicos-overlay',  carregarServicos);
-    bindMenuItemToModal('menu-admins',    'modal-admins-overlay',    carregarAdmins);
+    bindMenuItemToModal('menu-feriados', 'modal-feriados-overlay', carregarFeriados);
+    bindMenuItemToModal('menu-servicos', 'modal-servicos-overlay', carregarServicos);
+    bindMenuItemToModal('menu-admins', 'modal-admins-overlay', carregarAdmins);
+    bindMenuItemToModal('menu-horarios', 'modal-horarios-overlay', carregarHorarios);
 
     document.getElementById('menu-dashboard').addEventListener('click', () => {
         toggleDropdown(false);
@@ -1015,6 +2289,205 @@
             renderCounts();
         });
     });
+
+    // ── Modal Horários ────────────────────────────────────
+    const horariosOverlay = document.getElementById('modal-horarios-overlay');
+    const horarioLista = document.getElementById('horario-lista');
+    const horarioErro = document.getElementById('horario-erro');
+    const btnAddHorario = document.getElementById('btn-add-horario');
+
+    const DIAS_NOMES = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
+    let horarioProfSelecionado = null;
+    let horarioDiaSelecionado = null;
+
+    // Chips de profissional
+    document.querySelectorAll('.horario-prof-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            document.querySelectorAll('.horario-prof-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            horarioProfSelecionado = chip.dataset.id;
+            carregarHorarios();
+        });
+    });
+
+    // Botões de dia da semana
+    document.querySelectorAll('.horario-dia-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.horario-dia-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            horarioDiaSelecionado = btn.dataset.dia;
+        });
+    });
+
+    async function carregarHorarios() {
+        if (!horarioProfSelecionado) {
+            horarioLista.innerHTML = '<div class="horarios-empty">Selecione um profissional acima</div>';
+            return;
+        }
+        horarioLista.innerHTML = '<div class="horarios-empty">Carregando...</div>';
+        try {
+            const res = await fetch(`/horarios-funcionamento?profissional_id=${horarioProfSelecionado}`);
+            const json = await res.json();
+            if (!json.horarios || json.horarios.length === 0) {
+                horarioLista.innerHTML = '<div class="horarios-empty">Nenhum horário cadastrado para este profissional</div>';
+                return;
+            }
+            horarioLista.innerHTML = '';
+            json.horarios.sort((a, b) => a.dia_semana - b.dia_semana).forEach(h => {
+                const item = document.createElement('div');
+                item.className = 'horario-item';
+                item.innerHTML = `
+                <span class="horario-item-dia">${DIAS_NOMES[h.dia_semana]}</span>
+                <span class="horario-item-range">${h.hora_inicio.substring(0, 5)} – ${h.hora_fim.substring(0, 5)}</span>
+                <span class="horario-item-prof">${h.ativo ? 'Ativo' : 'Inativo'}</span>
+                <button class="horario-del" data-id="${h.id}" title="Remover">✕</button>`;
+                horarioLista.appendChild(item);
+            });
+            horarioLista.querySelectorAll('.horario-del').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (!confirm('Remover este horário?')) return;
+                    await fetch(`/horarios-funcionamento/${btn.dataset.id}`, { method: 'DELETE' });
+                    carregarHorarios();
+                });
+            });
+        } catch (e) {
+            horarioLista.innerHTML = '<div class="horarios-empty">Erro ao carregar.</div>';
+        }
+    }
+
+    btnAddHorario.addEventListener('click', async () => {
+        horarioErro.textContent = '';
+        const inicio = document.getElementById('horario-inicio-input').value;
+        const fim = document.getElementById('horario-fim-input').value;
+        if (!horarioProfSelecionado) { horarioErro.textContent = '⚠ Selecione um profissional.'; return; }
+        if (horarioDiaSelecionado === null) { horarioErro.textContent = '⚠ Selecione um dia da semana.'; return; }
+        if (!inicio || !fim) { horarioErro.textContent = '⚠ Preencha hora início e fim.'; return; }
+        if (inicio >= fim) { horarioErro.textContent = '⚠ Hora início deve ser menor que hora fim.'; return; }
+
+        btnAddHorario.textContent = 'Salvando...'; btnAddHorario.disabled = true;
+        try {
+            const res = await fetch('/horarios-funcionamento', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    profissional_id: horarioProfSelecionado,
+                    dia_semana: horarioDiaSelecionado,
+                    hora_inicio: inicio,
+                    hora_fim: fim
+                })
+            });
+            const json = await res.json();
+            if (json.sucesso) {
+                document.getElementById('horario-inicio-input').value = '';
+                document.getElementById('horario-fim-input').value = '';
+                document.querySelectorAll('.horario-dia-btn').forEach(b => b.classList.remove('active'));
+                horarioDiaSelecionado = null;
+                carregarHorarios();
+            } else {
+                horarioErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar.');
+            }
+        } catch (e) {
+            horarioErro.textContent = '⚠ Erro de conexão.';
+        } finally {
+            btnAddHorario.textContent = '+ Adicionar Horário';
+            btnAddHorario.disabled = false;
+        }
+    });
+
+    document.getElementById('modal-horarios-close').addEventListener('click', () => horariosOverlay.classList.remove('open'));
+    horariosOverlay.addEventListener('click', e => { if (e.target === horariosOverlay) horariosOverlay.classList.remove('open'); });
+
+    // ── Modal Novo Agendamento — slots dinâmicos ──────────
+    async function buscarSlotsAdmin() {
+        const barbeiro = document.getElementById('modal-barbeiro');
+        const servico = document.getElementById('modal-servico');
+        const data = document.getElementById('modal-data').value;
+        const selectHorario = document.getElementById('modal-horario');
+
+        const profId = barbeiro.selectedOptions[0]?.dataset.id;
+        const servicoId = servico.selectedOptions[0]?.dataset.id;
+
+        if (!profId || !servicoId || !data) {
+            selectHorario.innerHTML = '<option value="">Selecione barbeiro, serviço e data</option>';
+            return;
+        }
+
+        selectHorario.innerHTML = '<option value="">Carregando...</option>';
+
+        try {
+            const res = await fetch(`/admin/slots?profissional_id=${profId}&servico_id=${servicoId}&data=${data}`);
+            const json = await res.json();
+            const slots = (json.slots || []).filter(s => s.status === 'disponivel');
+
+            selectHorario.innerHTML = slots.length
+                ? '<option value="">Selecione</option>'
+                : '<option value="">Nenhum horário disponível</option>';
+
+            slots.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.hora_inicio.substring(0, 5);
+                opt.dataset.horaInicio = s.hora_inicio;
+                opt.dataset.horaFim = s.hora_fim;
+                opt.textContent = `${s.hora_inicio.substring(0, 5)} – ${s.hora_fim.substring(0, 5)}`;
+                selectHorario.appendChild(opt);
+            });
+        } catch (e) {
+            selectHorario.innerHTML = '<option value="">Erro ao carregar horários</option>';
+        }
+    }
+
+    // ── Modal Novo Agendamento — slots dinâmicos ──────────
+    async function buscarSlotsAdmin() {
+        const barbeiro = document.getElementById('modal-barbeiro');
+        const servico = document.getElementById('modal-servico');
+        const data = document.getElementById('modal-data').value;
+        const selectHorario = document.getElementById('modal-horario');
+
+        const profId = barbeiro.selectedOptions[0]?.dataset.id;
+        const servicoId = servico.selectedOptions[0]?.dataset.id;
+
+        if (!profId || !servicoId || !data) {
+            selectHorario.innerHTML = '<option value="">Selecione barbeiro, serviço e data</option>';
+            return;
+        }
+
+        selectHorario.innerHTML = '<option value="">Carregando...</option>';
+
+        try {
+            const res = await fetch(`/admin/slots?profissional_id=${profId}&servico_id=${servicoId}&data=${data}`);
+            const json = await res.json();
+            const slots = (json.slots || []).filter(s => s.status === 'disponivel');
+
+            selectHorario.innerHTML = slots.length
+                ? '<option value="">Selecione</option>'
+                : '<option value="">Nenhum horário disponível</option>';
+
+            slots.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.hora_inicio.substring(0, 5);
+                opt.dataset.horaInicio = s.hora_inicio;
+                opt.dataset.horaFim = s.hora_fim;
+                opt.textContent = `${s.hora_inicio.substring(0, 5)} – ${s.hora_fim.substring(0, 5)}`;
+                selectHorario.appendChild(opt);
+            });
+        } catch (e) {
+            selectHorario.innerHTML = '<option value="">Erro ao carregar horários</option>';
+        }
+    }
+
+    // Atualiza hidden fields ao selecionar horário
+    document.getElementById('modal-horario').addEventListener('change', function () {
+        const opt = this.selectedOptions[0];
+        document.getElementById('modal-profissional-id').value = document.getElementById('modal-barbeiro').selectedOptions[0]?.dataset.id || '';
+        document.getElementById('modal-hora-inicio').value = opt?.dataset.horaInicio || '';
+        document.getElementById('modal-hora-fim').value = opt?.dataset.horaFim || '';
+        document.getElementById('modal-servico-id').value = document.getElementById('modal-servico').selectedOptions[0]?.dataset.id || '';
+    });
+
+    document.getElementById('modal-barbeiro').addEventListener('change', buscarSlotsAdmin);
+    document.getElementById('modal-servico').addEventListener('change', buscarSlotsAdmin);
+    document.getElementById('modal-data').addEventListener('change', buscarSlotsAdmin);
 
     // ── Init ──────────────────────────────────────────────
     renderStats();

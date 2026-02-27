@@ -89,6 +89,10 @@ npm run dev
 ```
 npm install multer
 
+npm install jsonwebtoken
+
+
+
 7. Abra o navegador e acesse:
 ```
 http://localhost:3333

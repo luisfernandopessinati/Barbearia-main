@@ -996,3 +996,261 @@ footer p {
 .horario-del:hover { background: var(--danger-dim); opacity: 1; }
 .horarios-empty { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
 .horarios-sep { height: 1px; background: var(--border); margin: 20px 0; }
+
+/* ── Calendário ── */
+.cal-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.cal-nav-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 2px;
+    color: var(--text);
+    min-width: 180px;
+}
+
+.cal-wrap {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: calc(100vh - 260px);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+.cal-wrap::-webkit-scrollbar { width: 6px; height: 6px; }
+.cal-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.cal-grid {
+    display: grid;
+    min-width: 600px;
+    position: relative;
+}
+
+/* Cabeçalho dos dias */
+.cal-head-row {
+    display: contents;
+}
+
+.cal-head-time {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    padding: 10px 8px;
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    min-width: 56px;
+}
+
+.cal-head-cell {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    padding: 10px 8px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 9;
+    min-width: 130px;
+}
+
+.cal-head-day {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 15px;
+    letter-spacing: 2px;
+    color: var(--text);
+    display: block;
+}
+
+.cal-head-date {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    display: block;
+}
+
+.cal-head-cell.today .cal-head-day,
+.cal-head-cell.today .cal-head-date {
+    color: var(--gold);
+}
+
+/* Células da grade */
+.cal-time-cell {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    padding: 6px 8px;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    white-space: nowrap;
+    min-width: 56px;
+    vertical-align: top;
+}
+
+.cal-cell {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    padding: 4px;
+    min-height: 64px;
+    vertical-align: top;
+    position: relative;
+    transition: background 0.15s;
+    cursor: pointer;
+    min-width: 130px;
+}
+
+.cal-cell:hover {
+    background: var(--bg3);
+}
+
+.cal-cell.hoje-col {
+    background: #b8860b08;
+}
+
+/* Evento/agendamento na célula */
+.cal-event {
+    background: linear-gradient(135deg, var(--gold), #6b4c00);
+    border-radius: 6px;
+    padding: 5px 8px;
+    margin-bottom: 3px;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
+}
+
+.cal-event:hover {
+    opacity: 0.85;
+    transform: scale(1.01);
+}
+
+.cal-event-time {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    color: #fff;
+    letter-spacing: 1px;
+    display: block;
+    line-height: 1.1;
+}
+
+.cal-event-nome {
+    font-size: 11px;
+    font-weight: 500;
+    color: #fff;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cal-event-servico {
+    font-size: 10px;
+    color: rgba(255,255,255,0.7);
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Slot vazio */
+.cal-slot-vazio {
+    width: 100%;
+    height: 100%;
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: transparent;
+    font-size: 18px;
+    transition: color 0.15s;
+}
+
+.cal-cell:hover .cal-slot-vazio {
+    color: var(--border);
+}
+
+/* Popup de ações */
+.cal-popup {
+    position: fixed;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    z-index: 500;
+    min-width: 200px;
+    box-shadow: 0 16px 40px #00000099;
+    display: none;
+}
+
+.cal-popup.open { display: block; }
+
+.cal-popup-nome {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 2px;
+}
+
+.cal-popup-meta {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 12px;
+}
+
+.cal-popup-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* Mobile: lista */
+@media (max-width: 900px) {
+    .cal-wrap { max-height: none; border: none; border-radius: 0; overflow: visible; }
+    .cal-grid { display: flex; flex-direction: column; min-width: unset; gap: 16px; }
+    .cal-head-row, .cal-head-time, .cal-head-cell { display: none; }
+    .cal-mobile-day { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .cal-mobile-day-header {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border);
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 15px;
+        letter-spacing: 2px;
+        color: var(--text);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .cal-mobile-day-header.today { color: var(--gold); }
+    .cal-mobile-event {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+    }
+    .cal-mobile-event:last-child { border-bottom: none; }
+    .cal-mobile-time {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 20px;
+        color: var(--gold);
+        min-width: 50px;
+    }
+    .cal-mobile-info { flex: 1; }
+    .cal-mobile-nome { font-size: 13px; font-weight: 500; color: var(--text); }
+    .cal-mobile-meta { font-size: 11px; color: var(--muted); }
+    .cal-mobile-empty { padding: 16px 14px; font-size: 12px; color: var(--muted); }
+}
+

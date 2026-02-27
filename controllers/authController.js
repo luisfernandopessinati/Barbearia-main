@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const Empresa = require('../models/Empresa');
+const Empresa = require('../models/Empresas');
 const bcrypt = require('bcrypt');
 
 exports.login = async (req, res) => {

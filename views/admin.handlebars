@@ -90,7 +90,25 @@
     .cal-popup-telefone { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
     .cal-popup-meta { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
     .cal-popup-actions { display: flex; gap: 8px; }
-
+    .btn-whatsapp {
+        flex: 1;
+        padding: 4px 6px;
+        border-radius: 5px;
+        font-size: 11px;
+        font-family: 'DM Sans', sans-serif;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        background: #12a454;
+        border: 1px solid #0e8a43;
+        color: #fff;
+    }
+    .btn-whatsapp:hover { background: #0e8a43; }
     /* ── Mobile cal ── */
     .cal-mobile-day { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
     .cal-mobile-day-header { padding: 10px 14px; border-bottom: 1px solid var(--border); font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 2px; color: var(--text); display: flex; justify-content: space-between; align-items: center; }
@@ -518,15 +536,19 @@
     const currentMonth = fmtDate(new Date()).slice(3, 10);
 
     // ── Popup ──────────────────────────────────────────────
-    const popup = document.createElement('div');
+   const popup = document.createElement('div');
     popup.className = 'cal-popup';
     popup.innerHTML = `
         <div class="cal-popup-nome" id="popup-nome"></div>
-        <div class="cal-popup-telefone" id="popup-telefone"></div>
         <div class="cal-popup-meta" id="popup-meta"></div>
         <div class="cal-popup-actions">
             <a id="popup-editar" href="#" class="btn-edit"><i class="fa-solid fa-pen"></i> Editar</a>
-            <a id="popup-excluir" href="#" class="btn-del" onclick="return confirm('Excluir este agendamento?')"><i class="fa-solid fa-trash"></i> Excluir</a>
+            <a id="popup-whatsapp" href="#" target="_blank" class="btn-whatsapp">
+                <i class="fa-brands fa-whatsapp"></i> Confirmar
+            </a>
+            <a id="popup-excluir" href="#" class="btn-del" onclick="return confirm('Excluir este agendamento?')">
+                <i class="fa-solid fa-trash"></i> Excluir
+            </a>
         </div>`;
     document.body.appendChild(popup);
 
@@ -539,10 +561,17 @@
     function abrirPopup(e, a) {
         e.stopPropagation();
         document.getElementById('popup-nome').textContent = a.nome;
-        document.getElementById('popup-telefone').textContent = a.telefone;
         document.getElementById('popup-meta').textContent = `${a.horario} · ${a.servico} · ${a.barbeiro}`;
         document.getElementById('popup-editar').href = `/editar/${a.id}`;
         document.getElementById('popup-excluir').href = `/deletar/${a.id}`;
+
+        // Monta link WhatsApp
+        const tel = a.telefone.replace(/\D/g, ''); // remove tudo que não é número
+        const mensagem = encodeURIComponent(
+            `Olá ${a.nome}! 👋\n\nPassando para confirmar seu agendamento:\n📅 Data: ${a.data}\n🕐 Horário: ${a.horario}\n✂️ Serviço: ${a.servico}\n💈 Profissional: ${a.barbeiro}\n\nPor favor, confirme sua presença. Até lá!`
+        );
+        document.getElementById('popup-whatsapp').href = `https://wa.me/55${tel}?text=${mensagem}`;
+
         popup.classList.add('open');
         const rect = e.currentTarget.getBoundingClientRect();
         popup.style.top = (rect.bottom + 8 + window.scrollY) + 'px';

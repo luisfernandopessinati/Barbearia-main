@@ -7,13 +7,15 @@ const bodyParser = require('body-parser');
 const sequelize = require('./config/db');
 const bcrypt = require('bcryptjs');
 
-const Agendamento = require('./models/Agendamento');
-const Cliente = require('./models/Cliente');
 const Admin = require('./models/Admin');
-const Feriado = require('./models/feriado');
-const Servico = require('./models/servico');
+const Agendamento = require('./models/Agendamento');
+const Boqueio = require('./models/Boqueio');
+const Cliente = require('./models/Cliente');
 const Empresa = require('./models/Empresas');
+const Feriado = require('./models/feriado');
 const HorarioFuncionamento = require('./models/HorarioFuncionamento');
+const Servico = require('./models/servico');
+const produto = require('./models/produto');
 const { getSlotsDisponiveis, minutesToTime, temColisao, timeToMinutes } = require('./services/slotService');
 
 const passport = require('passport');
@@ -982,7 +984,7 @@ app.get('/deletar/:id', isAdminAuthenticated, function (req, res) {
 });
 
 
-sequelize.sync({ force: false }).then(() => {
+sequelize.sync({ force: true }).then(() => {
     app.listen(PORT, () => {
         console.log(`Servidor funcionando na porta http://localhost:${PORT}`);
         console.log(`Servidor funcionando na porta http://localhost:${PORT}/admin`);

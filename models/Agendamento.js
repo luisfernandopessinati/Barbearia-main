@@ -64,6 +64,6 @@ const Agendamento = sequelize.define('Agendamentos', {
     }
 });
 
-//Agendamento.sync({ alter: true });
+Agendamento.sync({ alter: true });
 
 module.exports = Agendamento;

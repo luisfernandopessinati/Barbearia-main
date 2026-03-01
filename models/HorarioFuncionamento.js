@@ -29,5 +29,5 @@ const HorarioFuncionamento = sequelize.define('HorariosFuncionamento', {
     }
 });
 
- //HorarioFuncionamento.sync({ alter: true }); // rodar uma vez
+ HorarioFuncionamento.sync({ alter: true }); // rodar uma vez
 module.exports = HorarioFuncionamento;

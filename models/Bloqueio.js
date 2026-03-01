@@ -28,5 +28,5 @@ const Bloqueio = sequelize.define('Bloqueios', {
     }
 });
 
- Bloqueio.sync({ alter: true }); // rodar uma vez
+// Bloqueio.sync({ alter: true }); // rodar uma vez
 module.exports = Bloqueio;

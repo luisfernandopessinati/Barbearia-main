@@ -46,7 +46,7 @@ const Agendamento = sequelize.define('Agendamentos', {
     servico_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        references: { model: 'servicos', key: 'id' }
+        references: { model: 'Servicos', key: 'id' }
     },
     servico: {
         type: DataTypes.STRING,
@@ -64,6 +64,6 @@ const Agendamento = sequelize.define('Agendamentos', {
     }
 });
 
-Agendamento.sync({ alter: true });
+//Agendamento.sync({ alter: true });
 
 module.exports = Agendamento;

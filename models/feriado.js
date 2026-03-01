@@ -18,5 +18,5 @@ const Feriado = sequelize.define('Feriados', {
     }
 });
 
- Feriado.sync({ force: true });
+// Feriado.sync({ force: true });
 module.exports = Feriado;

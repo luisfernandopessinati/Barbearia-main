@@ -33,5 +33,5 @@ const Admin = sequelize.define('Admin', {
 }
 })
 
- Admin.sync({ force: true });
+ //Admin.sync({ force: true });
 module.exports = Admin;

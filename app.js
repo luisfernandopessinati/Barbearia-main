@@ -983,8 +983,7 @@ app.get('/deletar/:id', isAdminAuthenticated, function (req, res) {
         });
 });
 
-sequelize.sync({ force: true })
-  .then(async () => {
+(async () => {
     await Admin.sync({ force: true });
     await Empresa.sync({ force: true });
     await Servico.sync({ force: true });
@@ -993,8 +992,7 @@ sequelize.sync({ force: true })
     await Feriado.sync({ force: true });
     await HorarioFuncionamento.sync({ force: true });
     await Bloqueio.sync({ force: true });
-    await Agendamento.sync({ force: true }); // por último, tem FK para Admin e Servico
-
+    await Agendamento.sync({ force: true });
     app.listen(PORT, () => {
         console.log(`Servidor funcionando na porta http://localhost:${PORT}`);
         console.log(`Servidor funcionando na porta http://localhost:${PORT}/admin`);

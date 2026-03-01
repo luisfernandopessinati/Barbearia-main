@@ -401,6 +401,7 @@ app.post('/admins', isAdminAuthenticated, async (req, res) => {
             email: emailNormalizado,
             senha: hashSenha,
             idEmpresa: req.user.idEmpresa,
+            ativo: 'S',
             role: role === 'owner' ? 'owner' : 'admin'   // só aceita os dois valores válidos
         });
 
@@ -984,15 +985,15 @@ app.get('/deletar/:id', isAdminAuthenticated, function (req, res) {
 });
 
 (async () => {
-    await Admin.sync({ force: true });
-    await Empresa.sync({ force: true });
-    await Servico.sync({ force: true });
-    await Cliente.sync({ force: true });
-    await produto.sync({ force: true });
-    await Feriado.sync({ force: true });
-    await HorarioFuncionamento.sync({ force: true });
-    await Bloqueio.sync({ force: true });
-    await Agendamento.sync({ force: true });
+    await Admin.sync({ alter: true });
+    await Empresa.sync({ alter: true });
+    await Servico.sync({ alter: true });
+    await Cliente.sync({ alter: true });
+    await produto.sync({ alter: true });
+    await Feriado.sync({ alter: true });
+    await HorarioFuncionamento.sync({ alter: true });
+    await Bloqueio.sync({ alter: true });
+    await Agendamento.sync({ alter: true });
     app.listen(PORT, () => {
         console.log(`Servidor funcionando na porta http://localhost:${PORT}`);
         console.log(`Servidor funcionando na porta http://localhost:${PORT}/admin`);

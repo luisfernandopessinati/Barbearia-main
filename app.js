@@ -614,19 +614,25 @@ app.post('/agendar/:token', async function (req, res) {
             status: 'pendente'                           // 👈 novo
         });
 
-        const telefoneEmpresa = empresa.celular;
-        const mensagem = encodeURIComponent(
-            `Olá! Acabei de agendar:\n` +
-            `📅 Data: ${data}\n` +
-            `⏰ Horário: ${horario}\n` +
-            `✂️ Serviço: ${servico}\n` +
-            `👤 Profissional: ${barbeiro}`
-        );
-        const whatsappLink = `https://wa.me/55${telefoneEmpresa.replace(/\D/g, '')}?text=${mensagem}`;
+        const telefoneEmpresa = empresa.celular || '';
+        const telefoneLimpo = telefoneEmpresa.replace(/\D/g, '');
+
+        let whatsappLink = null;
+
+        if (telefoneLimpo) {
+            const mensagem = encodeURIComponent(
+                `Olá! Acabei de agendar:\n` +
+                `📅 Data: ${data}\n` +
+                `⏰ Horário: ${horario}\n` +
+                `✂️ Serviço: ${servico}\n` +
+                `👤 Profissional: ${barbeiro}`
+            );
+            whatsappLink = `https://wa.me/55${telefoneLimpo}?text=${mensagem}`;
+        }
 
         req.session.agendamentoSucesso = {
             mensagem: 'Agendamento confirmado!',
-            whatsappLink
+            whatsappLink  // pode ser null se não tiver celular cadastrado
         };
 
         return res.redirect(`/agendar/${token}`);
@@ -1000,17 +1006,17 @@ app.get('/deletar/:id', isAdminAuthenticated, function (req, res) {
         console.log(`Servidor funcionando na porta http://localhost:${PORT}/loginUsuario`);
     });
 })();
-
 /*
-sequelize.sync({ force: true }).then(() => {
+
+sequelize.sync({ force: false }).then(() => {
     app.listen(PORT, () => {
         console.log(`Servidor funcionando na porta http://localhost:${PORT}`);
         console.log(`Servidor funcionando na porta http://localhost:${PORT}/admin`);
         console.log(`Servidor funcionando na porta http://localhost:${PORT}/loginUsuario`);
     });
 });
-*/
 
+*/
 /*app.listen(PORT, () => {
     console.log(`Servidor funcionando na porta http://localhost:${PORT}`);
     console.log(`Servidor funcionando na porta http://localhost:${PORT}/admin`);

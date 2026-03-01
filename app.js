@@ -9,7 +9,7 @@ const bcrypt = require('bcryptjs');
 
 const Admin = require('./models/Admin');
 const Agendamento = require('./models/Agendamento');
-const Boqueio = require('./models/Boqueio');
+const Bloqueio = require('./models/Bloqueio');
 const Cliente = require('./models/Cliente');
 const Empresa = require('./models/Empresas');
 const Feriado = require('./models/feriado');
@@ -1002,7 +1002,7 @@ sequelize.sync({ force: true })
       console.log(`Servidor funcionando na porta http://localhost:${PORT}/loginUsuario`);
     });
   });
-  
+
 /*
 sequelize.sync({ force: true }).then(() => {
     app.listen(PORT, () => {

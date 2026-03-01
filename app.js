@@ -985,23 +985,22 @@ app.get('/deletar/:id', isAdminAuthenticated, function (req, res) {
 
 sequelize.sync({ force: true })
   .then(async () => {
-    // Ordem importa! Tabelas pai primeiro, depois as que dependem delas
     await Admin.sync({ force: true });
-    await Empresas.sync({ force: true });
-    await servico.sync({ force: true });
+    await Empresa.sync({ force: true });
+    await Servico.sync({ force: true });
     await Cliente.sync({ force: true });
-    await Bloqueio.sync({ force: true });
-    await feriado.sync({ force: true });
-    await HorarioFuncionamento.sync({ force: true });
     await produto.sync({ force: true });
-    await Agendamento.sync({ force: true }); // Por último, pois depende das outras
+    await Feriado.sync({ force: true });
+    await HorarioFuncionamento.sync({ force: true });
+    await Bloqueio.sync({ force: true });
+    await Agendamento.sync({ force: true }); // por último, tem FK para Admin e Servico
 
     app.listen(PORT, () => {
-      console.log(`Servidor funcionando na porta http://localhost:${PORT}`);
-      console.log(`Servidor funcionando na porta http://localhost:${PORT}/admin`);
-      console.log(`Servidor funcionando na porta http://localhost:${PORT}/loginUsuario`);
+        console.log(`Servidor funcionando na porta http://localhost:${PORT}`);
+        console.log(`Servidor funcionando na porta http://localhost:${PORT}/admin`);
+        console.log(`Servidor funcionando na porta http://localhost:${PORT}/loginUsuario`);
     });
-  });
+})();
 
 /*
 sequelize.sync({ force: true }).then(() => {

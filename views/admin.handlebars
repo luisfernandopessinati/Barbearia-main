@@ -1974,50 +1974,17 @@
             : `${ini.getDate()} ${MESES_FULL[ini.getMonth()].slice(0, 3)} – ${fim.getDate()} ${MESES_FULL[fim.getMonth()].slice(0, 3)} ${fim.getFullYear()}`;
     }
 
-    function renderCalendar() {
+    function renderCalendar() { 
         const grid = document.getElementById('cal-grid');
-        grid.innerHTML = '';
+         grid.innerHTML = '';
+         const weekDates = getWeekDates(); updateNavLabel(weekDates);
+          const todayStr = fmtDate(new Date());
+           const weekStrs = weekDates.map(d => fmtDate(d));
+            const agendsSemana = todosAgendamentos.filter(a => weekStrs.includes(a.data));
+             document.getElementById('empty-state').classList.toggle('visible', agendsSemana.length === 0);
+              isMobile() ? renderMobile(grid, weekDates, todayStr) : renderDesktop(grid, weekDates, todayStr);
+     }
 
-        const todayStr = fmtDate(new Date());
-
-        if (isMobile()) {
-
-            // 📱 MOBILE → trabalha com 1 único dia
-            const baseDate = new Date();
-            baseDate.setHours(0, 0, 0, 0);
-            baseDate.setDate(baseDate.getDate() + mobileDayOffset);
-
-            const str = fmtDate(baseDate);
-
-            const agendsDia = todosAgendamentos.filter(a =>
-                a.data === str &&
-                (filtroBarbeiro === 'todos' || a.barbeiro === filtroBarbeiro)
-            );
-
-            document.getElementById('empty-state')
-                .classList.toggle('visible', agendsDia.length === 0);
-
-            renderMobile(grid, todayStr);
-
-        } else {
-
-            // 💻 DESKTOP → continua semanal normal
-            const weekDates = getWeekDates();
-            updateNavLabel(weekDates);
-
-            const weekStrs = weekDates.map(d => fmtDate(d));
-
-            const agendsSemana = todosAgendamentos.filter(a =>
-                weekStrs.includes(a.data) &&
-                (filtroBarbeiro === 'todos' || a.barbeiro === filtroBarbeiro)
-            );
-
-            document.getElementById('empty-state')
-                .classList.toggle('visible', agendsSemana.length === 0);
-
-            renderDesktop(grid, weekDates, todayStr);
-        }
-    }
 
     function renderDesktop(grid, weekDates, todayStr) {
         grid.style.gridTemplateColumns = `56px repeat(7, minmax(120px, 1fr))`;
@@ -2088,7 +2055,7 @@
         });
     }
 
-    /*function renderMobile(grid, weekDates, todayStr) {
+    function renderMobile(grid, weekDates, todayStr) {
         weekDates.forEach(d => {
             const str = fmtDate(d);
             const isToday = str === todayStr;
@@ -2141,90 +2108,6 @@
             }
             grid.appendChild(day);
         });
-    }*/
-
-    function renderMobile(grid, todayStr) {
-        grid.innerHTML = ''; // Limpa a div antes de começar
-    
-        const baseDate = new Date();
-        baseDate.setHours(12, 0, 0, 0); // Trava no meio do dia para evitar erros de fuso horário
-        baseDate.setDate(baseDate.getDate() + mobileDayOffset);
-
-        const str = fmtDate(baseDate); 
-        const eventos = todosAgendamentos.filter(a => {
-            return a.data === str && (filtroBarbeiro === 'todos' || a.barbeiro === filtroBarbeiro);
-        }).sort((a, b) => a.horario.localeCompare(b.horario));
-
-        const dia = String(baseDate.getDate()).padStart(2, '0');
-        const mes = String(baseDate.getMonth() + 1).padStart(2, '0');
-        const ano = baseDate.getFullYear();
-        const dataFormatada = `${dia}/${mes}/${ano}`; 
-
-        const isToday = dataFormatada === todayStr;
-
-        const eventos = todosAgendamentos
-            .filter(a =>
-                a.data === dataFormatada && // Compara com o formato DD/MM/YYYY
-                (filtroBarbeiro === 'todos' || a.barbeiro === filtroBarbeiro)
-            )
-            .sort((a, b) => a.horario.localeCompare(b.horario));
-
-        grid.innerHTML = ''; // Limpa o grid antes de renderizar o dia
-        const day = document.createElement('div');
-        day.className = 'cal-mobile-day';
-
-        const header = document.createElement('div');
-        header.className = 'cal-mobile-day-header' + (isToday ? ' today' : '');
-        
-        // Usamos botões com IDs genéricos e classes para evitar duplicação de eventos
-        header.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center; width:100%; padding: 10px;">
-                <button type="button" class="btn-nav" id="btn-prev-m"> <i class="fas fa-chevron-left"></i> </button>
-                <span style="font-family:'Bebas Neue'; font-size:1.5rem;">${DIAS[baseDate.getDay()]}, ${baseDate.getDate()}</span>
-                <button type="button" class="btn-nav" id="btn-next-m"> <i class="fas fa-chevron-right"></i> </button>
-            </div>
-        `;
-        day.appendChild(header);
-
-        if (eventos.length === 0) {
-            const empty = document.createElement('div');
-            empty.className = 'cal-mobile-empty';
-            empty.style.padding = "40px 20px";
-            empty.innerHTML = `<i class="fas fa-calendar-xmark" style="display:block; font-size:2rem; margin-bottom:10px; opacity:0.3"></i> Sem agendamentos`;
-            day.appendChild(empty);
-        } else {
-            eventos.forEach(a => {
-                const ev = document.createElement('div');
-                ev.className = 'cal-mobile-event';
-                // Aplicando o visual de Timeline que combinamos antes
-                ev.innerHTML = `
-                    <div class="cal-mobile-time" style="font-family:'Bebas Neue'; color:var(--gold-light); min-width:50px;">${a.horario}</div>
-                    <div style="width:2px; background:var(--gold-dim); margin:0 15px; position:relative;">
-                        <div style="width:8px; height:8px; background:var(--gold); border-radius:50%; position:absolute; left:-3px; top:5px;"></div>
-                    </div>
-                    <div class="cal-mobile-info" style="flex:1;">
-                        <div style="font-weight:bold">${a.nome}</div>
-                        <div style="font-size:12px; opacity:0.6">${a.servico} · ${a.barbeiro}</div>
-                    </div>
-                `;
-                ev.addEventListener('click', e => abrirPopup(e, a));
-                day.appendChild(ev);
-            });
-        }
-
-        grid.appendChild(day);
-
-        // Eventos dos botões (usando IDs específicos para não bugar)
-        document.getElementById('btn-prev-m').onclick = (e) => {
-            e.stopPropagation();
-            mobileDayOffset--;
-            renderCalendar();
-        };
-        document.getElementById('btn-next-m').onclick = (e) => {
-            e.stopPropagation();
-            mobileDayOffset++;
-            renderCalendar();
-        };
     }
 
     function renderStats() {

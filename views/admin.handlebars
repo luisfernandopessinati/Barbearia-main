@@ -8,7 +8,16 @@
         padding: 0;
         box-sizing: border-box;
     }
+    html {
+        height: 100%;
+        overflow: hidden;
+    }
 
+    body {
+        height: 100%;
+        overflow-y: auto;
+        overscroll-behavior-y: contain;
+    }
     :root {
         --gold: #b8860b;
         --gold-light: #d4a012;
@@ -1865,6 +1874,7 @@
     let filtroBarbeiro = 'todos';
     let horarioProfSelecionado = null;
     let horarioDiaSelecionado = null;
+    let mobileDayOffset = 0;
 
     const isMobile = () => window.innerWidth <= 900;
 
@@ -2045,7 +2055,7 @@
         });
     }
 
-    function renderMobile(grid, weekDates, todayStr) {
+    /*function renderMobile(grid, weekDates, todayStr) {
         weekDates.forEach(d => {
             const str = fmtDate(d);
             const isToday = str === todayStr;
@@ -2097,6 +2107,68 @@
                 });
             }
             grid.appendChild(day);
+        });
+    }*/
+        function renderMobile(grid, weekDates, todayStr) {
+        grid.innerHTML = '';
+
+        const baseDate = new Date();
+        baseDate.setHours(0,0,0,0);
+        baseDate.setDate(baseDate.getDate() + mobileDayOffset);
+
+        const str = fmtDate(baseDate);
+        const isToday = str === todayStr;
+
+        const eventos = todosAgendamentos
+            .filter(a =>
+                a.data === str &&
+                (filtroBarbeiro === 'todos' || a.barbeiro === filtroBarbeiro)
+            )
+            .sort((a, b) => a.horario.localeCompare(b.horario));
+
+        const day = document.createElement('div');
+        day.className = 'cal-mobile-day';
+
+        // Header com navegação
+        const header = document.createElement('div');
+        header.className = 'cal-mobile-day-header' + (isToday ? ' today' : '');
+        header.innerHTML = `
+            <button id="mobile-prev-day">⬅</button>
+            <span>${DIAS[baseDate.getDay()]}, ${baseDate.getDate()}</span>
+            <button id="mobile-next-day">➡</button>
+        `;
+        day.appendChild(header);
+
+        if (eventos.length === 0) {
+            const empty = document.createElement('div');
+            empty.className = 'cal-mobile-empty';
+            empty.textContent = 'Sem agendamentos';
+            day.appendChild(empty);
+        } else {
+            eventos.forEach(a => {
+                const ev = document.createElement('div');
+                ev.className = 'cal-mobile-event';
+                ev.innerHTML = `
+                    <div style="font-weight:bold">${a.horario}</div>
+                    <div>${a.nome}</div>
+                    <div style="font-size:12px;opacity:.6">${a.servico} · ${a.barbeiro}</div>
+                `;
+                ev.addEventListener('click', e => abrirPopup(e, a));
+                day.appendChild(ev);
+            });
+        }
+
+        grid.appendChild(day);
+
+        // Navegação
+        document.getElementById('mobile-prev-day').addEventListener('click', () => {
+            mobileDayOffset--;
+            renderCalendar();
+        });
+
+        document.getElementById('mobile-next-day').addEventListener('click', () => {
+            mobileDayOffset++;
+            renderCalendar();
         });
     }
 

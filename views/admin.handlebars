@@ -2144,13 +2144,17 @@
     }*/
 
     function renderMobile(grid, todayStr) {
+        grid.innerHTML = ''; // Limpa a div antes de começar
+    
         const baseDate = new Date();
-        // Ajuste importante para evitar problemas de fuso horário no Linux/Ubuntu
-        baseDate.setHours(12, 0, 0, 0); 
+        baseDate.setHours(12, 0, 0, 0); // Trava no meio do dia para evitar erros de fuso horário
         baseDate.setDate(baseDate.getDate() + mobileDayOffset);
-        
-        // IMPORTANTE: Use a mesma função de formatação que o Desktop usa (fmtDate)
-        // Se não tiver a fmtDate disponível nesse escopo, use:
+
+        const str = fmtDate(baseDate); 
+        const eventos = todosAgendamentos.filter(a => {
+            return a.data === str && (filtroBarbeiro === 'todos' || a.barbeiro === filtroBarbeiro);
+        }).sort((a, b) => a.horario.localeCompare(b.horario));
+
         const dia = String(baseDate.getDate()).padStart(2, '0');
         const mes = String(baseDate.getMonth() + 1).padStart(2, '0');
         const ano = baseDate.getFullYear();

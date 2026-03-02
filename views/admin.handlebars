@@ -1,95 +1,483 @@
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
 
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    :root {
-        --gold: #b8860b; --gold-light: #d4a012; --gold-dim: #b8860b33;
-        --bg: #090909; --bg2: #111111; --bg3: #181818;
-        --border: #222222; --text: #e8e8e8; --muted: #555;
-        --danger: #c0392b; --danger-dim: #c0392b22;
+    *,
+    *::before,
+    *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
 
-    body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; }
+    :root {
+        --gold: #b8860b;
+        --gold-light: #d4a012;
+        --gold-dim: #b8860b33;
+        --bg: #090909;
+        --bg2: #111111;
+        --bg3: #181818;
+        --border: #222222;
+        --text: #e8e8e8;
+        --muted: #555;
+        --danger: #c0392b;
+        --danger-dim: #c0392b22;
+    }
+
+    body {
+        background: var(--bg);
+        font-family: 'DM Sans', sans-serif;
+        color: var(--text);
+        min-height: 100vh;
+    }
 
     /* ── Header ── */
-    .adm-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 40px; border-bottom: 1px solid var(--border); background: var(--bg2); position: sticky; top: 0; z-index: 100; }
-    .adm-header-left { display: flex; align-items: center; gap: 20px; }
-    .adm-back { color: var(--muted); text-decoration: none; font-size: 18px; transition: color 0.2s; }
-    .adm-back:hover { color: var(--gold); }
-    .adm-logo { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px; color: var(--gold); text-decoration: none; }
-    .adm-header-center { font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 4px; color: var(--muted); text-transform: uppercase; }
-    .btn-sair { background: none; border: 1px solid var(--border); color: var(--muted); padding: 8px 20px; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
-    .btn-sair:hover { border-color: var(--danger); color: var(--danger); }
+    .adm-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 40px;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg2);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .adm-header-left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .adm-back {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 18px;
+        transition: color 0.2s;
+    }
+
+    .adm-back:hover {
+        color: var(--gold);
+    }
+
+    .adm-logo {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 20px;
+        letter-spacing: 3px;
+        color: var(--gold);
+        text-decoration: none;
+    }
+
+    .adm-header-center {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 13px;
+        letter-spacing: 4px;
+        color: var(--muted);
+        text-transform: uppercase;
+    }
+
+    .btn-sair {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 8px 20px;
+        border-radius: 6px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-sair:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+    }
 
     /* ── Body ── */
-    .adm-body { display: flex; flex-direction: column; min-height: calc(100vh - 65px); }
+    .adm-body {
+        display: flex;
+        flex-direction: column;
+        min-height: calc(100vh - 65px);
+    }
 
     /* ── Chips de barbeiros ── */
-    .barber-chips-bar { display: flex; align-items: center; gap: 8px; padding: 12px 40px; border-bottom: 1px solid var(--border); background: var(--bg2); overflow-x: auto; scrollbar-width: none; flex-shrink: 0; }
-    .barber-chips-bar::-webkit-scrollbar { display: none; }
+    .barber-chips-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 40px;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg2);
+        overflow-x: auto;
+        scrollbar-width: none;
+        flex-shrink: 0;
+    }
+
+    .barber-chips-bar::-webkit-scrollbar {
+        display: none;
+    }
+
     /*.barber-chip-top { display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0; background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px 6px 10px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--muted); transition: all 0.18s; white-space: nowrap; }*/
-    .barber-chip-top { display: inline-flex; align-items: center; gap: 7px;  background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px 6px 10px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--muted); transition: all 0.18s; white-space: nowrap; }
-    
-    .barber-chip-top:hover { border-color: var(--gold-dim); color: var(--text); }
-    .barber-chip-top.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
-    .barber-chip-avatar { width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #6b4c00); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 11px; color: #fff; flex-shrink: 0; }
-    
-    .barber-chip-top.active .barber-chip-avatar { background: linear-gradient(135deg, var(--gold-light), var(--gold)); }
-    .barber-chip-count { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; font-size: 10px; padding: 1px 6px; color: var(--muted); }
-    .barber-chip-top.active .barber-chip-count { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+    .barber-chip-top {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 6px 14px 6px 10px;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--muted);
+        transition: all 0.18s;
+        white-space: nowrap;
+    }
+
+    .barber-chip-top:hover {
+        border-color: var(--gold-dim);
+        color: var(--text);
+    }
+
+    .barber-chip-top.active {
+        background: var(--gold-dim);
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .barber-chip-avatar {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--gold), #6b4c00);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 11px;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .barber-chip-top.active .barber-chip-avatar {
+        background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    }
+
+    .barber-chip-count {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 10px;
+        padding: 1px 6px;
+        color: var(--muted);
+    }
+
+    .barber-chip-top.active .barber-chip-count {
+        background: var(--gold-dim);
+        border-color: var(--gold);
+        color: var(--gold);
+    }
 
     /* ── Content ── */
-    .adm-content { flex: 1; padding: 36px 40px; overflow-x: auto; }
+    .adm-content {
+        flex: 1;
+        padding: 36px 40px;
+        overflow-x: auto;
+    }
 
     /* ── Stats ── */
-    .stats-bar { display: flex; gap: 16px; margin-bottom: 28px; }
-    .stat-item { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; flex: 1; }
-    .stat-label { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
-    .stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--text); line-height: 1; }
-    .stat-value.gold { color: var(--gold); }
+    .stats-bar {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .stat-item {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px 20px;
+        flex: 1;
+    }
+
+    .stat-label {
+        font-size: 10px;
+        letter-spacing: 2px;
+        color: var(--muted);
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+
+    .stat-value {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 28px;
+        color: var(--text);
+        line-height: 1;
+    }
+
+    .stat-value.gold {
+        color: var(--gold);
+    }
 
     /* ── Cal Nav ── */
-    .cal-nav { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-    .cal-nav-label { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; color: var(--text); min-width: 180px; }
-    .date-nav-btn { background: var(--bg2); border: 1px solid var(--border); color: var(--muted); width: 34px; height: 34px; border-radius: 6px; font-size: 16px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
-    .date-nav-btn:hover { border-color: var(--gold); color: var(--gold); }
-    .btn-novo { margin-left: auto; background: var(--gold); border: none; color: #000; width: 36px; height: 36px; border-radius: 8px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.15s; flex-shrink: 0; line-height: 1; }
-    .btn-novo:hover { background: var(--gold-light); transform: scale(1.08); }
+    .cal-nav {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .cal-nav-label {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 18px;
+        letter-spacing: 2px;
+        color: var(--text);
+        min-width: 180px;
+    }
+
+    .date-nav-btn {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        width: 50px;
+        height: 34px;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .date-nav-btn:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .btn-novo {
+        margin-left: auto;
+        background: var(--gold);
+        border: none;
+        color: #000;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        font-size: 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s, transform 0.15s;
+        flex-shrink: 0;
+        line-height: 1;
+    }
+
+    .btn-novo:hover {
+        background: var(--gold-light);
+        transform: scale(1.08);
+    }
 
     /* ── Calendário grid ── */
-    .cal-wrap { overflow-x: auto; overflow-y: auto; max-height: calc(100vh - 280px); border: 1px solid var(--border); border-radius: 12px; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
-    .cal-wrap::-webkit-scrollbar { width: 6px; height: 6px; }
-    .cal-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-    .cal-grid { display: grid; min-width: 600px; }
+    .cal-wrap {
+        overflow-x: auto;
+        overflow-y: auto;
+        max-height: calc(100vh - 280px);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+    }
 
-    .cal-head-time { background: var(--bg2); border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); padding: 10px 8px; position: sticky; top: 0; left: 0; z-index: 10; min-width: 56px; }
-    .cal-head-cell { background: var(--bg2); border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); padding: 10px 8px; text-align: center; position: sticky; top: 0; z-index: 9; min-width: 120px; }
-    .cal-head-day { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 2px; color: var(--text); display: block; }
-    .cal-head-cell.today .cal-head-day { color: var(--gold); }
+    .cal-wrap::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
 
-    .cal-time-cell { background: var(--bg2); border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); padding: 6px 8px; font-size: 11px; color: var(--muted); text-align: right; position: sticky; left: 0; z-index: 5; white-space: nowrap; min-width: 56px; }
-    .cal-cell { background: var(--bg); border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); padding: 4px; min-height: 52px; position: relative; transition: background 0.15s; cursor: pointer; min-width: 120px; display: flex; gap: 3px; flex-wrap: wrap; align-content: flex-start; }
-    .cal-cell:hover { background: var(--bg3); }
-    .cal-cell.hoje-col { background: #b8860b08; }
+    .cal-wrap::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+    }
+
+    .cal-grid {
+        display: grid;
+        min-width: 600px;
+    }
+
+    .cal-head-time {
+        background: var(--bg2);
+        border-bottom: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+        padding: 10px 8px;
+        position: sticky;
+        top: 0;
+        left: 0;
+        z-index: 10;
+        min-width: 56px;
+    }
+
+    .cal-head-cell {
+        background: var(--bg2);
+        border-bottom: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+        padding: 10px 8px;
+        text-align: center;
+        position: sticky;
+        top: 0;
+        z-index: 9;
+        min-width: 120px;
+    }
+
+    .cal-head-day {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 15px;
+        letter-spacing: 2px;
+        color: var(--text);
+        display: block;
+    }
+
+    .cal-head-cell.today .cal-head-day {
+        color: var(--gold);
+    }
+
+    .cal-time-cell {
+        background: var(--bg2);
+        border-bottom: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+        padding: 6px 8px;
+        font-size: 11px;
+        color: var(--muted);
+        text-align: right;
+        position: sticky;
+        left: 0;
+        z-index: 5;
+        white-space: nowrap;
+        min-width: 56px;
+    }
+
+    .cal-cell {
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+        padding: 4px;
+        min-height: 52px;
+        position: relative;
+        transition: background 0.15s;
+        cursor: pointer;
+        min-width: 120px;
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        align-content: flex-start;
+    }
+
+    .cal-cell:hover {
+        background: var(--bg3);
+    }
+
+    .cal-cell.hoje-col {
+        background: #b8860b08;
+    }
 
     /* ── Evento ── */
-    .cal-event { background: linear-gradient(135deg, var(--gold), #6b4c00); border-radius: 5px; padding: 4px 7px; cursor: pointer; transition: opacity 0.15s, transform 0.15s; overflow: hidden; flex: 1; min-width: 80px; }
-    .cal-event:hover { opacity: 0.85; transform: scale(1.01); }
-    .cal-event-nome { font-size: 11px; font-weight: 600; color: #fff; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .cal-event-tel { font-size: 10px; color: rgba(255,255,255,0.75); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cal-event {
+        background: linear-gradient(135deg, var(--gold), #6b4c00);
+        border-radius: 5px;
+        padding: 4px 7px;
+        cursor: pointer;
+        transition: opacity 0.15s, transform 0.15s;
+        overflow: hidden;
+        flex: 1;
+        min-width: 80px;
+    }
+
+    .cal-event:hover {
+        opacity: 0.85;
+        transform: scale(1.01);
+    }
+
+    .cal-event-nome {
+        font-size: 11px;
+        font-weight: 600;
+        color: #fff;
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .cal-event-tel {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.75);
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
     /* ── Slot vazio ── */
-    .cal-slot-vazio { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: center; color: transparent; font-size: 18px; transition: color 0.15s; flex: 1; }
-    .cal-cell:hover .cal-slot-vazio { color: var(--border); }
+    .cal-slot-vazio {
+        width: 100%;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: transparent;
+        font-size: 18px;
+        transition: color 0.15s;
+        flex: 1;
+    }
+
+    .cal-cell:hover .cal-slot-vazio {
+        color: var(--border);
+    }
 
     /* ── Popup ── */
-    .cal-popup { position: fixed; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; z-index: 500; min-width: 200px; box-shadow: 0 16px 40px #00000099; display: none; }
-    .cal-popup.open { display: block; }
-    .cal-popup-nome { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
-    .cal-popup-telefone { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
-    .cal-popup-meta { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
-    .cal-popup-actions { display: flex; gap: 8px; }
+    .cal-popup {
+        position: fixed;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px;
+        z-index: 500;
+        min-width: 200px;
+        box-shadow: 0 16px 40px #00000099;
+        display: none;
+    }
+
+    .cal-popup.open {
+        display: block;
+    }
+
+    .cal-popup-nome {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text);
+        margin-bottom: 2px;
+    }
+
+    .cal-popup-telefone {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text);
+        margin-bottom: 2px;
+    }
+
+    .cal-popup-meta {
+        font-size: 11px;
+        color: var(--muted);
+        margin-bottom: 12px;
+    }
+
+    .cal-popup-actions {
+        display: flex;
+        gap: 8px;
+    }
+
     .btn-whatsapp {
         flex: 1;
         padding: 4px 6px;
@@ -108,149 +496,1013 @@
         border: 1px solid #0e8a43;
         color: #fff;
     }
-    .btn-whatsapp:hover { background: #0e8a43; }
+
+    .btn-whatsapp:hover {
+        background: #0e8a43;
+    }
+
     /* ── Mobile cal ── */
-    .cal-mobile-day { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
-    .cal-mobile-day-header { padding: 10px 14px; border-bottom: 1px solid var(--border); font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 2px; color: var(--text); display: flex; justify-content: space-between; align-items: center; }
-    .cal-mobile-day-header.today { color: var(--gold); }
-    .cal-mobile-event { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--border); cursor: pointer; }
-    .cal-mobile-event:last-child { border-bottom: none; }
-    .cal-mobile-time { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--gold); min-width: 50px; }
-    .cal-mobile-info { flex: 1; }
-    .cal-mobile-nome { font-size: 13px; font-weight: 500; color: var(--text); }
-    .cal-mobile-meta { font-size: 11px; color: var(--muted); }
-    .cal-mobile-empty { padding: 16px 14px; font-size: 12px; color: var(--muted); }
+    .cal-mobile-day {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 12px;
+    }
+
+    .cal-mobile-day-header {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border);
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 15px;
+        letter-spacing: 2px;
+        color: var(--text);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .cal-mobile-day-header.today {
+        color: var(--gold);
+    }
+
+    .cal-mobile-event {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+    }
+
+    .cal-mobile-event:last-child {
+        border-bottom: none;
+    }
+
+    .cal-mobile-time {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 20px;
+        color: var(--gold);
+        min-width: 50px;
+    }
+
+    .cal-mobile-info {
+        flex: 1;
+    }
+
+    .cal-mobile-nome {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+    }
+
+    .cal-mobile-meta {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .cal-mobile-empty {
+        padding: 16px 14px;
+        font-size: 12px;
+        color: var(--muted);
+    }
 
     /* ── Empty state ── */
-    .empty-state { text-align: center; padding: 80px 20px; color: var(--muted); display: none; }
-    .empty-state.visible { display: block; }
-    .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
-    .empty-state p { font-size: 14px; }
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        color: var(--muted);
+        display: none;
+    }
+
+    .empty-state.visible {
+        display: block;
+    }
+
+    .empty-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+        opacity: 0.3;
+    }
+
+    .empty-state p {
+        font-size: 14px;
+    }
 
     /* ── Buttons ── */
-    .btn-edit, .btn-del { flex: 1; padding: 4px 6px; border-radius: 5px; font-size: 11px; font-family: 'DM Sans', sans-serif; cursor: pointer; text-decoration: none; text-align: center; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 3px; }
-    .btn-edit { background: var(--bg2); border: 1px solid var(--border); color: var(--muted); }
-    .btn-edit:hover { border-color: var(--gold); color: var(--gold); }
-    .btn-del { background: var(--danger-dim); border: 1px solid var(--danger); color: var(--danger); }
-    .btn-del:hover { background: var(--danger); color: #fff; }
+    .btn-edit,
+    .btn-del {
+        flex: 1;
+        padding: 4px 6px;
+        border-radius: 5px;
+        font-size: 11px;
+        font-family: 'DM Sans', sans-serif;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+    }
+
+    .btn-edit {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        color: var(--muted);
+    }
+
+    .btn-edit:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .btn-del {
+        background: var(--danger-dim);
+        border: 1px solid var(--danger);
+        color: var(--danger);
+    }
+
+    .btn-del:hover {
+        background: var(--danger);
+        color: #fff;
+    }
 
     /* ── Modais ── */
-    .modal-overlay { position: fixed; inset: 0; background: #000000cc; backdrop-filter: blur(4px); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
-    .modal-overlay.open { opacity: 1; pointer-events: all; }
-    .modal { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 36px; width: 100%; max-width: 480px; transform: translateY(16px); transition: transform 0.25s; position: relative; }
-    .modal-overlay.open .modal { transform: translateY(0); }
-    .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--text); letter-spacing: 1px; margin-bottom: 4px; }
-    .modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 28px; }
-    .modal-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; transition: color 0.2s; }
-    .modal-close:hover { color: var(--text); }
-    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-    .modal-grid .full { grid-column: 1 / -1; }
-    .modal-field { display: flex; flex-direction: column; gap: 6px; }
-    .modal-field label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
-    .modal-field input, .modal-field select { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); outline: none; transition: border-color 0.2s; width: 100%; }
-    .modal-field input:focus, .modal-field select:focus { border-color: var(--gold); }
-    .modal-field select option { background: var(--bg3); }
-    .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
-    .btn-cancelar { flex: 1; background: none; border: 1px solid var(--border); color: var(--muted); padding: 12px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.2s; }
-    .btn-cancelar:hover { border-color: var(--danger); color: var(--danger); }
-    .btn-confirmar { flex: 2; background: var(--gold); border: none; color: #000; padding: 12px; border-radius: 8px; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; cursor: pointer; transition: background 0.2s; }
-    .btn-confirmar:hover { background: var(--gold-light); }
-    .modal-erro { font-size: 12px; color: var(--danger); margin-top: 10px; text-align: center; min-height: 16px; }
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: #000000cc;
+        backdrop-filter: blur(4px);
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+    }
+
+    .modal-overlay.open {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    .modal {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 36px;
+        width: 100%;
+        max-width: 480px;
+        transform: translateY(16px);
+        transition: transform 0.25s;
+        position: relative;
+    }
+
+    .modal-overlay.open .modal {
+        transform: translateY(0);
+    }
+
+    .modal-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 28px;
+        color: var(--text);
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+    }
+
+    .modal-sub {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 28px;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: none;
+        border: none;
+        color: var(--muted);
+        font-size: 20px;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .modal-close:hover {
+        color: var(--text);
+    }
+
+    .modal-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 14px;
+    }
+
+    .modal-grid .full {
+        grid-column: 1 / -1;
+    }
+
+    .modal-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .modal-field label {
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .modal-field input,
+    .modal-field select {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        color: var(--text);
+        outline: none;
+        transition: border-color 0.2s;
+        width: 100%;
+    }
+
+    .modal-field input:focus,
+    .modal-field select:focus {
+        border-color: var(--gold);
+    }
+
+    .modal-field select option {
+        background: var(--bg3);
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 24px;
+    }
+
+    .btn-cancelar {
+        flex: 1;
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 12px;
+        border-radius: 8px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-cancelar:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+    }
+
+    .btn-confirmar {
+        flex: 2;
+        background: var(--gold);
+        border: none;
+        color: #000;
+        padding: 12px;
+        border-radius: 8px;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 18px;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-confirmar:hover {
+        background: var(--gold-light);
+    }
+
+    .modal-erro {
+        font-size: 12px;
+        color: var(--danger);
+        margin-top: 10px;
+        text-align: center;
+        min-height: 16px;
+    }
 
     /* ── Listas modais ── */
-    .feriado-lista, .servico-lista, .admin-lista { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; overflow-y: auto; }
-    .feriado-lista { max-height: 220px; }
-    .servico-lista { max-height: 260px; }
-    .admin-lista { max-height: 240px; }
-    .feriado-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; }
-    .feriado-item-info { display: flex; flex-direction: column; gap: 2px; }
-    .feriado-item-data { font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: var(--gold); letter-spacing: 1px; }
-    .feriado-item-desc { font-size: 12px; color: var(--muted); }
-    .feriado-del { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 14px; padding: 4px 8px; border-radius: 4px; transition: background 0.2s; opacity: 0.6; }
-    .feriado-del:hover { background: var(--danger-dim); opacity: 1; }
-    .feriados-empty, .servicos-empty, .admins-empty { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
-    .feriados-sep, .servicos-sep, .admins-sep { height: 1px; background: var(--border); margin: 20px 0; }
+    .feriado-lista,
+    .servico-lista,
+    .admin-lista {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 16px;
+        overflow-y: auto;
+    }
 
-    .servico-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; gap: 10px; }
-    .servico-item.inativo { opacity: 0.4; }
-    .servico-item-nome { font-size: 13px; font-weight: 500; color: var(--text); flex: 1; }
-    .servico-item-valor { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--gold); letter-spacing: 1px; min-width: 70px; text-align: right; }
-    .servico-item-actions { display: flex; gap: 6px; flex-shrink: 0; }
-    .btn-servico-edit { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 11px; padding: 4px 8px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
-    .btn-servico-edit:hover { border-color: var(--gold); color: var(--gold); }
-    .btn-servico-toggle { background: #27ae6011; border: 1px solid #27ae6055; color: #27ae60; font-size: 11px; padding: 4px 8px; border-radius: 4px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-    .btn-servico-toggle.inativo { border-color: var(--danger); color: var(--danger); background: var(--danger-dim); }
-    .btn-servico-toggle:hover { opacity: 0.8; }
-    .servico-edit-row { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
-    .servico-edit-row input { background: var(--bg); border: 1px solid var(--gold); border-radius: 6px; padding: 4px 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--text); outline: none; width: 80px; }
+    .feriado-lista {
+        max-height: 220px;
+    }
 
-    .admin-item { display: flex; align-items: center; gap: 12px; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; }
-    .admin-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #6b4c00); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: #fff; flex-shrink: 0; }
-    .admin-item-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-    .admin-item-nome { font-size: 13px; font-weight: 500; color: var(--text); }
-    .admin-item-email { font-size: 11px; color: var(--muted); }
-    .admin-item-role { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; padding: 2px 8px; border-radius: 10px; border: 1px solid var(--border); color: var(--muted); background: var(--bg); white-space: nowrap; }
-    .admin-item-role.owner { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
-    .admin-del { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 14px; padding: 4px 8px; border-radius: 4px; transition: background 0.2s; opacity: 0.6; }
-    .admin-del:hover { background: var(--danger-dim); opacity: 1; }
+    .servico-lista {
+        max-height: 260px;
+    }
 
-    .input-pass-wrap { position: relative; }
-    .input-pass-wrap input { padding-right: 40px !important; }
-    .btn-toggle-pass { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; font-size: 13px; padding: 2px; line-height: 1; transition: color 0.2s; }
-    .btn-toggle-pass:hover { color: var(--gold); }
+    .admin-lista {
+        max-height: 240px;
+    }
+
+    .feriado-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 14px;
+    }
+
+    .feriado-item-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .feriado-item-data {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 16px;
+        color: var(--gold);
+        letter-spacing: 1px;
+    }
+
+    .feriado-item-desc {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .feriado-del {
+        background: none;
+        border: none;
+        color: var(--danger);
+        cursor: pointer;
+        font-size: 14px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: background 0.2s;
+        opacity: 0.6;
+    }
+
+    .feriado-del:hover {
+        background: var(--danger-dim);
+        opacity: 1;
+    }
+
+    .feriados-empty,
+    .servicos-empty,
+    .admins-empty {
+        text-align: center;
+        color: var(--muted);
+        font-size: 12px;
+        padding: 20px;
+    }
+
+    .feriados-sep,
+    .servicos-sep,
+    .admins-sep {
+        height: 1px;
+        background: var(--border);
+        margin: 20px 0;
+    }
+
+    .servico-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 14px;
+        gap: 10px;
+    }
+
+    .servico-item.inativo {
+        opacity: 0.4;
+    }
+
+    .servico-item-nome {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+        flex: 1;
+    }
+
+    .servico-item-valor {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 18px;
+        color: var(--gold);
+        letter-spacing: 1px;
+        min-width: 70px;
+        text-align: right;
+    }
+
+    .servico-item-actions {
+        display: flex;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    .btn-servico-edit {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-servico-edit:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .btn-servico-toggle {
+        background: #27ae6011;
+        border: 1px solid #27ae6055;
+        color: #27ae60;
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-servico-toggle.inativo {
+        border-color: var(--danger);
+        color: var(--danger);
+        background: var(--danger-dim);
+    }
+
+    .btn-servico-toggle:hover {
+        opacity: 0.8;
+    }
+
+    .servico-edit-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-top: 4px;
+    }
+
+    .servico-edit-row input {
+        background: var(--bg);
+        border: 1px solid var(--gold);
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        color: var(--text);
+        outline: none;
+        width: 80px;
+    }
+
+    .admin-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 14px;
+    }
+
+    .admin-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--gold), #6b4c00);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 13px;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .admin-item-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .admin-item-nome {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+    }
+
+    .admin-item-email {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .admin-item-role {
+        font-size: 10px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 2px 8px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        background: var(--bg);
+        white-space: nowrap;
+    }
+
+    .admin-item-role.owner {
+        background: var(--gold-dim);
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .admin-del {
+        background: none;
+        border: none;
+        color: var(--danger);
+        cursor: pointer;
+        font-size: 14px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: background 0.2s;
+        opacity: 0.6;
+    }
+
+    .admin-del:hover {
+        background: var(--danger-dim);
+        opacity: 1;
+    }
+
+    .input-pass-wrap {
+        position: relative;
+    }
+
+    .input-pass-wrap input {
+        padding-right: 40px !important;
+    }
+
+    .btn-toggle-pass {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 13px;
+        padding: 2px;
+        line-height: 1;
+        transition: color 0.2s;
+    }
+
+    .btn-toggle-pass:hover {
+        color: var(--gold);
+    }
 
     /* ── Menu Configurações ── */
-    .config-menu-wrap { position: relative; display: inline-block; flex-shrink: 0; }
-    .btn-config-menu { background: none; border: 1px solid var(--border); color: var(--muted); padding: 8px 16px; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
-    .btn-config-menu:hover, .btn-config-menu.open { border-color: var(--gold); color: var(--gold); }
-    .menu-icon { display: flex; flex-direction: column; gap: 3px; width: 14px; }
-    .menu-icon span { display: block; height: 1.5px; background: currentColor; border-radius: 2px; transition: all 0.2s; }
-    .btn-config-menu.open .menu-icon span:nth-child(1) { transform: translateY(4.5px) rotate(45deg); }
-    .btn-config-menu.open .menu-icon span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-    .btn-config-menu.open .menu-icon span:nth-child(3) { transform: translateY(-4.5px) rotate(-45deg); }
-    .config-dropdown { position: absolute; top: calc(100% + 8px); right: 0; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; min-width: 220px; padding: 6px; z-index: 150; opacity: 0; pointer-events: none; transform: translateY(-6px) scale(0.98); transform-origin: top right; transition: opacity 0.18s ease, transform 0.18s ease; box-shadow: 0 16px 40px #00000088; }
-    .config-dropdown.open { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
-    .config-dropdown-label { font-size: 9px; letter-spacing: 2.5px; color: var(--muted); text-transform: uppercase; padding: 8px 10px 4px; }
-    .config-dropdown-sep { height: 1px; background: var(--border); margin: 4px 0; }
-    .config-dropdown-item { display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 9px 10px; border-radius: 7px; cursor: pointer; transition: all 0.15s; text-align: left; }
-    .config-dropdown-item:hover { background: var(--bg3); color: var(--text); }
-    .item-icon { width: 28px; height: 28px; border-radius: 6px; background: var(--bg3); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; transition: all 0.15s; }
-    .config-dropdown-item:hover .item-icon { background: var(--gold-dim); border-color: var(--gold); }
-    .item-label { display: flex; flex-direction: column; gap: 1px; flex: 1; }
-    .item-label span { font-size: 13px; font-weight: 500; color: inherit; }
-    .item-label small { font-size: 10px; color: var(--muted); font-weight: 400; }
-    .item-badge { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; background: var(--gold-dim); color: var(--gold); border: 1px solid var(--gold); padding: 1px 6px; border-radius: 10px; }
-    .item-badgeBlock { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; background: var(--danger-dim); color: var(--danger); border: 1px solid var(--danger); padding: 1px 6px; border-radius: 10px; }
+    .config-menu-wrap {
+        position: relative;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+
+    .btn-config-menu {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 8px 30px;
+        border-radius: 6px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+    .btn-config-menu:hover,
+    .btn-config-menu.open {
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .menu-icon {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        width: 14px;
+    }
+
+    .menu-icon span {
+        display: block;
+        height: 1.5px;
+        background: currentColor;
+        border-radius: 2px;
+        transition: all 0.2s;
+    }
+
+    .btn-config-menu.open .menu-icon span:nth-child(1) {
+        transform: translateY(4.5px) rotate(45deg);
+    }
+
+    .btn-config-menu.open .menu-icon span:nth-child(2) {
+        opacity: 0;
+        transform: scaleX(0);
+    }
+
+    .btn-config-menu.open .menu-icon span:nth-child(3) {
+        transform: translateY(-4.5px) rotate(-45deg);
+    }
+
+    .config-dropdown {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        min-width: 220px;
+        padding: 6px;
+        z-index: 150;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-6px) scale(0.98);
+        transform-origin: top right;
+        transition: opacity 0.18s ease, transform 0.18s ease;
+        box-shadow: 0 16px 40px #00000088;
+    }
+
+    .config-dropdown.open {
+        opacity: 1;
+        pointer-events: all;
+        transform: translateY(0) scale(1);
+    }
+
+    .config-dropdown-label {
+        font-size: 9px;
+        letter-spacing: 2.5px;
+        color: var(--muted);
+        text-transform: uppercase;
+        padding: 8px 10px 4px;
+    }
+
+    .config-dropdown-sep {
+        height: 1px;
+        background: var(--border);
+        margin: 4px 0;
+    }
+
+    .config-dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        background: none;
+        border: none;
+        color: var(--muted);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        padding: 9px 10px;
+        border-radius: 7px;
+        cursor: pointer;
+        transition: all 0.15s;
+        text-align: left;
+    }
+
+    .config-dropdown-item:hover {
+        background: var(--bg3);
+        color: var(--text);
+    }
+
+    .item-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        flex-shrink: 0;
+        transition: all 0.15s;
+    }
+
+    .config-dropdown-item:hover .item-icon {
+        background: var(--gold-dim);
+        border-color: var(--gold);
+    }
+
+    .item-label {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        flex: 1;
+    }
+
+    .item-label span {
+        font-size: 13px;
+        font-weight: 500;
+        color: inherit;
+    }
+
+    .item-label small {
+        font-size: 10px;
+        color: var(--muted);
+        font-weight: 400;
+    }
+
+    .item-badge {
+        font-size: 9px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        background: var(--gold-dim);
+        color: var(--gold);
+        border: 1px solid var(--gold);
+        padding: 1px 6px;
+        border-radius: 10px;
+    }
+
+    .item-badgeBlock {
+        font-size: 9px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        background: var(--danger-dim);
+        color: var(--danger);
+        border: 1px solid var(--danger);
+        padding: 1px 6px;
+        border-radius: 10px;
+    }
 
     /* ── Horários modal ── */
-    .horario-prof-select { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-    .horario-prof-chip { background: var(--bg3); border: 1px solid var(--border); color: var(--muted); padding: 6px 14px; border-radius: 20px; font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.18s; }
-    .horario-prof-chip.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
-    .horario-dias-grid { gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-    .horario-dia-btn { background: var(--bg3); border: 1px solid var(--border); color: var(--muted); padding: 6px 12px; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.18s; }
-    .horario-dia-btn.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
-    .horarios-sep { height: 1px; background: var(--border); margin: 20px 0; }
-    .horarios-empty { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
-    .horario-item { display: flex; align-items: center; gap: 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; }
-    .horario-item-dia { font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: var(--gold); min-width: 36px; }
-    .horario-item-range { font-size: 13px; color: var(--text); flex: 1; }
-    .horario-item-prof { font-size: 11px; color: var(--muted); }
-    .horario-del { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 14px; padding: 4px 8px; border-radius: 4px; transition: background 0.2s; opacity: 0.6; margin-left: auto; }
-    .horario-del:hover { background: var(--danger-dim); opacity: 1; }
-    .horario-lista { max-height: 240px; overflow-y: auto; }
+    .horario-prof-select {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .horario-prof-chip {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.18s;
+    }
+
+    .horario-prof-chip.active {
+        background: var(--gold-dim);
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .horario-dias-grid {
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+
+    .horario-dia-btn {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.18s;
+    }
+
+    .horario-dia-btn.active {
+        background: var(--gold-dim);
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .horarios-sep {
+        height: 1px;
+        background: var(--border);
+        margin: 20px 0;
+    }
+
+    .horarios-empty {
+        text-align: center;
+        color: var(--muted);
+        font-size: 12px;
+        padding: 20px;
+    }
+
+    .horario-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 14px;
+        margin-bottom: 8px;
+    }
+
+    .horario-item-dia {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 16px;
+        color: var(--gold);
+        min-width: 36px;
+    }
+
+    .horario-item-range {
+        font-size: 13px;
+        color: var(--text);
+        flex: 1;
+    }
+
+    .horario-item-prof {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .horario-del {
+        background: none;
+        border: none;
+        color: var(--danger);
+        cursor: pointer;
+        font-size: 14px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: background 0.2s;
+        opacity: 0.6;
+        margin-left: auto;
+    }
+
+    .horario-del:hover {
+        background: var(--danger-dim);
+        opacity: 1;
+    }
+
+    .horario-lista {
+        max-height: 240px;
+        overflow-y: auto;
+    }
 
     /* ── Responsive ── */
     @media (max-width: 900px) {
-        .adm-header { padding: 14px 16px; }
-        .adm-header-center { display: none; }
-        .barber-chips-bar { padding: 10px 16px; }
-        .adm-content { padding: 16px; }
-        .stats-bar { flex-wrap: wrap; gap: 8px; }
-        .stat-item { padding: 10px 14px; }
-        .stat-value { font-size: 22px; }
-        .cal-wrap { max-height: none; border: none; border-radius: 0; overflow: visible; }
-        .cal-grid { display: flex; flex-direction: column; min-width: unset; gap: 12px; }
-        .cal-head-time, .cal-head-cell { display: none; }
+        .adm-header {
+            padding: 14px 16px;
+        }
+
+        .adm-header-center {
+            display: none;
+        }
+
+        .barber-chips-bar {
+            padding: 10px 16px;
+        }
+
+        .adm-content {
+            padding: 16px;
+        }
+
+        .stats-bar {
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .stat-item {
+            padding: 10px 14px;
+        }
+
+        .stat-value {
+            font-size: 22px;
+        }
+
+        .cal-wrap {
+            max-height: none;
+            border: none;
+            border-radius: 0;
+            overflow: visible;
+        }
+
+        .cal-grid {
+            display: flex;
+            flex-direction: column;
+            min-width: unset;
+            gap: 12px;
+        }
+
+        .cal-head-time,
+        .cal-head-cell {
+            display: none;
+        }
+    }
+
+    .link-card-premium {
+        background: linear-gradient(145deg, #1f1f1f, #252525);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+        margin-bottom: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    }
+
+    .link-card-top {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .link-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+    .link-title {
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .link-subtitle {
+        font-size: 11px;
+        opacity: 0.7;
+    }
+
+    .link-input-area {
+        display: flex;
+        gap: 8px;
+    }
+
+    .link-input-area input {
+        flex: 1;
+        background: #111;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 8px 10px;
+        font-size: 11px;
+        color: #fff;
+    }
+
+    #btn-copiar-link {
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        border: none;
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 11px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    #btn-copiar-link:hover {
+        transform: scale(1.05);
+    }
+
+    .btn-whatsapp {
+        background: #25d366;
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .btn-whatsapp:hover {
+        background: #1ebe5d;
     }
 </style>
 
@@ -268,6 +1520,21 @@
                 Menu
             </button>
             <div class="config-dropdown" id="config-dropdown">
+                <div class="config-dropdown-label">Compartilhar</div>
+                <div class="config-dropdown-item link-agendamento-item">                
+                    <div class="link-header">
+                        <span class="item-icon">🔗</span>
+                        <div class="item-label">
+                            <span>Link de Agendamento</span>
+                            <small>Envie para seus clientes</small>
+                        </div>
+                    </div>
+                    <div class="link-actions">
+                        <input type="text" id="input-link-agendamento" readonly />
+                        <button id="btn-copiar-link">Copiar</button>
+                    </div>
+                    <button id="btn-whatsapp-link" class="btn-whatsapp"> WhatsApp </button>
+                </div>
                 <div class="config-dropdown-label">Agenda</div>
                 <button class="config-dropdown-item" id="menu-feriados">
                     <span class="item-icon">📅</span>
@@ -372,8 +1639,10 @@
         <p class="modal-sub">Cadastro rápido pelo admin</p>
         <form action="/admin/agendar" method="post" id="form-admin">
             <div class="modal-grid">
-                <div class="modal-field full"><label>Nome do cliente</label><input type="text" name="nome" placeholder="Nome completo" required></div>
-                <div class="modal-field full"><label>Telefone</label><input type="tel" name="telefone" placeholder="(00) 00000-0000" required></div>
+                <div class="modal-field full"><label>Nome do cliente</label><input type="text" name="nome"
+                        placeholder="Nome completo" required></div>
+                <div class="modal-field full"><label>Telefone</label><input type="tel" name="telefone"
+                        placeholder="(00) 00000-0000" required></div>
                 <div class="modal-field full">
                     <label>Barbeiro</label>
                     <select name="barbeiro" id="modal-barbeiro" required>
@@ -385,10 +1654,12 @@
                     <label>Serviço</label>
                     <select name="servico" id="modal-servico" required>
                         <option value="">Selecione</option>
-                        {{#each servicos}}<option value="{{nome}}" data-id="{{id}}">{{nome}} — R$ {{valor}}</option>{{/each}}
+                        {{#each servicos}}<option value="{{nome}}" data-id="{{id}}">{{nome}} — R$ {{valor}}</option>
+                        {{/each}}
                     </select>
                 </div>
-                <div class="modal-field"><label>Data</label><input type="date" name="data" id="modal-data" required></div>
+                <div class="modal-field"><label>Data</label><input type="date" name="data" id="modal-data" required>
+                </div>
                 <div class="modal-field">
                     <label>Horário</label>
                     <select name="horario" id="modal-horario" required>
@@ -417,13 +1688,18 @@
         <p class="modal-sub">Datas bloqueadas para agendamento</p>
         <div class="modal-grid">
             <div class="modal-field"><label>Data</label><input type="date" id="feriado-data"></div>
-            <div class="modal-field"><label>Descrição</label><input type="text" id="feriado-desc" placeholder="Ex: Natal"></div>
+            <div class="modal-field"><label>Descrição</label><input type="text" id="feriado-desc"
+                    placeholder="Ex: Natal"></div>
         </div>
-        <div style="margin-top:12px;"><button class="btn-confirmar" id="btn-add-feriado" style="width:100%;font-size:15px;padding:10px;">+ Adicionar Feriado</button></div>
+        <div style="margin-top:12px;"><button class="btn-confirmar" id="btn-add-feriado"
+                style="width:100%;font-size:15px;padding:10px;">+ Adicionar Feriado</button></div>
         <div class="modal-erro" id="feriado-erro"></div>
         <div class="feriados-sep"></div>
-        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">Feriados cadastrados</p>
-        <div class="feriado-lista" id="feriado-lista"><div class="feriados-empty">Carregando...</div></div>
+        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">
+            Feriados cadastrados</p>
+        <div class="feriado-lista" id="feriado-lista">
+            <div class="feriados-empty">Carregando...</div>
+        </div>
     </div>
 </div>
 
@@ -434,14 +1710,21 @@
         <div class="modal-title">Serviços</div>
         <p class="modal-sub">Gerencie os serviços e valores</p>
         <div class="modal-grid">
-            <div class="modal-field full"><label>Nome do serviço</label><input type="text" id="servico-nome-input" placeholder="Ex: Corte + Barba"></div>
-            <div class="modal-field"><label>Valor (R$)</label><input type="number" id="servico-valor-input" placeholder="0,00" step="0.01" min="0"></div>
-            <div class="modal-field" style="justify-content:flex-end;"><label>&nbsp;</label><button class="btn-confirmar" id="btn-add-servico" style="padding:10px 16px;font-size:15px;">+ Adicionar</button></div>
+            <div class="modal-field full"><label>Nome do serviço</label><input type="text" id="servico-nome-input"
+                    placeholder="Ex: Corte + Barba"></div>
+            <div class="modal-field"><label>Valor (R$)</label><input type="number" id="servico-valor-input"
+                    placeholder="0,00" step="0.01" min="0"></div>
+            <div class="modal-field" style="justify-content:flex-end;"><label>&nbsp;</label><button
+                    class="btn-confirmar" id="btn-add-servico" style="padding:10px 16px;font-size:15px;">+
+                    Adicionar</button></div>
         </div>
         <div class="modal-erro" id="servico-erro"></div>
         <div class="servicos-sep"></div>
-        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">Serviços cadastrados</p>
-        <div class="servico-lista" id="servico-lista"><div class="servicos-empty">Carregando...</div></div>
+        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">
+            Serviços cadastrados</p>
+        <div class="servico-lista" id="servico-lista">
+            <div class="servicos-empty">Carregando...</div>
+        </div>
     </div>
 </div>
 
@@ -452,8 +1735,10 @@
         <div class="modal-title">Administradores</div>
         <p class="modal-sub">Gerencie os usuários com acesso ao painel</p>
         <div class="modal-grid">
-            <div class="modal-field full"><label>Nome</label><input type="text" id="admin-nome-input" placeholder="Ex: João Silva"></div>
-            <div class="modal-field full"><label>E-mail</label><input type="email" id="admin-email-input" placeholder="joao@barbearia.com"></div>
+            <div class="modal-field full"><label>Nome</label><input type="text" id="admin-nome-input"
+                    placeholder="Ex: João Silva"></div>
+            <div class="modal-field full"><label>E-mail</label><input type="email" id="admin-email-input"
+                    placeholder="joao@barbearia.com"></div>
             <div class="modal-field">
                 <label>Senha</label>
                 <div class="input-pass-wrap">
@@ -469,11 +1754,15 @@
                 </select>
             </div>
         </div>
-        <div style="margin-top:4px;"><button class="btn-confirmar" id="btn-add-admin" style="width:100%;font-size:15px;padding:10px;">+ Adicionar Admin</button></div>
+        <div style="margin-top:4px;"><button class="btn-confirmar" id="btn-add-admin"
+                style="width:100%;font-size:15px;padding:10px;">+ Adicionar Admin</button></div>
         <div class="modal-erro" id="admin-erro"></div>
         <div class="admins-sep"></div>
-        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">Admins cadastrados</p>
-        <div class="admin-lista" id="admin-lista"><div class="admins-empty">Carregando...</div></div>
+        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">
+            Admins cadastrados</p>
+        <div class="admin-lista" id="admin-lista">
+            <div class="admins-empty">Carregando...</div>
+        </div>
     </div>
 </div>
 
@@ -483,11 +1772,14 @@
         <button class="modal-close" id="modal-horarios-close">✕</button>
         <div class="modal-title">Horários</div>
         <p class="modal-sub">Configure os horários de atendimento por profissional</p>
-        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">Profissional</p>
+        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">
+            Profissional</p>
         <div class="horario-prof-select" id="horario-prof-select">
-            {{#each barbeiros}}<button class="horario-prof-chip" data-id="{{id}}" data-nome="{{nome}}">{{nome}}</button>{{/each}}
+            {{#each barbeiros}}<button class="horario-prof-chip" data-id="{{id}}"
+                data-nome="{{nome}}">{{nome}}</button>{{/each}}
         </div>
-        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">Dia da semana</p>
+        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">Dia
+            da semana</p>
         <div class="horario-dias-grid">
             <button class="horario-dia-btn" data-dia="0">Dom</button>
             <button class="horario-dia-btn" data-dia="1">Seg</button>
@@ -501,11 +1793,15 @@
             <div class="modal-field"><label>Hora início</label><input type="time" id="horario-inicio-input"></div>
             <div class="modal-field"><label>Hora fim</label><input type="time" id="horario-fim-input"></div>
         </div>
-        <div style="margin-top:12px;"><button class="btn-confirmar" id="btn-add-horario" style="width:100%;font-size:15px;padding:10px;">+ Adicionar Horário</button></div>
+        <div style="margin-top:12px;"><button class="btn-confirmar" id="btn-add-horario"
+                style="width:100%;font-size:15px;padding:10px;">+ Adicionar Horário</button></div>
         <div class="modal-erro" id="horario-erro"></div>
         <div class="horarios-sep"></div>
-        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">Horários cadastrados</p>
-        <div class="horario-lista" id="horario-lista"><div class="horarios-empty">Selecione um profissional acima</div></div>
+        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">
+            Horários cadastrados</p>
+        <div class="horario-lista" id="horario-lista">
+            <div class="horarios-empty">Selecione um profissional acima</div>
+        </div>
     </div>
 </div>
 
@@ -513,13 +1809,13 @@
     // ── Dados do backend ──────────────────────────────────
     const todosAgendamentos = [
         {{#each agendamentos}}
-        { id: {{id}}, nome: "{{nome}}", telefone: "{{telefone}}", data: "{{data}}", horario: "{{horario}}", servico: "{{servico}}", barbeiro: "{{barbeiro}}" },
-        {{/each}}
+    { id: {{id}}, nome: "{{nome}}", telefone: "{{telefone}}", data: "{{data}}", horario: "{{horario}}", servico: "{{servico}}", barbeiro: "{{barbeiro}}" },
+    {{/each}}
     ];
 
     const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-    const MESES_FULL = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-    const HORAS = Array.from({length: 19}, (_, i) => `${String(i + 5).padStart(2, '0')}:00`);
+    const MESES_FULL = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    const HORAS = Array.from({ length: 19 }, (_, i) => `${String(i + 5).padStart(2, '0')}:00`);
     const DIAS_NOMES = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
     let weekOffset = 0;
@@ -530,13 +1826,39 @@
     const isMobile = () => window.innerWidth <= 900;
 
     function fmtDate(d) {
-        return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+        return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
     }
 
     const currentMonth = fmtDate(new Date()).slice(3, 10);
 
+    const tokenAgendamento = "{{empresa.token_agendamento}}";
+    const linkAgendamento = `https://lpsolutions.online/loginUsuario/${tokenAgendamento}`;
+
+    const inputLink = document.getElementById("input-link-agendamento");
+    const btnCopiar = document.getElementById("btn-copiar-link");
+    const btnWhatsapp = document.getElementById("btn-whatsapp-link");
+
+    inputLink.value = linkAgendamento;
+
+    btnCopiar.addEventListener("click", () => {
+        navigator.clipboard.writeText(linkAgendamento);
+        btnCopiar.innerText = "Copiado ✓";
+        btnCopiar.style.background = "#16a34a";
+
+        setTimeout(() => {
+            btnCopiar.innerText = "Copiar";
+            btnCopiar.style.background = "linear-gradient(135deg,#4f46e5,#7c3aed)";
+        }, 2000);
+    });
+
+    btnWhatsapp.addEventListener("click", () => {
+        const mensagem = `Olá! Faça seu agendamento online pelo link:\n${linkAgendamento}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(mensagem)}`, "_blank");
+    });
+
+
     // ── Popup ──────────────────────────────────────────────
-   const popup = document.createElement('div');
+    const popup = document.createElement('div');
     popup.className = 'cal-popup';
     popup.innerHTML = `
         <div class="cal-popup-nome" id="popup-nome"></div>
@@ -585,10 +1907,10 @@
 
     // ── Calendário ────────────────────────────────────────
     function getWeekDates() {
-        const today = new Date(); today.setHours(0,0,0,0);
+        const today = new Date(); today.setHours(0, 0, 0, 0);
         const monday = new Date(today);
         monday.setDate(today.getDate() - today.getDay() + 1 + weekOffset * 7);
-        return Array.from({length: 7}, (_, i) => { const d = new Date(monday); d.setDate(monday.getDate() + i); return d; });
+        return Array.from({ length: 7 }, (_, i) => { const d = new Date(monday); d.setDate(monday.getDate() + i); return d; });
     }
 
     function updateNavLabel(dates) {
@@ -596,7 +1918,7 @@
         const ini = dates[0], fim = dates[6];
         label.textContent = ini.getMonth() === fim.getMonth()
             ? `${ini.getDate()} – ${fim.getDate()} ${MESES_FULL[ini.getMonth()]} ${ini.getFullYear()}`
-            : `${ini.getDate()} ${MESES_FULL[ini.getMonth()].slice(0,3)} – ${fim.getDate()} ${MESES_FULL[fim.getMonth()].slice(0,3)} ${fim.getFullYear()}`;
+            : `${ini.getDate()} ${MESES_FULL[ini.getMonth()].slice(0, 3)} – ${fim.getDate()} ${MESES_FULL[fim.getMonth()].slice(0, 3)} ${fim.getFullYear()}`;
     }
 
     function renderCalendar() {
@@ -722,7 +2044,7 @@
         const weekStrs = getWeekDates().map(d => fmtDate(d));
         document.getElementById('stat-hoje').textContent = todosAgendamentos.filter(a => a.data === today).length;
         document.getElementById('stat-semana').textContent = todosAgendamentos.filter(a => weekStrs.includes(a.data)).length;
-        document.getElementById('stat-total').textContent = todosAgendamentos.filter(a => a.data.slice(3,10) === currentMonth).length;
+        document.getElementById('stat-total').textContent = todosAgendamentos.filter(a => a.data.slice(3, 10) === currentMonth).length;
     }
 
     function renderCounts() {
@@ -782,7 +2104,7 @@
     const btnConfirmar = formAdmin.querySelector('.btn-confirmar');
 
     const hoje = new Date();
-    modalData.setAttribute('min', `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`);
+    modalData.setAttribute('min', `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`);
 
     function fecharModal() { overlay.classList.remove('open'); formAdmin.reset(); modalErro.textContent = ''; }
 
@@ -812,7 +2134,7 @@
     const feriadoDescInput = document.getElementById('feriado-desc');
     const btnAddFeriado = document.getElementById('btn-add-feriado');
 
-    function fmtFeriadoData(str) { const [y,m,d] = str.split('-'); return `${d}/${m}/${y}`; }
+    function fmtFeriadoData(str) { const [y, m, d] = str.split('-'); return `${d}/${m}/${y}`; }
 
     async function carregarFeriados() {
         feriadoLista.innerHTML = '<div class="feriados-empty">Carregando...</div>';
@@ -821,7 +2143,7 @@
             const json = await res.json();
             if (!json.feriados?.length) { feriadoLista.innerHTML = '<div class="feriados-empty">Nenhum feriado cadastrado</div>'; return; }
             feriadoLista.innerHTML = '';
-            json.feriados.sort((a,b) => a.data.localeCompare(b.data)).forEach(f => {
+            json.feriados.sort((a, b) => a.data.localeCompare(b.data)).forEach(f => {
                 const item = document.createElement('div');
                 item.className = 'feriado-item';
                 item.innerHTML = `<div class="feriado-item-info"><span class="feriado-item-data">${fmtFeriadoData(f.data)}</span><span class="feriado-item-desc">${f.descricao}</span></div><button class="feriado-del" data-data="${f.data}">✕</button>`;
@@ -1073,10 +2395,10 @@
             const json = await res.json();
             if (!json.horarios?.length) { horarioLista.innerHTML = '<div class="horarios-empty">Nenhum horário cadastrado</div>'; return; }
             horarioLista.innerHTML = '';
-            json.horarios.sort((a,b) => a.dia_semana - b.dia_semana).forEach(h => {
+            json.horarios.sort((a, b) => a.dia_semana - b.dia_semana).forEach(h => {
                 const item = document.createElement('div');
                 item.className = 'horario-item';
-                item.innerHTML = `<span class="horario-item-dia">${DIAS_NOMES[h.dia_semana]}</span><span class="horario-item-range">${h.hora_inicio.substring(0,5)} – ${h.hora_fim.substring(0,5)}</span><span class="horario-item-prof">${h.ativo ? 'Ativo' : 'Inativo'}</span><button class="horario-del" data-id="${h.id}">✕</button>`;
+                item.innerHTML = `<span class="horario-item-dia">${DIAS_NOMES[h.dia_semana]}</span><span class="horario-item-range">${h.hora_inicio.substring(0, 5)} – ${h.hora_fim.substring(0, 5)}</span><span class="horario-item-prof">${h.ativo ? 'Ativo' : 'Inativo'}</span><button class="horario-del" data-id="${h.id}">✕</button>`;
                 horarioLista.appendChild(item);
             });
             horarioLista.querySelectorAll('.horario-del').forEach(btn => {
@@ -1132,10 +2454,10 @@
             selectHorario.innerHTML = slots.length ? '<option value="">Selecione</option>' : '<option value="">Nenhum horário disponível</option>';
             slots.forEach(s => {
                 const opt = document.createElement('option');
-                opt.value = s.hora_inicio.substring(0,5);
+                opt.value = s.hora_inicio.substring(0, 5);
                 opt.dataset.horaInicio = s.hora_inicio;
                 opt.dataset.horaFim = s.hora_fim;
-                opt.textContent = `${s.hora_inicio.substring(0,5)} – ${s.hora_fim.substring(0,5)}`;
+                opt.textContent = `${s.hora_inicio.substring(0, 5)} – ${s.hora_fim.substring(0, 5)}`;
                 selectHorario.appendChild(opt);
             });
         } catch (e) { selectHorario.innerHTML = '<option value="">Erro ao carregar horários</option>'; }

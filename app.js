@@ -27,25 +27,17 @@ const { Op } = require('sequelize');
 const app = express();
 const PORT = process.env.PORT || 3333;
 
+// desconectar automaticamente 
 app.use(session({
     secret: process.env.CHAVE,
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 2 * 60 * 1000 }
+    cookie: { maxAge: 24 * 60 * 60 * 1000 }
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.engine('handlebars', engine({
-    helpers: {
-        substr: (str, start, len) => {
-            if (!str) return '';
-            return str.substring(start, start + len).toUpperCase();
-        },
-        eq: (a, b) => a === b
-    }
-}));
 app.set('view engine', 'handlebars');
 
 app.use(express.json());
@@ -697,13 +689,14 @@ app.get('/admin', isAdminAuthenticated, async (req, res) => {
     try {
         const idEmpresa = req.user.idEmpresa;
 
-        const [agendamentos, admins, servicos] = await Promise.all([
+        const [agendamentos, admins, servicos, empresa] = await Promise.all([
             Agendamento.findAll({ where: { idEmpresa } }),
             Admin.findAll({ where: { idEmpresa }, attributes: ['id', 'nome', 'email', 'role', 'ativo'] }), 
-            Servico.findAll({ where: { ativo: true, idEmpresa }, order: [['nome', 'ASC']] })
+            Servico.findAll({ where: { ativo: true, idEmpresa }, order: [['nome', 'ASC']]}),
+            Empresa.findByPk(idEmpresa) // 👈 ADICIONADO: Busca os dados da empresa (incluindo o token)
         ]);
 
-        const barbeiros = admins.map(a => ({ id: a.id, nome: a.nome })); // 👈 agora é objeto
+        const barbeiros = admins.map(a => ({ id: a.id, nome: a.nome }));
 
         const servicosFormatados = servicos.map(s => ({
             id: s.id,
@@ -714,21 +707,24 @@ app.get('/admin', isAdminAuthenticated, async (req, res) => {
         const agendamentosFormatados = agendamentos.map(agendamento => {
             const data = new Date(agendamento.data);
             data.setMinutes(data.getMinutes() + data.getTimezoneOffset());
-            const ano = data.getFullYear();
-            const mes = String(data.getMonth() + 1).padStart(2, '0');
-            const dia = String(data.getDate()).padStart(2, '0');
             return {
                 id: agendamento.id,
                 nome: agendamento.nome,
                 telefone: agendamento.telefone,
-                data: `${dia}/${mes}/${ano}`,
+                data: `${String(data.getDate()).padStart(2, '0')}/${String(data.getMonth() + 1).padStart(2, '0')}/${data.getFullYear()}`,
                 horario: agendamento.horario,
                 servico: agendamento.servico,
                 barbeiro: agendamento.barbeiro
             };
         });
 
-        res.render('admin', { agendamentos: agendamentosFormatados, barbeiros, servicos: servicosFormatados });
+        // Agora passamos o objeto 'empresa' para a view
+        res.render('admin', { 
+            agendamentos: agendamentosFormatados, 
+            barbeiros, 
+            servicos: servicosFormatados,
+            empresa: empresa ? empresa.get({ plain: true }) : null // 👈 ENVIANDO PARA O HANDLEBARS
+        });
     } catch (error) {
         res.render('admin', { erro: "Erro ao buscar dados: " + error.message });
     }
@@ -990,6 +986,7 @@ app.get('/deletar/:id', isAdminAuthenticated, function (req, res) {
         });
 });
 
+
 (async () => {
     await Admin.sync({ alter: true });
     await Empresa.sync({ alter: true });
@@ -1006,8 +1003,8 @@ app.get('/deletar/:id', isAdminAuthenticated, function (req, res) {
         console.log(`Servidor funcionando na porta http://localhost:${PORT}/loginUsuario`);
     });
 })();
-/*
 
+/*
 sequelize.sync({ force: false }).then(() => {
     app.listen(PORT, () => {
         console.log(`Servidor funcionando na porta http://localhost:${PORT}`);

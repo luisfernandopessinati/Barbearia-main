@@ -1545,11 +1545,6 @@
         transform: translate(-50%, -50%) !important;
         width: 90vw !important;
         max-width: 350px;
-        z-index: 9999; /* Garante que fique acima de tudo */
-        transition: opacity 0.2s ease-in-out;
-    }
-    #popup-agendamento:not(.open) {
-        display: none !important;
     }
 }
 </style>
@@ -1927,60 +1922,30 @@
             popup.classList.remove('open');
         }
     });
+
     function abrirPopup(e, a) {
         e.stopPropagation();
-        
-        // Preenchimento dos dados (seu código original)
         document.getElementById('popup-nome').textContent = a.nome;
         document.getElementById('popup-meta').textContent = `${a.horario} · ${a.servico} · ${a.barbeiro}`;
         document.getElementById('popup-editar').href = `/editar/${a.id}`;
         document.getElementById('popup-excluir').href = `/deletar/${a.id}`;
 
-        const tel = a.telefone.replace(/\D/g, '');
+        // Monta link WhatsApp
+        const tel = a.telefone.replace(/\D/g, ''); // remove tudo que não é número
         const mensagem = encodeURIComponent(
-            `Olá ${a.nome}! 👋\n\nConfirmando seu agendamento:\n📅 Data: ${a.data}\n🕐 Horário: ${a.horario}\n✂️ Serviço: ${a.servico}\n\nConfirme sua presença, por favor!`
+            `Olá ${a.nome}! 👋\n\nPassando para confirmar seu agendamento:\n📅 Data: ${a.data}\n🕐 Horário: ${a.horario}\n✂️ Serviço: ${a.servico}\n💈 Profissional: ${a.barbeiro}\n\nPor favor, confirme sua presença. Até lá!`
         );
         document.getElementById('popup-whatsapp').href = `https://wa.me/55${tel}?text=${mensagem}`;
 
-        const popup = document.getElementById('popup-agendamento'); // Certifique-se que o ID está correto
         popup.classList.add('open');
-
-        // --- LÓGICA DE POSICIONAMENTO CORRIGIDA ---
-        if (window.innerWidth <= 768) {
-            // NO CELULAR: Centraliza fixo na tela
-            popup.style.position = 'fixed';
-            popup.style.top = '50%';
-            popup.style.left = '50%';
-            popup.style.bottom = 'auto';
-            popup.style.transform = 'translate(-50%, -50%)';
-            popup.style.margin = '0';
-            popup.style.width = '90%';
-            popup.style.maxWidth = '320px';
-        } else {
-            // NO DESKTOP: Segue o clique (seu cálculo atual ajustado)
-            popup.style.position = 'absolute';
-            popup.style.transform = 'none';
-            popup.style.width = 'auto';
-            
-            const rect = e.currentTarget.getBoundingClientRect();
-            let top = rect.bottom + 8 + window.scrollY;
-            let left = rect.left + window.scrollX;
-
-            popup.style.top = top + 'px';
-            popup.style.left = left + 'px';
-
-            requestAnimationFrame(() => {
-                const pr = popup.getBoundingClientRect();
-                // Ajuste se sair da tela na direita
-                if (pr.right > window.innerWidth - 8) {
-                    popup.style.left = (window.innerWidth - pr.width - 20) + 'px';
-                }
-                // Ajuste se sair da tela embaixo
-                if (pr.bottom > window.innerHeight) {
-                    popup.style.top = (rect.top + window.scrollY - pr.height - 8) + 'px';
-                }
-            });
-        }
+        const rect = e.currentTarget.getBoundingClientRect();
+        popup.style.top = (rect.bottom + 8 + window.scrollY) + 'px';
+        popup.style.left = (rect.left + window.scrollX) + 'px';
+        requestAnimationFrame(() => {
+            const pr = popup.getBoundingClientRect();
+            if (pr.right > window.innerWidth - 8) popup.style.left = (window.innerWidth - pr.width - 8) + 'px';
+            if (pr.bottom > window.innerHeight - 8) popup.style.top = (rect.top + window.scrollY - pr.height - 8) + 'px';
+        });
     }
 
     // ── Calendário ────────────────────────────────────────

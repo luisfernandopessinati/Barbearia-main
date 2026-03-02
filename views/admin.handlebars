@@ -1977,13 +1977,46 @@
     function renderCalendar() {
         const grid = document.getElementById('cal-grid');
         grid.innerHTML = '';
-        const weekDates = getWeekDates();
-        updateNavLabel(weekDates);
+
         const todayStr = fmtDate(new Date());
-        const weekStrs = weekDates.map(d => fmtDate(d));
-        const agendsSemana = todosAgendamentos.filter(a => weekStrs.includes(a.data));
-        document.getElementById('empty-state').classList.toggle('visible', agendsSemana.length === 0);
-        isMobile() ? renderMobile(grid, weekDates, todayStr) : renderDesktop(grid, weekDates, todayStr);
+
+        if (isMobile()) {
+
+            // 📱 MOBILE → trabalha com 1 único dia
+            const baseDate = new Date();
+            baseDate.setHours(0, 0, 0, 0);
+            baseDate.setDate(baseDate.getDate() + mobileDayOffset);
+
+            const str = fmtDate(baseDate);
+
+            const agendsDia = todosAgendamentos.filter(a =>
+                a.data === str &&
+                (filtroBarbeiro === 'todos' || a.barbeiro === filtroBarbeiro)
+            );
+
+            document.getElementById('empty-state')
+                .classList.toggle('visible', agendsDia.length === 0);
+
+            renderMobile(grid, todayStr);
+
+        } else {
+
+            // 💻 DESKTOP → continua semanal normal
+            const weekDates = getWeekDates();
+            updateNavLabel(weekDates);
+
+            const weekStrs = weekDates.map(d => fmtDate(d));
+
+            const agendsSemana = todosAgendamentos.filter(a =>
+                weekStrs.includes(a.data) &&
+                (filtroBarbeiro === 'todos' || a.barbeiro === filtroBarbeiro)
+            );
+
+            document.getElementById('empty-state')
+                .classList.toggle('visible', agendsSemana.length === 0);
+
+            renderDesktop(grid, weekDates, todayStr);
+        }
     }
 
     function renderDesktop(grid, weekDates, todayStr) {
@@ -2109,16 +2142,12 @@
             grid.appendChild(day);
         });
     }*/
-        function renderMobile(grid, weekDates, todayStr) {
-        grid.innerHTML = '';
-
+     function renderMobile(grid, todayStr) {
         const baseDate = new Date();
         baseDate.setHours(0,0,0,0);
         baseDate.setDate(baseDate.getDate() + mobileDayOffset);
-
         const str = fmtDate(baseDate);
         const isToday = str === todayStr;
-
         const eventos = todosAgendamentos
             .filter(a =>
                 a.data === str &&
@@ -2129,13 +2158,12 @@
         const day = document.createElement('div');
         day.className = 'cal-mobile-day';
 
-        // Header com navegação
         const header = document.createElement('div');
         header.className = 'cal-mobile-day-header' + (isToday ? ' today' : '');
         header.innerHTML = `
-            <button id="mobile-prev-day">⬅</button>
+            <button type="button" id="mobile-prev-day">⬅</button>
             <span>${DIAS[baseDate.getDay()]}, ${baseDate.getDate()}</span>
-            <button id="mobile-next-day">➡</button>
+            <button type="button" id="mobile-next-day">➡</button>
         `;
         day.appendChild(header);
 
@@ -2160,7 +2188,6 @@
 
         grid.appendChild(day);
 
-        // Navegação
         document.getElementById('mobile-prev-day').addEventListener('click', () => {
             mobileDayOffset--;
             renderCalendar();

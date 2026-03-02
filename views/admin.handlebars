@@ -1531,6 +1531,22 @@
     .cal-cell:hover .cal-slot-vazio {
         opacity: 1;
     }
+    @media (max-width: 768px) {
+    .cal-mobile-day {
+        touch-action: pan-y; /* Melhora a rolagem no celular */
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Garante que o popup não fique cortado ou suma */
+    #popup-agendamento { 
+        position: fixed !important; 
+        top: 50% !important; 
+        left: 50% !important; 
+        transform: translate(-50%, -50%) !important;
+        width: 90vw !important;
+        max-width: 350px;
+    }
+}
 </style>
 
 <!-- ── Header ── -->
@@ -2072,7 +2088,11 @@
                     ev.style.display = "flex";
                     ev.style.marginBottom = "15px";
                     ev.style.alignItems = "stretch";
-                    ev.addEventListener('click', e => abrirPopup(e, a));
+                    ev.addEventListener('click', e => {
+                            e.preventDefault(); // Impede o comportamento padrão do navegador
+                            e.stopPropagation(); // Evita que o clique "vaze" para elementos de baixo
+                            abrirPopup(e, a);
+                        }, { passive: false });
                     day.appendChild(ev);
                 });
             }

@@ -1504,6 +1504,33 @@
     .btn-whatsapp:hover {
         background: #1ebe5d;
     }
+    /* Efeito de hover nos eventos do calendário */
+    .cal-event {
+        background: var(--bg3) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 4px !important;
+        transition: transform 0.2s, border-color 0.2s;
+        padding: 5px !important;
+        margin-bottom: 2px;
+    }
+
+    .cal-event:hover {
+        transform: scale(1.02);
+        border-color: var(--gold) !important;
+        z-index: 10;
+    }
+
+    /* Ajuste para o slot vazio (o botão +) */
+    .cal-slot-vazio {
+        opacity: 0;
+        transition: opacity 0.2s;
+        color: var(--gold);
+        font-size: 1.5rem;
+    }
+
+    .cal-cell:hover .cal-slot-vazio {
+        opacity: 1;
+    }
 </style>
 
 <!-- ── Header ── -->
@@ -1973,9 +2000,11 @@
                         const ev = document.createElement('div');
                         ev.className = 'cal-event';
                         ev.innerHTML = `
-                            <span class="cal-event-nome">${a.barbeiro}</span>
-                            <span class="cal-event-nome">${a.nome}</span>
-                            <span class="cal-event-tel">${a.telefone}</span>`;
+                                <div style="border-left: 3px solid var(--gold); padding-left: 5px; display: flex; flex-direction: column;">
+                                    <span class="cal-event-nome" style="font-weight: bold; color: var(--gold-light); font-size: 11px; text-transform: uppercase;">${a.barbeiro}</span>
+                                    <span class="cal-event-nome" style="color: #fff; font-size: 13px;">${a.nome}</span>
+                                    <span class="cal-event-tel" style="font-size: 10px; opacity: 0.6;">${a.servico}</span>
+                                </div>`;
                         ev.addEventListener('click', e => abrirPopup(e, a));
                         cell.appendChild(ev);
                     });
@@ -2026,11 +2055,23 @@
                     const ev = document.createElement('div');
                     ev.className = 'cal-mobile-event';
                     ev.innerHTML = `
-                        <span class="cal-mobile-time">${a.horario}</span>
-                        <div class="cal-mobile-info">
-                            <div class="cal-mobile-nome">${a.nome}</div>
-                            <div class="cal-mobile-meta">${a.servico} · ${a.barbeiro} · ${a.telefone}</div>
+                        <div class="cal-mobile-time" style="font-family: 'Bebas Neue'; font-size: 1.2rem; color: var(--gold-light); min-width: 50px;">
+                            ${a.horario}
+                        </div>
+                        <div style="width: 2px; background: var(--gold-dim); margin: 0 15px; position: relative;">
+                            <div style="width: 8px; height: 8px; background: var(--gold); border-radius: 50%; position: absolute; left: -3px; top: 5px;"></div>
+                        </div>
+                        <div class="cal-mobile-info" style="flex: 1; background: var(--bg3); padding: 10px; border-radius: 8px; border: 1px solid var(--border);">
+                            <div class="cal-mobile-nome" style="font-weight: bold; color: var(--text);">${a.nome}</div>
+                            <div class="cal-mobile-meta" style="font-size: 12px; color: var(--muted);">
+                                <i class="fas fa-cut" style="font-size: 10px;"></i> ${a.servico} <br>
+                                <i class="fas fa-user" style="font-size: 10px;"></i> ${a.barbeiro}
+                            </div>
                         </div>`;
+                    // Adicione este ajuste de estilo na linha do elemento pai (ev):
+                    ev.style.display = "flex";
+                    ev.style.marginBottom = "15px";
+                    ev.style.alignItems = "stretch";
                     ev.addEventListener('click', e => abrirPopup(e, a));
                     day.appendChild(ev);
                 });

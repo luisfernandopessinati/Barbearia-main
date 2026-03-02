@@ -2142,44 +2142,66 @@
             grid.appendChild(day);
         });
     }*/
-     function renderMobile(grid, todayStr) {
+
+    function renderMobile(grid, todayStr) {
         const baseDate = new Date();
-        baseDate.setHours(0,0,0,0);
+        // Ajuste importante para evitar problemas de fuso horário no Linux/Ubuntu
+        baseDate.setHours(12, 0, 0, 0); 
         baseDate.setDate(baseDate.getDate() + mobileDayOffset);
-        const str = fmtDate(baseDate);
-        const isToday = str === todayStr;
+        
+        // IMPORTANTE: Use a mesma função de formatação que o Desktop usa (fmtDate)
+        // Se não tiver a fmtDate disponível nesse escopo, use:
+        const dia = String(baseDate.getDate()).padStart(2, '0');
+        const mes = String(baseDate.getMonth() + 1).padStart(2, '0');
+        const ano = baseDate.getFullYear();
+        const dataFormatada = `${dia}/${mes}/${ano}`; 
+
+        const isToday = dataFormatada === todayStr;
+
         const eventos = todosAgendamentos
             .filter(a =>
-                a.data === str &&
+                a.data === dataFormatada && // Compara com o formato DD/MM/YYYY
                 (filtroBarbeiro === 'todos' || a.barbeiro === filtroBarbeiro)
             )
             .sort((a, b) => a.horario.localeCompare(b.horario));
 
+        grid.innerHTML = ''; // Limpa o grid antes de renderizar o dia
         const day = document.createElement('div');
         day.className = 'cal-mobile-day';
 
         const header = document.createElement('div');
         header.className = 'cal-mobile-day-header' + (isToday ? ' today' : '');
+        
+        // Usamos botões com IDs genéricos e classes para evitar duplicação de eventos
         header.innerHTML = `
-            <button type="button" id="mobile-prev-day">⬅</button>
-            <span>${DIAS[baseDate.getDay()]}, ${baseDate.getDate()}</span>
-            <button type="button" id="mobile-next-day">➡</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%; padding: 10px;">
+                <button type="button" class="btn-nav" id="btn-prev-m"> <i class="fas fa-chevron-left"></i> </button>
+                <span style="font-family:'Bebas Neue'; font-size:1.5rem;">${DIAS[baseDate.getDay()]}, ${baseDate.getDate()}</span>
+                <button type="button" class="btn-nav" id="btn-next-m"> <i class="fas fa-chevron-right"></i> </button>
+            </div>
         `;
         day.appendChild(header);
 
         if (eventos.length === 0) {
             const empty = document.createElement('div');
             empty.className = 'cal-mobile-empty';
-            empty.textContent = 'Sem agendamentos';
+            empty.style.padding = "40px 20px";
+            empty.innerHTML = `<i class="fas fa-calendar-xmark" style="display:block; font-size:2rem; margin-bottom:10px; opacity:0.3"></i> Sem agendamentos`;
             day.appendChild(empty);
         } else {
             eventos.forEach(a => {
                 const ev = document.createElement('div');
                 ev.className = 'cal-mobile-event';
+                // Aplicando o visual de Timeline que combinamos antes
                 ev.innerHTML = `
-                    <div style="font-weight:bold">${a.horario}</div>
-                    <div>${a.nome}</div>
-                    <div style="font-size:12px;opacity:.6">${a.servico} · ${a.barbeiro}</div>
+                    <div class="cal-mobile-time" style="font-family:'Bebas Neue'; color:var(--gold-light); min-width:50px;">${a.horario}</div>
+                    <div style="width:2px; background:var(--gold-dim); margin:0 15px; position:relative;">
+                        <div style="width:8px; height:8px; background:var(--gold); border-radius:50%; position:absolute; left:-3px; top:5px;"></div>
+                    </div>
+                    <div class="cal-mobile-info" style="flex:1;">
+                        <div style="font-weight:bold">${a.nome}</div>
+                        <div style="font-size:12px; opacity:0.6">${a.servico} · ${a.barbeiro}</div>
+                    </div>
                 `;
                 ev.addEventListener('click', e => abrirPopup(e, a));
                 day.appendChild(ev);
@@ -2188,15 +2210,17 @@
 
         grid.appendChild(day);
 
-        document.getElementById('mobile-prev-day').addEventListener('click', () => {
+        // Eventos dos botões (usando IDs específicos para não bugar)
+        document.getElementById('btn-prev-m').onclick = (e) => {
+            e.stopPropagation();
             mobileDayOffset--;
             renderCalendar();
-        });
-
-        document.getElementById('mobile-next-day').addEventListener('click', () => {
+        };
+        document.getElementById('btn-next-m').onclick = (e) => {
+            e.stopPropagation();
             mobileDayOffset++;
             renderCalendar();
-        });
+        };
     }
 
     function renderStats() {

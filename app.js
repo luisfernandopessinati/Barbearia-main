@@ -358,7 +358,7 @@ app.get('/admins', isAdminAuthenticated, async (req, res) => {
     try {
         const admins = await Admin.findAll({
             where: { idEmpresa: req.user.idEmpresa },
-            attributes: ['id', 'nome', 'email', 'role', 'ativo'],
+            attributes: ['id', 'nome', 'email', 'role', 'ativo', 'telefone'],
             order: [['nome', 'ASC']]
         });
         res.json({ admins });
@@ -370,9 +370,9 @@ app.get('/admins', isAdminAuthenticated, async (req, res) => {
 // POST /admins — cria um novo admin
 app.post('/admins', isAdminAuthenticated, async (req, res) => {
     try {
-        const { nome, email, senha, role } = req.body;
+        const { nome, email, senha, role, telefone } = req.body;
 
-        if (!nome || !email || !senha) {
+        if (!nome || !email || !senha || !telefone) {
             return res.status(400).json({ erro: 'Nome, e-mail e senha são obrigatórios.' });
         }
         if (senha.length < 6) {
@@ -392,9 +392,10 @@ app.post('/admins', isAdminAuthenticated, async (req, res) => {
             nome: nome.trim(),
             email: emailNormalizado,
             senha: hashSenha,
+            telefone: telefone.trim(),
             idEmpresa: req.user.idEmpresa,
             ativo: 'S',
-            role: role === 'owner' ? 'owner' : 'admin'   // só aceita os dois valores válidos
+            role: role === 'owner' ? 'owner' : 'admin'
         });
 
         res.json({ sucesso: true });
@@ -455,6 +456,19 @@ app.patch('/admins/:id/nome', isAdminAuthenticated, async (req, res) => {
         res.status(500).json({ erro: 'Erro ao atualizar nome: ' + error.message });
     }
 }); 
+
+app.patch('/admins/:id/telefone', isAdminAuthenticated, async (req, res) => {
+    try {
+        const { telefone } = req.body;
+        if (!telefone || telefone.trim().length < 8) return res.status(400).json({ erro: 'Telefone inválido.' });
+        const admin = await Admin.findOne({ where: { id: req.params.id, idEmpresa: req.user.idEmpresa } });
+        if (!admin) return res.status(404).json({ erro: 'Admin não encontrado.' });
+        await admin.update({ telefone: telefone.trim() });
+        res.json({ sucesso: true });
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao atualizar telefone: ' + error.message });
+    }
+});
 
 // RETORNA HORÁRIOS OCUPADOS POR BARBEIRO E DATA
 app.get('/horarios-ocupados', async (req, res) => {
@@ -561,11 +575,8 @@ app.delete('/horarios-funcionamento/:id', isAdminAuthenticated, async (req, res)
 
 // CLIENTE AGENDAapp.post('/agendar/:token', async function (req, res) {
 app.post('/agendar/:token', async function (req, res) {
-    const { barbeiro, data, horario, servico, profissional_id, hora_inicio, hora_fim, servico_id } = req.body; // 👈 adicionamos os novos
+    const { barbeiro, data, horario, servico, profissional_id, hora_inicio, hora_fim, servico_id } = req.body;
     const { token } = req.params;
-    console.log('Token recebido:', token);
-    const empresa = await Empresa.findOne({ where: { token_agendamento: token } });
-    console.log('Empresa encontrada:', empresa);
 
     try {
         const empresa = await Empresa.findOne({ where: { token_agendamento: token } });
@@ -599,32 +610,39 @@ app.post('/agendar/:token', async function (req, res) {
             servico,
             valor,
             idEmpresa,
-            profissional_id: profissional_id || null,   // 👈 novo
-            hora_inicio: hora_inicio || horario || null, // 👈 novo (fallback para horario antigo)
-            hora_fim: hora_fim || null,                  // 👈 novo
-            servico_id: servico_id || null,              // 👈 novo
-            status: 'pendente'                           // 👈 novo
+            profissional_id: profissional_id || null,
+            hora_inicio: hora_inicio || horario || null,
+            hora_fim: hora_fim || null,
+            servico_id: servico_id || null,
+            status: 'pendente'
         });
 
-        const telefoneEmpresa = empresa.celular || '';
-        const telefoneLimpo = telefoneEmpresa.replace(/\D/g, '');
-
+        // 👇 Busca o admin/profissional pelo profissional_id para pegar o telefone
         let whatsappLink = null;
 
-        if (telefoneLimpo) {
-            const mensagem = encodeURIComponent(
-                `Olá! Acabei de agendar:\n` +
-                `📅 Data: ${data}\n` +
-                `⏰ Horário: ${horario}\n` +
-                `✂️ Serviço: ${servico}\n` +
-                `👤 Profissional: ${barbeiro}`
-            );
-            whatsappLink = `https://wa.me/55${telefoneLimpo}?text=${mensagem}`;
+        if (profissional_id) {
+            const adminProf = await Admin.findOne({
+                where: { id: profissional_id, idEmpresa },
+                attributes: ['telefone']
+            });
+
+            const telefoneLimpo = adminProf?.telefone?.replace(/\D/g, '');
+
+            if (telefoneLimpo) {
+                const mensagem = encodeURIComponent(
+                    `Olá! Acabei de agendar:\n` +
+                    `📅 Data: ${data}\n` +
+                    `⏰ Horário: ${horario}\n` +
+                    `✂️ Serviço: ${servico}\n` +
+                    `👤 Profissional: ${barbeiro}`
+                );
+                whatsappLink = `https://wa.me/55${telefoneLimpo}?text=${mensagem}`;
+            }
         }
 
         req.session.agendamentoSucesso = {
             mensagem: 'Agendamento confirmado!',
-            whatsappLink  // pode ser null se não tiver celular cadastrado
+            whatsappLink
         };
 
         return res.redirect(`/agendar/${token}`);
@@ -920,14 +938,14 @@ app.get('/editar/:id', isAdminAuthenticated, async (req, res) => {
 // LISTA TODOS OS SERVIÇOS (admin — inclui inativos)
 app.get('/servicos/admin', isAdminAuthenticated, async (req, res) => {
     const servicos = await Servico.findAll({ where: { idEmpresa: req.user.idEmpresa }, order: [['nome', 'ASC']] });
-    res.json({ servicos: servicos.map(s => ({ id: s.id, nome: s.nome, valor: s.valor, ativo: s.ativo })) });
+    res.json({ servicos: servicos.map(s => ({ id: s.id, nome: s.nome, valor: s.valor, ativo: s.ativo, duracao_minutos: s.duracao_minutos })) }); 
 });
 
 // ADICIONA NOVO SERVIÇO
 app.post('/servicos', isAdminAuthenticated, async (req, res) => {
-    const { nome, valor } = req.body;
+    const { nome, valor, duracao_minutos  } = req.body;
     try {
-        await Servico.create({ nome, valor, idEmpresa: req.user.idEmpresa });
+        await Servico.create({ nome, valor,duracao_minutos , idEmpresa: req.user.idEmpresa });
         res.json({ sucesso: true });
     } catch (e) {
         res.status(500).json({ erro: e.message });
@@ -936,9 +954,9 @@ app.post('/servicos', isAdminAuthenticated, async (req, res) => {
 
 // EDITA NOME E VALOR
 app.put('/servicos/:id', isAdminAuthenticated, async (req, res) => {
-    const { nome, valor } = req.body;
+    const { nome, valor, duracao_minutos  } = req.body;
     try {
-        await Servico.update({ nome, valor }, { where: { id: req.params.id } });
+        await Servico.update({ nome, valor, duracao_minutos  }, { where: { id: req.params.id } });
         res.json({ sucesso: true });
     } catch (e) {
         res.status(500).json({ erro: e.message });

@@ -1762,13 +1762,11 @@
         <div class="modal-title">Serviços</div>
         <p class="modal-sub">Gerencie os serviços e valores</p>
         <div class="modal-grid">
-            <div class="modal-field full"><label>Nome do serviço</label><input type="text" id="servico-nome-input"
-                    placeholder="Ex: Corte + Barba"></div>
-            <div class="modal-field"><label>Valor (R$)</label><input type="number" id="servico-valor-input"
-                    placeholder="0,00" step="0.01" min="0"></div>
-            <div class="modal-field" style="justify-content:flex-end;"><label>&nbsp;</label><button
-                    class="btn-confirmar" id="btn-add-servico" style="padding:10px 16px;font-size:15px;">+
-                    Adicionar</button></div>
+            <div class="modal-field full"><label>Nome do serviço</label><input type="text" id="servico-nome-input" placeholder="Ex: Corte + Barba"></div>
+            <!-- <div class="modal-field full"><label>Descrição</label><input type="text" id="servico-descricao-input" placeholder="Ex: Corte social com acabamento"></div> -->
+            <div class="modal-field"><label>Valor (R$)</label><input type="number" id="servico-valor-input" placeholder="0,00" step="0.01" min="0"></div>
+            <div class="modal-field"><label>Duração (min)</label><input type="number" id="servico-duracao-input" placeholder="Ex: 30" min="1"></div>
+            <div class="modal-field" style="justify-content:flex-end;"><label>&nbsp;</label><button class="btn-confirmar" id="btn-add-servico" style="padding:10px 16px;font-size:15px;">+ Adicionar</button></div>
         </div>
         <div class="modal-erro" id="servico-erro"></div>
         <div class="servicos-sep"></div>
@@ -2253,6 +2251,7 @@
     const servicoErro = document.getElementById('servico-erro');
     const servicoNomeInput = document.getElementById('servico-nome-input');
     const servicoValorInput = document.getElementById('servico-valor-input');
+    const servicoDuracaoInput = document.getElementById('servico-duracao-input'); // 👈
     const btnAddServico = document.getElementById('btn-add-servico');
 
     async function carregarServicos() {
@@ -2268,12 +2267,14 @@
                 item.innerHTML = `
                     <span class="servico-item-nome">${s.nome}</span>
                     <span class="servico-item-valor">R$ ${parseFloat(s.valor).toFixed(2).replace('.', ',')}</span>
+                    <span class="servico-item-duracao" style="font-size:12px;color:var(--muted);">${s.duracao_minutos ? s.duracao_minutos + ' min' : '—'}</span>
                     <div class="servico-item-actions">
-                        <button class="btn-servico-edit" data-id="${s.id}" data-nome="${s.nome}" data-valor="${s.valor}">✏️</button>
+                        <button class="btn-servico-edit" data-id="${s.id}" data-nome="${s.nome}" data-valor="${s.valor}" data-duracao="${s.duracao_minutos || ''}">✏️</button>
                         <button class="btn-servico-toggle ${s.ativo ? '' : 'inativo'}" data-id="${s.id}">${s.ativo ? 'Ativo' : 'Inativo'}</button>
                     </div>`;
                 servicoLista.appendChild(item);
             });
+
             servicoLista.querySelectorAll('.btn-servico-edit').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const item = btn.closest('.servico-item');
@@ -2281,21 +2282,32 @@
                     if (jaEditando) { jaEditando.remove(); return; }
                     const row = document.createElement('div');
                     row.className = 'servico-edit-row';
-                    row.innerHTML = `<input type="number" value="${btn.dataset.valor}" step="0.01" min="0"><button style="background:var(--gold);border:none;color:#000;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;">Salvar</button><button style="background:none;border:1px solid var(--border);color:var(--muted);padding:5px 10px;border-radius:6px;cursor:pointer;font-size:12px;">✕</button>`;
+                    row.innerHTML = `
+                        <input type="number" value="${btn.dataset.valor}" step="0.01" min="0" placeholder="Valor (R$)">
+                        <input type="number" value="${btn.dataset.duracao}" min="1" placeholder="Duração (min)" style="width:100px;">
+                        <button style="background:var(--gold);border:none;color:#000;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;">Salvar</button>
+                        <button style="background:none;border:1px solid var(--border);color:var(--muted);padding:5px 10px;border-radius:6px;cursor:pointer;font-size:12px;">✕</button>`;
                     item.appendChild(row);
-                    const [inputVal, btnSalvar, btnCancelar] = row.querySelectorAll('input, button');
+                    const [inputVal, inputDur, btnSalvar, btnCancelar] = row.querySelectorAll('input, button');
                     btnCancelar.addEventListener('click', () => row.remove());
                     btnSalvar.addEventListener('click', async () => {
                         const novoValor = parseFloat(inputVal.value);
+                        const novaDuracao = parseInt(inputDur.value);
                         if (isNaN(novoValor) || novoValor < 0) return;
+                        if (isNaN(novaDuracao) || novaDuracao < 1) return;
                         try {
-                            const res = await fetch(`/servicos/${btn.dataset.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ valor: novoValor, nome: btn.dataset.nome }) });
+                            const res = await fetch(`/servicos/${btn.dataset.id}`, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ valor: novoValor, nome: btn.dataset.nome, duracao_minutos: novaDuracao }) // 👈
+                            });
                             const json = await res.json();
                             if (json.sucesso) carregarServicos();
                         } catch (e) { servicoErro.textContent = '⚠ Erro de conexão.'; }
                     });
                 });
             });
+
             servicoLista.querySelectorAll('.btn-servico-toggle').forEach(btn => {
                 btn.addEventListener('click', async () => {
                     try {
@@ -2310,13 +2322,20 @@
 
     btnAddServico.addEventListener('click', async () => {
         servicoErro.textContent = '';
-        const nome = servicoNomeInput.value.trim(), valor = parseFloat(servicoValorInput.value);
+        const nome = servicoNomeInput.value.trim();
+        const valor = parseFloat(servicoValorInput.value);
+        const duracao_minutos = parseInt(servicoDuracaoInput.value); // 👈
         if (!nome || isNaN(valor) || valor < 0) { servicoErro.textContent = '⚠ Preencha nome e valor.'; return; }
+        if (isNaN(duracao_minutos) || duracao_minutos < 1) { servicoErro.textContent = '⚠ Informe a duração em minutos.'; return; } // 👈
         btnAddServico.textContent = 'Salvando...'; btnAddServico.disabled = true;
         try {
-            const res = await fetch('/servicos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome, valor }) });
+            const res = await fetch('/servicos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, valor, duracao_minutos }) // 👈
+            });
             const json = await res.json();
-            if (json.sucesso) { servicoNomeInput.value = ''; servicoValorInput.value = ''; carregarServicos(); }
+            if (json.sucesso) { servicoNomeInput.value = ''; servicoValorInput.value = ''; servicoDuracaoInput.value = ''; carregarServicos(); }
             else servicoErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar.');
         } catch (e) { servicoErro.textContent = '⚠ Erro de conexão.'; }
         finally { btnAddServico.textContent = '+ Adicionar'; btnAddServico.disabled = false; }
@@ -2326,7 +2345,7 @@
     servicosOverlay.addEventListener('click', e => { if (e.target === servicosOverlay) servicosOverlay.classList.remove('open'); });
 
     // ── Modal Admins ──────────────────────────────────────
-    const adminsOverlay = document.getElementById('modal-admins-overlay');
+   const adminsOverlay = document.getElementById('modal-admins-overlay');
     const adminLista = document.getElementById('admin-lista');
     const adminErro = document.getElementById('admin-erro');
     const btnAddAdmin = document.getElementById('btn-add-admin');
@@ -2355,15 +2374,19 @@
                         <span class="admin-item-nome" id="nome-label-${a.id}">${a.nome}${a.ativo !== 'S' ? ' <span style="font-size:10px;color:#c0392b;letter-spacing:1px;text-transform:uppercase;">● Inativo</span>' : ''}</span>
                         <input id="nome-input-${a.id}" value="${a.nome}" style="display:none;background:#181818;border:1px solid #b8860b;border-radius:6px;padding:4px 8px;color:#e8e8e8;font-size:14px;width:140px;">
                         <span class="admin-item-email">${a.email}</span>
+                        <span class="admin-item-tel" id="tel-label-${a.id}">${a.telefone || '—'}</span>
+                        <input id="tel-input-${a.id}" value="${a.telefone || ''}" type="tel" style="display:none;background:#181818;border:1px solid #b8860b;border-radius:6px;padding:4px 8px;color:#e8e8e8;font-size:13px;width:130px;">
                     </div>
                     <span class="admin-item-role ${a.role === 'owner' ? 'owner' : ''}">${a.role}</span>
-                    <button class="admin-edit-nome" data-id="${a.id}" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;">✎</button>
+                    <button class="admin-edit-tel" data-id="${a.id}" style="background:none;border:none;color:#555;font-size:14px;cursor:pointer;" title="Editar telefone">✎</button>
+                    <button class="admin-edit-nome" data-id="${a.id}" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;" title="Editar nome">✎</button>
                     ${a.role !== 'owner' ? (a.ativo !== 'S'
                         ? `<button class="admin-reativar" data-id="${a.id}" style="background:none;border:1px solid #b8860b;color:#b8860b;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;">↺ Reativar</button>`
                         : `<button class="admin-del" data-id="${a.id}" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;">✕</button>`
                     ) : ''}`;
                 adminLista.appendChild(item);
             });
+
             adminLista.querySelectorAll('.admin-edit-nome').forEach(btn => {
                 btn.addEventListener('click', async () => {
                     const id = btn.dataset.id;
@@ -2384,6 +2407,28 @@
                     }
                 });
             });
+
+            adminLista.querySelectorAll('.admin-edit-tel').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.dataset.id;
+                    const label = document.getElementById(`tel-label-${id}`);
+                    const input = document.getElementById(`tel-input-${id}`);
+                    if (input.style.display === 'none') {
+                        label.style.display = 'none'; input.style.display = 'inline-block'; input.focus();
+                        btn.textContent = '✔'; btn.style.color = '#b8860b';
+                    } else {
+                        const novoTel = input.value.trim();
+                        if (!novoTel) return;
+                        try {
+                            const res = await fetch(`/admins/${id}/telefone`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ telefone: novoTel }) });
+                            const json = await res.json();
+                            if (json.sucesso) carregarAdmins();
+                            else adminErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar.');
+                        } catch (e) { adminErro.textContent = '⚠ Erro de conexão.'; }
+                    }
+                });
+            });
+
             adminLista.querySelectorAll('.admin-del').forEach(btn => {
                 btn.addEventListener('click', async () => {
                     if (!confirm('Inativar este admin?')) return;
@@ -2395,6 +2440,7 @@
                     } catch (e) { adminErro.textContent = '⚠ Erro de conexão.'; }
                 });
             });
+
             adminLista.querySelectorAll('.admin-reativar').forEach(btn => {
                 btn.addEventListener('click', async () => {
                     if (!confirm('Reativar este admin?')) return;
@@ -2406,6 +2452,7 @@
                     } catch (e) { adminErro.textContent = '⚠ Erro de conexão.'; }
                 });
             });
+
         } catch (e) { adminLista.innerHTML = '<div class="admins-empty">Erro ao carregar.</div>'; }
     }
 
@@ -2415,15 +2462,17 @@
         const email = document.getElementById('admin-email-input').value.trim();
         const senha = adminSenhaInput.value;
         const role = document.getElementById('admin-role-select').value;
-        if (!nome || !email || !senha) { adminErro.textContent = '⚠ Preencha todos os campos.'; return; }
+        const telefone = document.getElementById('admin-tel-input').value.trim();
+        if (!nome || !email || !senha || !telefone) { adminErro.textContent = '⚠ Preencha todos os campos.'; return; }
         if (senha.length < 6) { adminErro.textContent = '⚠ Senha mínima de 6 caracteres.'; return; }
         btnAddAdmin.textContent = 'Salvando...'; btnAddAdmin.disabled = true;
         try {
-            const res = await fetch('/admins', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome, email, senha, role }) });
+            const res = await fetch('/admins', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome, email, senha, role, telefone }) });
             const json = await res.json();
             if (json.sucesso) {
                 document.getElementById('admin-nome-input').value = '';
                 document.getElementById('admin-email-input').value = '';
+                document.getElementById('admin-tel-input').value = '';
                 adminSenhaInput.value = '';
                 document.getElementById('admin-role-select').value = 'admin';
                 carregarAdmins();
@@ -2434,7 +2483,6 @@
 
     document.getElementById('modal-admins-close').addEventListener('click', () => adminsOverlay.classList.remove('open'));
     adminsOverlay.addEventListener('click', e => { if (e.target === adminsOverlay) adminsOverlay.classList.remove('open'); });
-
     // ── Modal Horários ────────────────────────────────────
     const horariosOverlay = document.getElementById('modal-horarios-overlay');
     const horarioLista = document.getElementById('horario-lista');

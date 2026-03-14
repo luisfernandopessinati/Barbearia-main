@@ -54,6 +54,7 @@ app.use('/api', agendamentoRoutes);
 const authRoutes = require('./routes/authRoutes');
 app.use('/api', authRoutes);
 
+app.use('/', require('./routes/empresaRoutes'));
 
 app.engine('handlebars', engine({
     helpers: {
@@ -104,6 +105,18 @@ app.get('/slots', async (req, res) => {
     }
 });
 
+app.get('/site/:nome', (req, res) => {
+    const { nome } = req.params;
+    
+    // Segurança: remove qualquer ../ ou caractere estranho
+    const nomeSeguro = nome.replace(/[^a-zA-Z0-9_-]/g, '');
+    
+    res.render(nomeSeguro, (err, html) => {
+        if (err) return res.status(404).send('Site não encontrado');
+        res.send(html);
+    });
+});
+
 // GET /admin/slots — para o painel admin, sem validação de horário de funcionamento
 app.get('/admin/slots', isAdminAuthenticated, async (req, res) => {
     const { profissional_id, servico_id, data } = req.query;
@@ -150,6 +163,7 @@ app.get('/admin/slots', isAdminAuthenticated, async (req, res) => {
         res.status(500).json({ erro: e.message });
     }
 });
+
 
 app.get('/agendar/:token', async (req, res) => {
     try {
@@ -1006,7 +1020,7 @@ app.get('/deletar/:id', isAdminAuthenticated, function (req, res) {
 
 
 (async () => {
-    await Admin.sync({ alter: true });
+    /*await Admin.sync({ alter: true });
     await Empresa.sync({ alter: true });
     await Servico.sync({ alter: true });
     await Cliente.sync({ alter: true });
@@ -1014,27 +1028,10 @@ app.get('/deletar/:id', isAdminAuthenticated, function (req, res) {
     await Feriado.sync({ alter: true });
     await HorarioFuncionamento.sync({ alter: true });
     await Bloqueio.sync({ alter: true });
-    await Agendamento.sync({ alter: true });
+    await Agendamento.sync({ alter: true });*/
     app.listen(PORT, () => {
         console.log(`Servidor funcionando na porta http://localhost:${PORT}`);
         console.log(`Servidor funcionando na porta http://localhost:${PORT}/admin`);
         console.log(`Servidor funcionando na porta http://localhost:${PORT}/loginUsuario`);
     });
 })();
-
-/*
-sequelize.sync({ force: false }).then(() => {
-    app.listen(PORT, () => {
-        console.log(`Servidor funcionando na porta http://localhost:${PORT}`);
-        console.log(`Servidor funcionando na porta http://localhost:${PORT}/admin`);
-        console.log(`Servidor funcionando na porta http://localhost:${PORT}/loginUsuario`);
-    });
-});
-
-*/
-/*app.listen(PORT, () => {
-    console.log(`Servidor funcionando na porta http://localhost:${PORT}`);
-    console.log(`Servidor funcionando na porta http://localhost:${PORT}/admin`);
-    console.log(`Servidor funcionando na porta http://localhost:${PORT}/loginUsuario`);
-});
-*/

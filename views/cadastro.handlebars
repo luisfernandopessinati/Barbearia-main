@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro</title>
+    <link rel="stylesheet" href="/css/home.css">
+    <style>
+        .cadastro-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 0;
+        }
+
+        .cadastro-box {
+            background: #151515;
+            border: 1px solid #222;
+            border-radius: 16px;
+            padding: 48px;
+            width: 100%;
+            max-width: 560px;
+        }
+
+        .cadastro-box h2 {
+            font-size: 32px;
+            margin-bottom: 6px;
+        }
+
+        .cadastro-box h2 span {
+            color: #d4af37;
+        }
+
+        .cadastro-sub {
+            color: #aaa;
+            font-size: 14px;
+            margin-bottom: 36px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-grid .full {
+            grid-column: 1 / -1;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-field label {
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #555;
+        }
+
+        .form-field input,
+        .form-field select {
+            background: #0f0f0f;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 11px 14px;
+            font-size: 13px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+
+        .form-field input:focus,
+        .form-field select:focus {
+            border-color: #d4af37;
+        }
+
+        .form-field select option {
+            background: #151515;
+        }
+
+        .btn-cadastrar {
+            width: 100%;
+            background: #d4af37;
+            border: none;
+            color: black;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 24px;
+            transition: background 0.2s, transform 0.15s;
+            letter-spacing: 1px;
+        }
+
+        .btn-cadastrar:hover {
+            background: #c9a227;
+            transform: translateY(-1px);
+        }
+
+        .btn-cadastrar:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .form-msg {
+            margin-top: 16px;
+            text-align: center;
+            font-size: 13px;
+            min-height: 20px;
+        }
+
+        .form-msg.erro {
+            color: #c0392b;
+        }
+
+        .form-msg.sucesso {
+            color: #27ae60;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .login-link a {
+            color: #d4af37;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .cadastro-box {
+                padding: 28px 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <section class="cadastro-section">
+        <div class="cadastro-box">
+
+            <h2>Criar sua <span>conta</span></h2>
+            <p class="cadastro-sub">Preencha os dados da sua empresa para começar</p>
+
+            <div class="form-grid">
+                <div class="form-field full">
+                    <label>Razão Social</label>
+                    <input type="text" id="nome" placeholder="Nome completo da empresa" />
+                </div>
+                <div class="form-field full">
+                    <label>Nome Fantasia</label>
+                    <input type="text" id="fantasia" placeholder="Como é conhecido" />
+                </div>
+                <div class="form-field">
+                    <label>CNPJ</label>
+                    <input type="text" id="cnpj" placeholder="00.000.000/0000-00" maxlength="18" />
+                </div>
+                <div class="form-field">
+                    <label>Celular</label>
+                    <input type="text" id="celular" placeholder="(00) 00000-0000" maxlength="15" />
+                </div>
+                <div class="form-field">
+                    <label>Segmento</label>
+                    <select id="segmento">
+                        <option value="">Selecione...</option>
+                        <option value="barbearia">Barbearia</option>
+                        <option value="salao">Salão de Beleza</option>
+                        <option value="clinica">Clínica</option>
+                        <option value="studio">Studio</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label>Cidade</label>
+                    <input type="text" id="cidade" placeholder="Sua cidade" />
+                </div>
+                <div class="form-field full">
+                    <label>Endereço</label>
+                    <input type="text" id="endereco" placeholder="Rua, Avenida..." />
+                </div>
+                <div class="form-field">
+                    <label>Número</label>
+                    <input type="text" id="numero" placeholder="Nº" />
+                </div>
+                <div class="form-field">
+                    <label>Bairro</label>
+                    <input type="text" id="bairro" placeholder="Bairro" />
+                </div>
+                <div class="form-field full">
+                    <label>E-mail de acesso</label>
+                    <input type="email" id="email" placeholder="seu@email.com" />
+                </div>
+                <div class="form-grid">
+                    <div class="form-field full">
+                        <label>Senha</label>
+                        <input type="password" id="senha" placeholder="Mínimo 6 caracteres" />
+                    </div>
+                    <div class="form-field full">
+                        <label>Confirmar Senha</label>
+                        <input type="password" id="senha2" placeholder="Repita a senha" />
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-cadastrar" id="btn-cadastrar">Criar conta</button>
+            <div class="form-msg" id="form-msg"></div>
+
+            <div class="login-link">
+                Já tem conta? <a href="/loginAdmin">Entrar</a>
+            </div>
+
+        </div>
+    </section>
+
+    <script>
+        // Máscara CNPJ
+        document.getElementById('cnpj').addEventListener('input', function () {
+            let v = this.value.replace(/\D/g, '');
+            v = v.replace(/^(\d{2})(\d)/, '$1.$2');
+            v = v.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+            v = v.replace(/\.(\d{3})(\d)/, '.$1/$2');
+            v = v.replace(/(\d{4})(\d)/, '$1-$2');
+            this.value = v;
+        });
+
+        // Máscara Celular
+        document.getElementById('celular').addEventListener('input', function () {
+            let v = this.value.replace(/\D/g, '');
+            v = v.replace(/^(\d{2})(\d)/, '($1) $2');
+            v = v.replace(/(\d{5})(\d)/, '$1-$2');
+            this.value = v;
+        });
+
+        // Envio via API
+        document.getElementById('btn-cadastrar').addEventListener('click', async () => {
+            const btn = document.getElementById('btn-cadastrar');
+            const msg = document.getElementById('form-msg');
+
+            const dados = {
+                nome: document.getElementById('nome').value.trim(),
+                fantasia: document.getElementById('fantasia').value.trim(),
+                cnpj: document.getElementById('cnpj').value.trim(),
+                celular: document.getElementById('celular').value.trim(),
+                segmento: document.getElementById('segmento').value,
+                cidade: document.getElementById('cidade').value.trim(),
+                endereco: document.getElementById('endereco').value.trim(),
+                numero: document.getElementById('numero').value.trim(),
+                bairro: document.getElementById('bairro').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                senha: document.getElementById('senha').value
+            };
+
+            // Validação básica front
+            if (!dados.nome || !dados.fantasia || !dados.cnpj || !dados.celular || !dados.email) {
+                msg.className = 'form-msg erro';
+                msg.textContent = 'Preencha os campos obrigatórios.';
+                return;
+            }
+            const senha2 = document.getElementById('senha2').value;
+            if (dados.senha !== senha2) {
+                msg.className = 'form-msg erro';
+                msg.textContent = 'As senhas não coincidem.';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Cadastrando...';
+            msg.textContent = '';
+
+            try {
+                const res = await fetch('/api/cadastro', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dados)
+                });
+
+                const data = await res.json();
+
+                if (data.sucesso) {
+                    msg.className = 'form-msg sucesso';
+                    msg.textContent = '✅ Cadastro realizado! Redirecionando...';
+                    setTimeout(() => window.location.href = '/loginAdmin', 2000);
+                } else {
+                    msg.className = 'form-msg erro';
+                    msg.textContent = data.erro || 'Erro ao cadastrar.';
+                    btn.disabled = false;
+                    btn.textContent = 'Criar conta';
+                }
+
+            } catch (e) {
+                msg.className = 'form-msg erro';
+                msg.textContent = 'Erro de conexão. Tente novamente.';
+                btn.disabled = false;
+                btn.textContent = 'Criar conta';
+            }
+        });
+    </script>
+
+</body>
+
+</html>

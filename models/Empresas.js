@@ -21,8 +21,7 @@ const Empresa = sequelize.define('Empresa', {
     }, 
     cnpj: {
         type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
+        allowNull: false        
     },
     celular: {
         type: DataTypes.STRING,
@@ -47,12 +46,20 @@ const Empresa = sequelize.define('Empresa', {
     dominio: {
         type: DataTypes.STRING,
         allowNull: true,
-        unique: true
+        unique: 'dominio'
+    },
+    segmento: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    site: {
+        type: DataTypes.STRING,
+        allowNull: true
     },
     token_agendamento: {
         type: DataTypes.STRING,
         allowNull: true,
-        unique: true
+        unique: 'token_agendamento'
     }
 }, {
     tableName: 'empresas',

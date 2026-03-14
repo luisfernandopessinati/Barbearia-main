@@ -1,123 +1,237 @@
-<header>
-    <nav>
-        <a href="/loginAdmin"><img src="/img/logo2.svg" alt="logo" class="logo"></a>
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="#sobre">Sobre</a></li>
-            <li><a href="#servicos">Serviços</a></li>
-            <li><a href="/agendar">Agendar</a></li>
-        </ul>
-        <div class="header-redes">
-            <a href="https://www.instagram.com/rootsbarbereshop/" class="redes-sociais" target="_blank"><i
-                    class="fa-brands fa-instagram"></i></a>
-            <a href="https://www.tiktok.com/@guilaobarber?_r=1&_t=ZS-93yKhMxDuK8" class="redes-sociais"
-                target="_blank"><i class="fa-brands fa-tiktok"></i></a>
-        </div>
-    </nav>
+<!DOCTYPE html>
+<html lang="pt-br">
 
-    <div class="header-conteudo">
-        <h1 class="header-titulo"><span>Transformando</span> seu <span>visual</span> com <span>estilo</span> e
-            <span>precisão</span>
-        </h1>
-        <p class="subtitulo">Horário de funcionamento: 09:00 às 19:00</p>
+<head>
 
-        <a href="/loginUsuario/123456789"><button class="btn-agendar">Agendar um horário</button></a>
-    </div>
-</header>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
-<main>
+    <link rel="stylesheet" href="/css/home.css">
 
-    <section class="sobre" id="sobre">
-        <h1 class="titulo">Sobre Nós</h1>
-        <div class="container-sobre">
-            {{!
-            <div class="sobre-left">
-                <iframe width="90%" height="400" src="https://www.youtube.com/embed/W18jsNa8KmA?si=tAQ5mRKt0Ol_V10_"
-                    title="YouTube video player" frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            </div>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-            }}
-            <div class="sobre-right">
-                <h3>Bem-vindo à Roots </h3>
-                <p>Uma barbearia moderna para caras reais como você. Aqui misturamos estilo urbano com cortes precisos e
-                    barbas impecáveis, usando produtos premium que realmente funcionam. Nossa vibe é descontraída, mas o
-                    resultado é sempre profissional.</p>
+</head>
 
-                <h3>O que rolamos de bom</h3>
-                <p>Cortes que acompanham seu estilo - do fade perfeito ao messy moderno, barba desenhada na régua e
-                    skincare facial que deixa a pele tinindo. Tudo feito por barbeiros que entendem de tendência e sabem
-                    personalizar pro seu rosto e lifestyle.</p>
+<body>
 
-                <h3>Vem pra cá</h3>
-                <p>Agenda pelo app do whatsapp em 2 cliques. Te esperamos pra transformar seu visual e sua
-                    confiança. É barbearia de boa, mas resultado top!</p>
+    <header class="navbar">
 
-            </div>
-
-    </section>
-
-    </div>
-    <section class="servicos" id="servicos">
-        <h1 class="titulo">Serviços</h1>
         <div class="container">
 
-            <div class="card">
-                <img src="/img/serviço1.jpg" alt="Serviço corte de cabelo" class="img" />
-                <div class="card-info">
-                    <p>Corte de cabelo</p>
-                </div>
+            <div class="logo-lp">
+                <img src="/img/logolp.png" alt="LP Solutions">
             </div>
 
-            <div class="card">
-                <img src="/img/serviço2.jpg" alt="Serviço barba" class="img" />
-                <div class="card-info">
-                    <p>Barba </p>
+            <nav>
+                <a href="#beneficios">Benefícios</a>
+                <a href="#funcionalidades">Sistema</a>
+                <a href="#como">Como funciona</a>
+                <a href="/admin" class="btn-outline">Entrar</a>
+                <a href="/cadastro" class="btn-gold">Começar</a>
+            </nav>
+
+        </div>
+
+    </header>
+
+    <section class="hero">
+
+        <div class="container hero-grid">
+
+            <div class="hero-text">
+
+                <h1>
+                    Organize seus agendamentos<br>
+                    <span>de forma automática</span>
+                </h1>
+
+                <p>
+                    Menos tempo respondendo mensagens.<br>
+                    Mais tempo atendendo clientes.
+                </p>
+
+                <div class="hero-buttons">
+
+                    <a href="/cadastro" class="btn-gold">
+                        Começar agora
+                    </a>
+
+                    <a href="#funcionalidades" class="btn-outline">
+                        Conhecer sistema
+                    </a>
+
                 </div>
+
             </div>
 
-            <div class="card">
-                <img src="/img/serviço4.jpg" alt="Sombrancelha" class="img" />
-                <div class="card-info">
-                    <p>Sombrancelha</p>
-                </div>
-            </div>
+            <div class="hero-image">
+                <img src="/img/db1.jpg" class="dash dash1">
+                <img src="/img/db2.jpg" class="dash dash3">
+                <img src="/img/db3.jpg" class="dash dash2">
+                <img src="/img/db4.jpg" class="dash dash4">
+                <img src="/img/db5.jpg" class="dash dash5">
 
-            <div class="card">
-                <img src="/img/serviço3.jpg" alt="Serviço de combo" class="img" />
-                <div class="card-info">
-                    <p>Combo</p>
-                </div>
             </div>
 
         </div>
-    </section>
-
-
-    <section class="profissionais" id="profissionais">
-        <h2 class="titulo">profissionais</h2>
-        <swiper-container class="mySwiper" pagination="true" pagination-clickable="true" space-between="20"
-            slides-per-view="1" breakpoints='{"768": {"slidesPerView": 2}}' >
-            <swiper-slide><img src="/img/barbeiro4.jpg" alt="barbeiro">
-                <p class="nome-profissional">Cicero</p>
-            </swiper-slide>
-            <swiper-slide><img src="/img/barbeiro3.jpg" alt="barbeiro">
-                <p class="nome-profissional">Guilherme</p>
-            </swiper-slide>
-        </swiper-container>
 
     </section>
 
-    <section id="unidade">
-        <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3729.3926178009783!2d-49.509717123937385!3d-20.815846366505674!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94bdaf7106e077c9%3A0xe4d41a47f7d85682!2sSalao%20Roots%20Barbearia!5e0!3m2!1spt-BR!2sbr!4v1771249362680!5m2!1spt-BR!2sbr"
-            width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+    <section id="beneficios" class="section">
+
+        <div class="container center">
+
+            <h2>Feito para simplificar seu dia</h2>
+
+            <p class="subtitle">
+                Automatize seus agendamentos e organize seu negócio com poucos cliques.
+            </p>
+
+            <div class="grid-3">
+
+                <div class="card">
+                    <h3>Agenda organizada</h3>
+                    <p>Controle todos os horários em um único painel.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Clientes agendam sozinhos</h3>
+                    <p>Seu cliente escolhe o horário disponível automaticamente.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Mais profissionalismo</h3>
+                    <p>Ofereça uma experiência moderna para seus clientes.</p>
+                </div>
+
+            </div>
+
+        </div>
+
     </section>
 
-    <a href="https://wa.me/qr/ZPWOWMCIFZKHL1" class="whatsapp-fixed" target="_blank" style="text-decoration: none;"><i
-            class="fa-brands fa-whatsapp" title="Fale conosco"></i></a>
 
-</main>
+    <section id="como" class="section dark">
+
+        <div class="container center">
+
+            <h2>Como funciona</h2>
+
+            <div class="grid-3 steps">
+
+                <div>
+
+                    <span class="number">1</span>
+
+                    <h3>Cadastre seu negócio</h3>
+
+                    <p>Adicione seus serviços e configure sua agenda.</p>
+
+                </div>
+
+                <div>
+
+                    <span class="number">2</span>
+
+                    <h3>Compartilhe seu link</h3>
+
+                    <p>Envie o link para seus clientes ou redes sociais.</p>
+
+                </div>
+
+                <div>
+
+                    <span class="number">3</span>
+
+                    <h3>Receba agendamentos</h3>
+
+                    <p>Clientes escolhem horários disponíveis automaticamente.</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section id="funcionalidades" class="section">
+
+        <div class="container center">
+
+            <h2>Um sistema completo</h2>
+
+            <div class="grid-3">
+
+                <div class="card">
+                    <h3>Agendamento online</h3>
+                    <p>Clientes marcam horários facilmente.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Painel de agenda</h3>
+                    <p>Controle todos os atendimentos do dia.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Cadastro de serviços</h3>
+                    <p>Configure duração e valores.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Dashboard</h3>
+                    <p>Veja estatísticas do seu negócio.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Ranking de clientes</h3>
+                    <p>Identifique seus melhores clientes.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Acesso mobile</h3>
+                    <p>Use pelo celular ou computador.</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="cta">
+
+        <div class="container center">
+
+            <h2>
+                Comece a organizar sua agenda hoje
+            </h2>
+
+            <p>
+                Automatize seus agendamentos e tenha mais tempo para atender clientes.
+            </p>
+
+            <a href="/cadastro" class="btn-gold big">
+                Criar minha conta
+            </a>
+
+        </div>
+
+    </section>
+
+
+
+    <a href="https://wa.me/5517981043899" class="whatsapp" target="_blank" rel="noopener">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+            <path
+                d="M16 0C7.163 0 0 7.163 0 16c0 2.822.736 5.471 2.027 7.773L0 32l8.437-2.01A15.934 15.934 0 0 0 16 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.538a13.51 13.51 0 0 1-6.89-1.885l-.494-.294-5.007 1.194 1.235-4.877-.322-.51A13.461 13.461 0 0 1 2.462 16C2.462 8.971 8.971 2.462 16 2.462S29.538 8.971 29.538 16 23.029 29.538 16 29.538zm7.406-10.008c-.406-.203-2.4-1.184-2.772-1.319-.372-.135-.643-.203-.913.203-.27.406-1.048 1.319-1.285 1.59-.237.27-.473.304-.879.101-.406-.203-1.714-.631-3.265-2.014-1.207-1.075-2.022-2.403-2.259-2.809-.237-.406-.025-.625.178-.827.182-.181.406-.473.609-.71.203-.236.27-.405.406-.676.135-.27.068-.507-.034-.71-.101-.203-.913-2.201-1.251-3.013-.33-.79-.664-.683-.913-.695l-.777-.013c-.27 0-.71.101-1.082.507-.372.406-1.42 1.387-1.42 3.385s1.454 3.927 1.657 4.198c.203.27 2.86 4.368 6.931 6.123.969.418 1.724.668 2.313.856.972.309 1.857.265 2.557.161.78-.116 2.4-.981 2.738-1.928.338-.947.338-1.76.237-1.928-.101-.168-.372-.27-.777-.473z" />
+        </svg>
+    </a>  
+
+</body>
+
+</html>

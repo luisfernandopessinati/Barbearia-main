@@ -164,7 +164,6 @@ body {
 }
 
 header {
-    background-image: url("/img/banner.jpg");
     background-repeat: no-repeat;
     background-size: cover;
     background-position: top center;
@@ -187,6 +186,7 @@ nav {
     justify-content: space-around; 
     width: 100%; 
     padding: 10px 20px; 
+    margin-left: auto;
 }
 
 nav ul {
@@ -336,14 +336,14 @@ header .header-titulo span {
     background-color: var(--secundario1);
 }
 
-.container {
+.container-servicos {
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
     margin-top: 30px;
 }
 
-.card {
+.card-servicos {
     background-color: var(--secundario);
     width: 400px;
     height: auto;

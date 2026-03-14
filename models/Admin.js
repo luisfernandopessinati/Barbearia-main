@@ -31,6 +31,10 @@ const Admin = sequelize.define('Admin', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    foto: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
     role: {
     type: DataTypes.STRING,
     defaultValue: 'admin'

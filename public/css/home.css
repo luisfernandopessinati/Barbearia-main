@@ -1,0 +1,388 @@
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family: 'Inter', sans-serif;
+background:#0f0f0f;
+color:white;
+}
+
+.container{
+width:90%;
+max-width:1200px;
+margin:auto;
+}
+
+.navbar{
+padding:25px 0;
+border-bottom:1px solid #222;
+background-color: #0f0f0f;
+}
+
+.navbar .container{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+nav a {
+    margin-left: 35px; /* Aumentei o espaço entre eles */
+    text-decoration: none;
+    color: #ffffff; /* Branco real para dar contraste */
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase; /* Deixa com cara de menu profissional */
+    letter-spacing: 1px; /* Espaçamento entre letras melhora a leitura */
+    transition: all 0.3s ease;
+    opacity: 0.7; /* Fica levemente suave por padrão */
+}
+
+/* Efeito ao passar o mouse */
+nav a:hover {
+    opacity: 1; /* Acende o texto */
+    color: #d4af37; /* Muda para o dourado do seu logo */
+    transform: translateY(-2px); /* Dá um leve saltinho */
+}
+
+.btn-outline, .btn-gold {
+    margin-left: 20px;
+}
+
+.logo-lp {
+    display: flex;
+    align-items: center;
+    height: 80px;
+    transition: 0.3s;
+    flex-shrink: 0;
+}
+
+.logo-lp img {
+    height: 100%; 
+    width: auto;
+}
+
+.logo-lp img:hover{
+transform:scale(1.05);
+}
+
+.hero{
+padding:120px 0;
+}
+
+.hero-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+align-items:center;
+gap:60px;
+}
+
+.hero h1{
+font-size:52px;
+line-height:1.1;
+margin-bottom:20px;
+}
+
+.hero span{
+color:#d4af37;
+}
+
+.hero p{
+color:#aaa;
+font-size:18px;
+margin-bottom:30px;
+}
+
+.hero img{
+width:100%;
+border-radius:12px;
+}
+
+.section{
+padding:120px 0;
+}
+
+.center{
+text-align:center;
+}
+
+.subtitle{
+margin-top:10px;
+color:#aaa;
+}
+
+.grid-3{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:30px;
+margin-top:60px;
+}
+
+.card{
+background:#151515;
+padding:30px;
+border-radius:10px;
+transition:.3s;
+}
+
+.card:hover{
+transform:translateY(-5px);
+border:1px solid #d4af37;
+}
+
+.steps .number{
+font-size:28px;
+color:#d4af37;
+font-weight:600;
+}
+
+.btn-gold{
+background:#d4af37;
+color:black;
+padding:12px 22px;
+border-radius:6px;
+text-decoration:none;
+font-weight:600;
+display: inline-block;
+}
+
+.btn-outline{
+border:1px solid #d4af37;
+padding:12px 22px;
+border-radius:6px;
+text-decoration:none;
+color:#d4af37;
+}
+
+.hero-buttons a{
+margin-right:15px;
+}
+
+.cta{
+padding:140px 0;
+text-align:center;
+background:#111;
+flex-direction: column;
+}
+
+.cta h2{
+font-size:40px;
+margin-bottom:20px;
+}
+
+.cta p {
+    margin-bottom: 25px; /* Empurra o botão para baixo */
+    line-height: 1.6;    /* Melhora o espaçamento entre as linhas do texto */
+}
+
+.big{
+font-size:18px;
+padding:16px 32px;
+}
+
+footer{
+padding:40px 0;
+text-align:center;
+color:#777;
+border-top:1px solid #222;
+}
+.whatsapp {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  background: #25D366;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
+  animation: wpp-float 3s ease-in-out infinite;
+  z-index: 999;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.whatsapp:hover {
+  transform: scale(1.12) translateY(-4px);
+  box-shadow: 0 14px 35px rgba(37, 211, 102, 0.55);
+  animation-play-state: paused;
+}
+
+/* Anel pulsante ao redor */
+.whatsapp::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(37, 211, 102, 0.35);
+  animation: wpp-pulse 2.5s ease-out infinite;
+}
+
+.whatsapp svg {
+  width: 32px;
+  height: 32px;
+  fill: white;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes wpp-float {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-7px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes wpp-pulse {
+  0%   { transform: scale(1);   opacity: 0.6; }
+  70%  { transform: scale(1.55); opacity: 0; }
+  100% { transform: scale(1.55); opacity: 0; }
+}
+
+.hero-image{
+position:relative;
+height:420px;
+}
+
+.hero-image img{
+position:absolute;
+width:220px;
+border-radius:12px;
+box-shadow:0 20px 40px rgba(0,0,0,0.6);
+transition:transform .4s;
+}
+
+/* posições */
+
+.dash1{
+top:0;
+left:40px;
+animation:float1 6s ease-in-out infinite;
+}
+
+.dash2{
+top:360px;
+right:40px;
+animation:float2 7s ease-in-out infinite;
+z-index:10;
+}
+
+.dash3{
+top:180px;
+left:0;
+animation:float3 6s ease-in-out infinite;
+}
+
+.dash4{
+bottom:0;
+right:60px;
+animation:float4 8s ease-in-out infinite;
+}
+
+.dash5{
+top:40px;
+left:180px;
+animation:float5 7s ease-in-out infinite;
+}
+
+@keyframes float1{
+0%{transform:translateY(0)}
+50%{transform:translateY(-15px)}
+100%{transform:translateY(0)}
+}
+
+@keyframes float2{
+0%{transform:translateY(0)}
+50%{transform:translateY(-20px)}
+100%{transform:translateY(0)}
+}
+
+@keyframes float3{
+0%{transform:translateY(0)}
+50%{transform:translateY(-12px)}
+100%{transform:translateY(0)}
+}
+
+@keyframes float4{
+0%{transform:translateY(0)}
+50%{transform:translateY(-18px)}
+100%{transform:translateY(0)}
+}
+
+@keyframes float5{
+0%{transform:translateY(0)}
+50%{transform:translateY(-16px)}
+100%{transform:translateY(0)}
+}
+
+.hero-image img:hover{
+transform:scale(1.05);
+}
+
+
+/* ============ MOBILE ============ */
+@media (max-width: 768px) {
+
+  .hero {
+    padding: 60px 0 40px;
+  }
+
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .hero h1 {
+    font-size: 32px;
+  }
+
+  .hero p {
+    font-size: 16px;
+  }
+
+  /* Remove o layout absoluto flutuante */
+  .hero-image {
+    position: static;
+    height: auto;
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+
+    /* Esconde a scrollbar mas mantém o scroll */
+    scrollbar-width: none;
+  }
+
+  .hero-image::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Cada dashboard vira um card fixo no carrossel */
+  .hero-image img {
+    position: static;
+    width: 220px;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    animation: none; /* Remove o float no mobile */
+    transform: none !important;
+  }
+
+  /* Botões empilhados no mobile */
+  .hero-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .hero-buttons a {
+    margin-right: 0;
+  }
+
+}

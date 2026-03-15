@@ -27,6 +27,8 @@ const { Op } = require('sequelize');
 const app = express();
 const PORT = process.env.PORT || 3333;
 
+const clienteController = require('./controllers/clienteController');
+
 // desconectar automaticamente 
 app.use(session({
     secret: process.env.CHAVE,
@@ -56,6 +58,10 @@ app.use('/api', authRoutes);
 
 app.use('/', require('./routes/empresaRoutes'));
 
+//app.use('/', require('./routes/clienteRoutes'));
+//app.get('/clientes', isAdminAuthenticated, clienteController.listar);
+app.use('/', require('./routes/clienteRoutes')(isAdminAuthenticated));
+
 app.engine('handlebars', engine({
     helpers: {
         substr: (str, start, len) => {
@@ -64,7 +70,8 @@ app.engine('handlebars', engine({
         },
         eq: (a, b) => a === b,
         lt: (a, b) => a < b,
-        json: (obj) => JSON.stringify(obj)
+        json: (obj) => JSON.stringify(obj),
+        add: (a, b) => a + b
     }
 }));
 

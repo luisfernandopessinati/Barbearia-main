@@ -1162,6 +1162,9 @@
         transform-origin: top right;
         transition: opacity 0.18s ease, transform 0.18s ease;
         box-shadow: 0 16px 40px #00000088;
+        max-height: calc(100vh - 80px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
     }
 
     .config-dropdown.open {
@@ -1205,7 +1208,20 @@
         background: var(--bg3);
         color: var(--text);
     }
-
+ 
+    .config-dropdown::-webkit-scrollbar {
+        width: 4px;
+    }
+    .config-dropdown::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .config-dropdown::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 4px;
+    }
+    .config-dropdown::-webkit-scrollbar-thumb:hover {
+        background: var(--gold);
+    }
     .item-icon {
         width: 24px;
         height: 24px;
@@ -1612,11 +1628,6 @@
                 </button>
                 <div class="config-dropdown-sep"></div>
                 <div class="config-dropdown-label">Sistema</div>
-                <button class="config-dropdown-item" id="menu-admins">
-                    <span class="item-icon">👤</span>
-                    <span class="item-label"><span>Admins</span><small>Usuários e acessos</small></span>
-                    <span class="item-badge">Novo</span>
-                </button>
                 <button class="config-dropdown-item" id="menu-dashboard">
                     <span class="item-icon">📊</span>
                     <span class="item-label"><span>Dashboard</span><small>Análises e relatórios</small></span>
@@ -1629,6 +1640,16 @@
                 </button>
                 <div class="config-dropdown-sep"></div>
                 <div class="config-dropdown-label">Cadastros</div>
+                <button class="config-dropdown-item" id="menu-admins">
+                    <span class="item-icon">👤</span>
+                    <span class="item-label"><span>Admins</span><small>Usuários e acessos</small></span>
+                    <span class="item-badge">Novo</span>
+                </button>
+                <button class="config-dropdown-item" id="menu-clientes">
+                    <span class="item-icon">👥</span>
+                    <span class="item-label"><span>Clientes</span><small>Ranking e histórico</small></span>
+                    <span class="item-badge">Novo</span>
+                </button>
                 <button class="config-dropdown-item" id="menu-servicos">
                     <span class="item-icon">✂️</span>
                     <span class="item-label"><span>Serviços</span><small>Preços e catálogo</small></span>
@@ -2220,6 +2241,7 @@
     document.getElementById('next-week').addEventListener('click', () => { weekOffset++; renderCalendar(); renderCounts(); });
     document.getElementById('btn-hoje').addEventListener('click', () => { weekOffset = 0; renderCalendar(); renderCounts(); });
     document.getElementById('btn-sair').addEventListener('click', () => { window.location.href = '/logout'; });
+    document.getElementById('menu-clientes').addEventListener('click', () => {window.location.href = '/clientes';}); 
     window.addEventListener('resize', renderCalendar);
 
     // ── Filtro barbeiros ──────────────────────────────────

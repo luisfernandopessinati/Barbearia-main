@@ -1,0 +1,727 @@
+<style>
+    :root {
+        --gold: #b8860b;
+        --gold-light: #d4a012;
+        --gold-dim: #b8860b33;
+        --bg: #090909;
+        --bg2: #111111;
+        --bg3: #181818;
+        --border: #222222;
+        --text: #e8e8e8;
+        --muted: #555;
+        --danger: #c0392b;
+        --danger-dim: #c0392b22;
+    }
+
+    .clientes-wrap {
+        padding: 36px 40px;
+        min-height: calc(100vh - 130px);
+        background: var(--bg);
+    }
+
+    /* ── Header da página ── */
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 32px;
+    }
+
+    .page-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 22px;
+        letter-spacing: 4px;
+        color: var(--text);
+    }
+
+    .btn-sair-pg {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 8px 20px;
+        border-radius: 6px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-sair-pg:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+    }
+
+    .section-titulo {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 13px;
+        letter-spacing: 4px;
+        color: var(--muted);
+        text-transform: uppercase;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* ══════════════════════════════
+       RANKING BARBEIROS — grid uniforme
+    ══════════════════════════════ */
+    .ranking-wrap { margin-bottom: 40px; }
+
+    .ranking-grid-barbeiros {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+    }
+
+    .ranking-barb-card {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 16px;
+        cursor: pointer;
+        transition: border-color 0.2s, background 0.2s;
+        position: relative;
+        user-select: none;
+    }
+
+    .ranking-barb-card:hover { border-color: var(--gold); background: var(--bg3); }
+    .ranking-barb-card.active { border-color: var(--gold); background: var(--gold-dim); }
+
+    .ranking-barb-top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .ranking-barb-pos {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 22px;
+        color: var(--muted);
+        min-width: 28px;
+        line-height: 1;
+    }
+
+    .ranking-barb-card.pos1 .ranking-barb-pos { color: var(--gold); }
+
+    .ranking-barb-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #333, #1a1a1a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 14px;
+        color: #888;
+        flex-shrink: 0;
+        border: 1px solid var(--border);
+        transition: all 0.2s;
+    }
+
+    .ranking-barb-card.pos1 .ranking-barb-avatar {
+        background: linear-gradient(135deg, var(--gold-light), #6b4c00);
+        color: #fff;
+        border-color: var(--gold);
+    }
+
+    .ranking-barb-nome {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex: 1;
+    }
+
+    .ranking-barb-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+    }
+
+    .ranking-barb-stat {
+        font-size: 10px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .ranking-barb-stat span {
+        display: block;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 16px;
+        color: var(--gold);
+        letter-spacing: 1px;
+        line-height: 1.2;
+    }
+
+    .ranking-barb-card.pos1 .ranking-barb-stat span { color: var(--gold-light); }
+
+    .ranking-barb-expand-hint {
+        font-size: 9px;
+        letter-spacing: 1px;
+        color: var(--muted);
+        text-align: right;
+        margin-top: 10px;
+        text-transform: uppercase;
+        transition: color 0.2s;
+    }
+
+    .ranking-barb-card:hover .ranking-barb-expand-hint,
+    .ranking-barb-card.active .ranking-barb-expand-hint { color: var(--gold); }
+
+    /* ── Painel expandido ── */
+    .barb-expand-panel {
+        display: none;
+        background: var(--bg3);
+        border: 1px solid var(--gold);
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 10px;
+        grid-column: 1 / -1;
+        animation: fadeIn 0.2s ease;
+    }
+
+    .barb-expand-panel.open { display: block; }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .barb-expand-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 13px;
+        letter-spacing: 3px;
+        color: var(--gold);
+        margin-bottom: 14px;
+    }
+
+    .barb-top-clientes {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+    }
+
+    .barb-top-cli-card {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px;
+        text-align: center;
+    }
+
+    .barb-top-cli-pos {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 11px;
+        letter-spacing: 2px;
+        color: var(--muted);
+        margin-bottom: 6px;
+    }
+
+    .barb-top-cli-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--gold), #6b4c00);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 12px;
+        color: #fff;
+        margin: 0 auto 8px;
+    }
+
+    .barb-top-cli-nome {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 4px;
+    }
+
+    .barb-top-cli-stat {
+        font-size: 10px;
+        color: var(--muted);
+    }
+
+    .barb-top-cli-stat span { color: var(--gold); font-weight: 600; }
+
+    .barb-expand-empty {
+        font-size: 12px;
+        color: var(--muted);
+        text-align: center;
+        padding: 20px;
+    }
+
+    /* ══════════════════════════════
+       TOP 5 CLIENTES
+    ══════════════════════════════ */
+    .top-clientes-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        margin-bottom: 40px;
+    }
+
+    .top-cliente-card {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px;
+        text-align: center;
+        transition: border-color 0.2s;
+    }
+
+    .top-cliente-card:hover { border-color: var(--gold); }
+    .top-cliente-card.primeiro { background: var(--gold-dim); border-color: var(--gold); }
+
+    .top-cliente-pos {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 11px;
+        letter-spacing: 2px;
+        color: var(--muted);
+        margin-bottom: 8px;
+    }
+
+    .top-cliente-card.primeiro .top-cliente-pos { color: var(--gold); }
+
+    .top-cliente-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #333, #1a1a1a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 14px;
+        color: #888;
+        margin: 0 auto 8px;
+        border: 1px solid var(--border);
+    }
+
+    .top-cliente-card.primeiro .top-cliente-avatar {
+        background: linear-gradient(135deg, var(--gold-light), #6b4c00);
+        color: #fff;
+        border-color: var(--gold);
+    }
+
+    .top-cliente-nome {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .top-cliente-stat { font-size: 10px; color: var(--muted); margin-bottom: 2px; }
+    .top-cliente-stat span { color: var(--gold); font-weight: 600; }
+
+    /* ══════════════════════════════
+       TABELA CLIENTES + PESQUISA
+    ══════════════════════════════ */
+    .clientes-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .clientes-search-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 8px 14px;
+        transition: border-color 0.2s;
+        min-width: 220px;
+    }
+
+    .clientes-search-wrap:focus-within { border-color: var(--gold); }
+
+    .clientes-search-wrap svg {
+        width: 14px;
+        height: 14px;
+        fill: var(--muted);
+        flex-shrink: 0;
+    }
+
+    .clientes-search {
+        background: none;
+        border: none;
+        outline: none;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        color: var(--text);
+        width: 100%;
+    }
+
+    .clientes-search::placeholder { color: var(--muted); }
+
+    .clientes-count {
+        font-size: 11px;
+        color: var(--muted);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .clientes-table-wrap {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .clientes-table { width: 100%; border-collapse: collapse; }
+
+    .clientes-table th {
+        background: var(--bg3);
+        padding: 12px 16px;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 11px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--muted);
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+    }
+
+    .clientes-table td {
+        padding: 13px 16px;
+        font-size: 13px;
+        color: var(--text);
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+    }
+
+    .clientes-table tr:last-child td { border-bottom: none; }
+    .clientes-table tbody tr { transition: background 0.15s; }
+    .clientes-table tbody tr:hover td { background: var(--bg3); }
+    .clientes-table tbody tr.hidden { display: none; }
+
+    .td-nome-wrap { display: flex; align-items: center; gap: 10px; }
+
+    .td-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--gold), #6b4c00);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 12px;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .td-total {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 22px;
+        color: var(--gold);
+        line-height: 1;
+    }
+
+    .td-valor { font-size: 13px; font-weight: 500; }
+    .td-muted { color: var(--muted); font-size: 12px; }
+
+    .td-badge {
+        font-size: 10px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 2px 8px;
+        border-radius: 10px;
+        white-space: nowrap;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 40px;
+        color: var(--muted);
+        font-size: 13px;
+        display: none;
+    }
+
+    .clientes-empty { text-align: center; padding: 80px 20px; color: var(--muted); }
+    .clientes-empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.3; }
+    .clientes-empty p { font-size: 13px; }
+
+    /* ══════════════════════════════
+       MOBILE
+    ══════════════════════════════ */
+    @media (max-width: 900px) {
+        .clientes-wrap { padding: 16px; }
+        .ranking-grid-barbeiros { grid-template-columns: repeat(2, 1fr); }
+        .barb-top-clientes { grid-template-columns: repeat(2, 1fr); }
+        .top-clientes-grid { grid-template-columns: repeat(2, 1fr); }
+        .clientes-table th:nth-child(5),
+        .clientes-table td:nth-child(5),
+        .clientes-table th:nth-child(6),
+        .clientes-table td:nth-child(6) { display: none; }
+    }
+
+    @media (max-width: 600px) {
+        .ranking-grid-barbeiros { grid-template-columns: 1fr 1fr; }
+        .clientes-table th:nth-child(4),
+        .clientes-table td:nth-child(4) { display: none; }
+        .top-clientes-grid { grid-template-columns: repeat(2, 1fr); }
+        .barb-top-clientes { grid-template-columns: repeat(2, 1fr); }
+    }
+</style>
+
+<div class="clientes-wrap">
+
+    {{!-- Header --}}
+    <div class="page-header">
+        <div class="page-title">Clientes & Barbeiros</div>
+        <a href="/admin" class="btn-sair-pg">
+            ← Voltar
+        </a>
+    </div>
+
+    {{!-- ═══════════════════════════════
+         RANKING BARBEIROS
+    ═══════════════════════════════ --}}
+    <div class="ranking-wrap">
+        <div class="section-titulo">✂️ Ranking de Barbeiros</div>
+
+        {{#if rankingBarbeiros.length}}
+        <div class="ranking-grid-barbeiros" id="ranking-barbeiros-grid">
+
+            {{#each rankingBarbeiros}}
+            <div class="ranking-barb-card {{#if (eq @index 0)}}pos1{{/if}}"
+                 data-id="{{id}}"
+                 data-clientes='{{json topClientes}}'
+                 onclick="toggleBarbeiro(this)">
+                <div class="ranking-barb-top">
+                    <div class="ranking-barb-pos">#{{add @index 1}}</div>
+                    <div class="ranking-barb-avatar">{{substr nome 0 2}}</div>
+                    <div class="ranking-barb-nome">{{nome}}</div>
+                </div>
+                <div class="ranking-barb-stats">
+                    <div class="ranking-barb-stat">
+                        Atendimentos
+                        <span>{{total}}</span>
+                    </div>
+                    <div class="ranking-barb-stat">
+                        Faturamento
+                        <span>R$ {{faturamento}}</span>
+                    </div>
+                    <div class="ranking-barb-stat">
+                        Serviço Top
+                        <span>{{servicoTop}}</span>
+                    </div>
+                    {{#if ultimoAtendimento}}
+                    <div class="ranking-barb-stat">
+                        Último
+                        <span>{{ultimoAtendimento}}</span>
+                    </div>
+                    {{/if}}
+                </div>
+                <div class="ranking-barb-expand-hint">ver clientes ▾</div>
+            </div>
+            {{/each}}
+
+            {{!-- Painel expansível --}}
+            <div class="barb-expand-panel" id="barb-expand-panel">
+                <div class="barb-expand-title" id="barb-expand-title">Top Clientes</div>
+                <div class="barb-top-clientes" id="barb-top-clientes"></div>
+                <div class="barb-expand-empty" id="barb-expand-empty" style="display:none">Nenhum cliente encontrado.</div>
+            </div>
+
+        </div>
+        {{else}}
+        <div class="clientes-empty">
+            <div class="clientes-empty-icon">✂️</div>
+            <p>Nenhum barbeiro cadastrado.</p>
+        </div>
+        {{/if}}
+    </div>
+
+    {{!-- ═══════════════════════════════
+         TOP 5 CLIENTES GERAL
+    ═══════════════════════════════ --}}
+    {{#if topClientes.length}}
+    <div class="section-titulo">🏆 Top Clientes</div>
+    <div class="top-clientes-grid">
+        {{#each topClientes}}
+        <div class="top-cliente-card {{#if (eq @index 0)}}primeiro{{/if}}">
+            <div class="top-cliente-pos">#{{add @index 1}}</div>
+            <div class="top-cliente-avatar">{{substr nome 0 2}}</div>
+            <div class="top-cliente-nome">{{nome}}</div>
+            <div class="top-cliente-stat">Agend: <span>{{total}}</span></div>
+            <div class="top-cliente-stat">Gasto: <span>R$ {{valorTotal}}</span></div>
+            <div class="top-cliente-stat">Fav: <span>{{servicoFavorito}}</span></div>
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
+
+    {{!-- ═══════════════════════════════
+         LISTA COMPLETA + PESQUISA
+    ═══════════════════════════════ --}}
+    <div class="clientes-header">
+        <div class="section-titulo" style="margin-bottom:0">👥 Todos os Clientes</div>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+            {{#if clientes.length}}
+            <span class="clientes-count" id="clientes-count">{{clientes.length}} cadastrados</span>
+            {{/if}}
+            <div class="clientes-search-wrap">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+                </svg>
+                <input class="clientes-search" id="clientes-search" type="text" placeholder="Buscar cliente ou telefone..." />
+            </div>
+        </div>
+    </div>
+
+    {{#if clientes.length}}
+    <div class="clientes-table-wrap">
+        <table class="clientes-table" id="clientes-table">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Telefone</th>
+                    <th>Agendamentos</th>
+                    <th>Valor Total</th>
+                    <th>Último Agendamento</th>
+                    <th>Serviço Favorito</th>
+                </tr>
+            </thead>
+            <tbody id="clientes-tbody">
+                {{#each clientes}}
+                <tr data-nome="{{nome}}" data-telefone="{{telefone}}">
+                    <td>
+                        <div class="td-nome-wrap">
+                            <div class="td-avatar">{{substr nome 0 2}}</div>
+                            <span>{{nome}}</span>
+                        </div>
+                    </td>
+                    <td class="td-muted">{{telefone}}</td>
+                    <td><span class="td-total">{{total}}</span></td>
+                    <td><span class="td-valor">R$ {{valorTotal}}</span></td>
+                    <td class="td-muted">{{ultimoAgendamento}}</td>
+                    <td><span class="td-badge">{{servicoFavorito}}</span></td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        <div class="no-results" id="no-results">Nenhum cliente encontrado para "<span id="search-term"></span>"</div>
+    </div>
+    {{else}}
+    <div class="clientes-empty">
+        <div class="clientes-empty-icon">👥</div>
+        <p>Nenhum cliente cadastrado ainda.</p>
+    </div>
+    {{/if}}
+
+</div>
+
+<script>
+    // ── Expand barbeiro ──
+    let activeBarbCard = null;
+
+    function toggleBarbeiro(card) {
+        const panel = document.getElementById('barb-expand-panel');
+        const title = document.getElementById('barb-expand-title');
+        const container = document.getElementById('barb-top-clientes');
+        const empty = document.getElementById('barb-expand-empty');
+
+        // Fecha se clicar no mesmo
+        if (activeBarbCard === card) {
+            card.classList.remove('active');
+            panel.classList.remove('open');
+            activeBarbCard = null;
+            return;
+        }
+
+        // Troca ativo
+        if (activeBarbCard) activeBarbCard.classList.remove('active');
+        card.classList.add('active');
+        activeBarbCard = card;
+
+        const nome = card.querySelector('.ranking-barb-nome').textContent;
+        const clientes = JSON.parse(card.dataset.clientes || '[]');
+
+        title.textContent = `Top Clientes de ${nome}`;
+        container.innerHTML = '';
+
+        if (!clientes.length) {
+            empty.style.display = 'block';
+            container.style.display = 'none';
+        } else {
+            empty.style.display = 'none';
+            container.style.display = 'grid';
+            clientes.forEach((c, i) => {
+                const initials = c.nome.substring(0, 2).toUpperCase();
+                container.innerHTML += `
+                    <div class="barb-top-cli-card">
+                        <div class="barb-top-cli-pos">#${i + 1}</div>
+                        <div class="barb-top-cli-avatar">${initials}</div>
+                        <div class="barb-top-cli-nome">${c.nome}</div>
+                        <div class="barb-top-cli-stat">Agend: <span>${c.total}</span></div>
+                        <div class="barb-top-cli-stat">Gasto: <span>R$ ${c.valor}</span></div>
+                    </div>`;
+            });
+        }
+
+        // Move o painel para após o card clicado
+        card.after(panel);
+        panel.classList.add('open');
+    }
+
+    // ── Pesquisa clientes ──
+    const searchInput = document.getElementById('clientes-search');
+    const tbody = document.getElementById('clientes-tbody');
+    const countEl = document.getElementById('clientes-count');
+    const noResults = document.getElementById('no-results');
+    const searchTerm = document.getElementById('search-term');
+
+    if (searchInput && tbody) {
+        searchInput.addEventListener('input', function () {
+            const termo = this.value.toLowerCase().trim();
+            const rows = tbody.querySelectorAll('tr');
+            let visiveis = 0;
+
+            rows.forEach(row => {
+                const nome = (row.dataset.nome || '').toLowerCase();
+                const tel = (row.dataset.telefone || '').toLowerCase();
+                const match = !termo || nome.includes(termo) || tel.includes(termo);
+                row.classList.toggle('hidden', !match);
+                if (match) visiveis++;
+            });
+
+            if (countEl) countEl.textContent = `${visiveis} cadastrados`;
+
+            if (noResults) {
+                noResults.style.display = visiveis === 0 ? 'block' : 'none';
+                if (searchTerm) searchTerm.textContent = this.value;
+            }
+        });
+    }
+</script>

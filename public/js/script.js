@@ -2,7 +2,7 @@ const telefone = document.getElementById('telefone');
 
 if (telefone) {
     telefone.addEventListener('input', () => {
-        let valorAtual = telefone.value.replace(/\D/g, "").substring(0, 11);
+       /* let valorAtual = telefone.value.replace(/\D/g, "").substring(0, 13);
         let numeroFormatado = "";
 
         if (valorAtual.length > 0) {
@@ -16,6 +16,8 @@ if (telefone) {
         }
 
         telefone.value = numeroFormatado;
+        */
+        telefone.value = telefone.value.replace(/\D/g, "");
     });
 }
 

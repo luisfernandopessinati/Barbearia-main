@@ -321,9 +321,29 @@ async function criarAdmin() {
 }
 criarAdmin();
 
+function normalizarTelefone(tel) {
+    // Remove tudo que não é número
+    const numeros = tel.replace(/\D/g, '');
+    // Remove o 55 do Brasil se vier com DDI
+    const semDDI = numeros.startsWith('55') && numeros.length >= 12 
+        ? numeros.slice(2) 
+        : numeros;
+    // Formata como (XX) XXXXX-XXXX
+    if (semDDI.length === 11) {
+        return `(${semDDI.slice(0,2)}) ${semDDI.slice(2,7)}-${semDDI.slice(7)}`;
+    }
+    // Fixo (XX) XXXX-XXXX
+    if (semDDI.length === 10) {
+        return `(${semDDI.slice(0,2)}) ${semDDI.slice(2,6)}-${semDDI.slice(6)}`;
+    }
+    // Se não reconhecer o formato, retorna só os números
+    return semDDI;
+}
+
 // CRIAR CLIENTES NO BANCO DE DADOS
 app.post('/loginUsuario/:token', async (req, res) => {
-    const { nome, telefone } = req.body;
+    const { nome } = req.body;
+    const telefone = normalizarTelefone(req.body.telefone); // 👈
     const { token } = req.params;
 
     try {

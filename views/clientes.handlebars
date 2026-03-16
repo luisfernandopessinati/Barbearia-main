@@ -19,7 +19,6 @@
         background: var(--bg);
     }
 
-    /* ── Header da página ── */
     .page-header {
         display: flex;
         align-items: center;
@@ -69,9 +68,7 @@
         gap: 8px;
     }
 
-    /* ══════════════════════════════
-       RANKING BARBEIROS — grid uniforme
-    ══════════════════════════════ */
+    /* ══ RANKING BARBEIROS ══ */
     .ranking-wrap { margin-bottom: 40px; }
 
     .ranking-grid-barbeiros {
@@ -180,7 +177,6 @@
     .ranking-barb-card:hover .ranking-barb-expand-hint,
     .ranking-barb-card.active .ranking-barb-expand-hint { color: var(--gold); }
 
-    /* ── Painel expandido ── */
     .barb-expand-panel {
         display: none;
         background: var(--bg3);
@@ -253,11 +249,7 @@
         margin-bottom: 4px;
     }
 
-    .barb-top-cli-stat {
-        font-size: 10px;
-        color: var(--muted);
-    }
-
+    .barb-top-cli-stat { font-size: 10px; color: var(--muted); }
     .barb-top-cli-stat span { color: var(--gold); font-weight: 600; }
 
     .barb-expand-empty {
@@ -267,9 +259,7 @@
         padding: 20px;
     }
 
-    /* ══════════════════════════════
-       TOP 5 CLIENTES
-    ══════════════════════════════ */
+    /* ══ TOP 5 CLIENTES ══ */
     .top-clientes-grid {
         display: grid;
         grid-template-columns: repeat(5, 1fr);
@@ -333,9 +323,7 @@
     .top-cliente-stat { font-size: 10px; color: var(--muted); margin-bottom: 2px; }
     .top-cliente-stat span { color: var(--gold); font-weight: 600; }
 
-    /* ══════════════════════════════
-       TABELA CLIENTES + PESQUISA
-    ══════════════════════════════ */
+    /* ══ TABELA CLIENTES ══ */
     .clientes-header {
         display: flex;
         align-items: center;
@@ -459,6 +447,22 @@
         white-space: nowrap;
     }
 
+    .btn-cli-edit {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-cli-edit:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
     .no-results {
         text-align: center;
         padding: 40px;
@@ -471,9 +475,137 @@
     .clientes-empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.3; }
     .clientes-empty p { font-size: 13px; }
 
-    /* ══════════════════════════════
-       MOBILE
-    ══════════════════════════════ */
+    /* ══ MODAL EDIÇÃO CLIENTE ══ */
+    .modal-cli-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: #000000cc;
+        backdrop-filter: blur(4px);
+        z-index: 300;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-cli-overlay.open { display: flex; }
+
+    .modal-cli {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 28px;
+        width: 100%;
+        max-width: 380px;
+        position: relative;
+        transform: translateY(16px);
+        transition: transform 0.25s;
+    }
+
+    .modal-cli-overlay.open .modal-cli { transform: translateY(0); }
+
+    .modal-cli-close {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        background: none;
+        border: none;
+        color: var(--muted);
+        font-size: 18px;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .modal-cli-close:hover { color: var(--text); }
+
+    .modal-cli-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 22px;
+        letter-spacing: 2px;
+        color: var(--text);
+        margin-bottom: 4px;
+    }
+
+    .modal-cli-sub {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 20px;
+    }
+
+    .modal-cli-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 12px;
+    }
+
+    .modal-cli-field label {
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .modal-cli-field input {
+        width: 100%;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        color: var(--text);
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    .modal-cli-field input:focus { border-color: var(--gold); }
+
+    .modal-cli-erro {
+        font-size: 12px;
+        color: var(--danger);
+        min-height: 16px;
+        margin-top: 6px;
+    }
+
+    .modal-cli-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .btn-cli-cancelar {
+        flex: 1;
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 10px;
+        border-radius: 8px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-cli-cancelar:hover { border-color: var(--danger); color: var(--danger); }
+
+    .btn-cli-salvar {
+        flex: 2;
+        background: var(--gold);
+        border: none;
+        color: #000;
+        padding: 10px;
+        border-radius: 8px;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 16px;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-cli-salvar:hover { background: var(--gold-light); }
+    .btn-cli-salvar:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ══ MOBILE ══ */
     @media (max-width: 900px) {
         .clientes-wrap { padding: 16px; }
         .ranking-grid-barbeiros { grid-template-columns: repeat(2, 1fr); }
@@ -496,17 +628,12 @@
 
 <div class="clientes-wrap">
 
-    {{!-- Header --}}
     <div class="page-header">
         <div class="page-title">Clientes & Barbeiros</div>
-        <a href="/admin" class="btn-sair-pg">
-            ← Voltar
-        </a>
+        <a href="/admin" class="btn-sair-pg">← Voltar</a>
     </div>
 
-    {{!-- ═══════════════════════════════
-         RANKING BARBEIROS
-    ═══════════════════════════════ --}}
+    {{!-- RANKING BARBEIROS --}}
     <div class="ranking-wrap">
         <div class="section-titulo">✂️ Ranking de Barbeiros</div>
 
@@ -524,30 +651,17 @@
                     <div class="ranking-barb-nome">{{nome}}</div>
                 </div>
                 <div class="ranking-barb-stats">
-                    <div class="ranking-barb-stat">
-                        Atendimentos
-                        <span>{{total}}</span>
-                    </div>
-                    <div class="ranking-barb-stat">
-                        Faturamento
-                        <span>R$ {{faturamento}}</span>
-                    </div>
-                    <div class="ranking-barb-stat">
-                        Serviço Top
-                        <span>{{servicoTop}}</span>
-                    </div>
+                    <div class="ranking-barb-stat">Atendimentos<span>{{total}}</span></div>
+                    <div class="ranking-barb-stat">Faturamento<span>R$ {{faturamento}}</span></div>
+                    <div class="ranking-barb-stat">Serviço Top<span>{{servicoTop}}</span></div>
                     {{#if ultimoAtendimento}}
-                    <div class="ranking-barb-stat">
-                        Último
-                        <span>{{ultimoAtendimento}}</span>
-                    </div>
+                    <div class="ranking-barb-stat">Último<span>{{ultimoAtendimento}}</span></div>
                     {{/if}}
                 </div>
                 <div class="ranking-barb-expand-hint">ver clientes ▾</div>
             </div>
             {{/each}}
 
-            {{!-- Painel expansível --}}
             <div class="barb-expand-panel" id="barb-expand-panel">
                 <div class="barb-expand-title" id="barb-expand-title">Top Clientes</div>
                 <div class="barb-top-clientes" id="barb-top-clientes"></div>
@@ -563,9 +677,7 @@
         {{/if}}
     </div>
 
-    {{!-- ═══════════════════════════════
-         TOP 5 CLIENTES GERAL
-    ═══════════════════════════════ --}}
+    {{!-- TOP 5 CLIENTES --}}
     {{#if topClientes.length}}
     <div class="section-titulo">🏆 Top Clientes</div>
     <div class="top-clientes-grid">
@@ -582,9 +694,7 @@
     </div>
     {{/if}}
 
-    {{!-- ═══════════════════════════════
-         LISTA COMPLETA + PESQUISA
-    ═══════════════════════════════ --}}
+    {{!-- LISTA COMPLETA --}}
     <div class="clientes-header">
         <div class="section-titulo" style="margin-bottom:0">👥 Todos os Clientes</div>
         <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
@@ -611,22 +721,29 @@
                     <th>Valor Total</th>
                     <th>Último Agendamento</th>
                     <th>Serviço Favorito</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody id="clientes-tbody">
                 {{#each clientes}}
-                <tr data-nome="{{nome}}" data-telefone="{{telefone}}">
+                <tr data-id="{{id}}" data-nome="{{nome}}" data-telefone="{{telefone}}">
                     <td>
                         <div class="td-nome-wrap">
                             <div class="td-avatar">{{substr nome 0 2}}</div>
-                            <span>{{nome}}</span>
+                            <span id="cli-nome-{{id}}">{{nome}}</span>
                         </div>
                     </td>
-                    <td class="td-muted">{{telefone}}</td>
+                    <td class="td-muted" id="cli-tel-{{id}}">{{telefone}}</td>
                     <td><span class="td-total">{{total}}</span></td>
                     <td><span class="td-valor">R$ {{valorTotal}}</span></td>
                     <td class="td-muted">{{ultimoAgendamento}}</td>
                     <td><span class="td-badge">{{servicoFavorito}}</span></td>
+                    <td>
+                        <button class="btn-cli-edit"
+                            data-id="{{id}}"
+                            data-nome="{{nome}}"
+                            data-tel="{{telefone}}">✎</button>
+                    </td>
                 </tr>
                 {{/each}}
             </tbody>
@@ -642,17 +759,39 @@
 
 </div>
 
+{{!-- MODAL EDIÇÃO CLIENTE --}}
+<div class="modal-cli-overlay" id="modal-cli-overlay">
+    <div class="modal-cli">
+        <button class="modal-cli-close" id="modal-cli-close">✕</button>
+        <div class="modal-cli-title">Editar Cliente</div>
+        <p class="modal-cli-sub">Alterações refletem nos agendamentos vinculados</p>
+        <input type="hidden" id="cli-edit-id">
+        <div class="modal-cli-field">
+            <label>Nome</label>
+            <input id="cli-edit-nome" type="text" placeholder="Nome do cliente">
+        </div>
+        <div class="modal-cli-field">
+            <label>Telefone</label>
+            <input id="cli-edit-tel" type="text" placeholder="(00) 00000-0000">
+        </div>
+        <div class="modal-cli-erro" id="cli-edit-erro"></div>
+        <div class="modal-cli-actions">
+            <button class="btn-cli-cancelar" id="btn-cli-cancelar">Cancelar</button>
+            <button class="btn-cli-salvar" id="btn-cli-salvar">Salvar</button>
+        </div>
+    </div>
+</div>
+
 <script>
     // ── Expand barbeiro ──
     let activeBarbCard = null;
 
     function toggleBarbeiro(card) {
-        const panel = document.getElementById('barb-expand-panel');
-        const title = document.getElementById('barb-expand-title');
+        const panel     = document.getElementById('barb-expand-panel');
+        const title     = document.getElementById('barb-expand-title');
         const container = document.getElementById('barb-top-clientes');
-        const empty = document.getElementById('barb-expand-empty');
+        const empty     = document.getElementById('barb-expand-empty');
 
-        // Fecha se clicar no mesmo
         if (activeBarbCard === card) {
             card.classList.remove('active');
             panel.classList.remove('open');
@@ -660,22 +799,21 @@
             return;
         }
 
-        // Troca ativo
         if (activeBarbCard) activeBarbCard.classList.remove('active');
         card.classList.add('active');
         activeBarbCard = card;
 
-        const nome = card.querySelector('.ranking-barb-nome').textContent;
+        const nome     = card.querySelector('.ranking-barb-nome').textContent;
         const clientes = JSON.parse(card.dataset.clientes || '[]');
 
-        title.textContent = `Top Clientes de ${nome}`;
+        title.textContent  = `Top Clientes de ${nome}`;
         container.innerHTML = '';
 
         if (!clientes.length) {
-            empty.style.display = 'block';
+            empty.style.display     = 'block';
             container.style.display = 'none';
         } else {
-            empty.style.display = 'none';
+            empty.style.display     = 'none';
             container.style.display = 'grid';
             clientes.forEach((c, i) => {
                 const initials = c.nome.substring(0, 2).toUpperCase();
@@ -690,38 +828,111 @@
             });
         }
 
-        // Move o painel para após o card clicado
         card.after(panel);
         panel.classList.add('open');
     }
 
     // ── Pesquisa clientes ──
     const searchInput = document.getElementById('clientes-search');
-    const tbody = document.getElementById('clientes-tbody');
-    const countEl = document.getElementById('clientes-count');
-    const noResults = document.getElementById('no-results');
-    const searchTerm = document.getElementById('search-term');
+    const tbody       = document.getElementById('clientes-tbody');
+    const countEl     = document.getElementById('clientes-count');
+    const noResults   = document.getElementById('no-results');
+    const searchTerm  = document.getElementById('search-term');
 
     if (searchInput && tbody) {
         searchInput.addEventListener('input', function () {
             const termo = this.value.toLowerCase().trim();
-            const rows = tbody.querySelectorAll('tr');
+            const rows  = tbody.querySelectorAll('tr');
             let visiveis = 0;
 
             rows.forEach(row => {
-                const nome = (row.dataset.nome || '').toLowerCase();
-                const tel = (row.dataset.telefone || '').toLowerCase();
+                const nome  = (row.dataset.nome     || '').toLowerCase();
+                const tel   = (row.dataset.telefone || '').toLowerCase();
                 const match = !termo || nome.includes(termo) || tel.includes(termo);
                 row.classList.toggle('hidden', !match);
                 if (match) visiveis++;
             });
 
             if (countEl) countEl.textContent = `${visiveis} cadastrados`;
-
             if (noResults) {
                 noResults.style.display = visiveis === 0 ? 'block' : 'none';
                 if (searchTerm) searchTerm.textContent = this.value;
             }
         });
     }
+
+    // ── Modal edição cliente ──
+    const modalOverlay  = document.getElementById('modal-cli-overlay');
+    const btnCliCancelar = document.getElementById('btn-cli-cancelar');
+    const btnCliClose   = document.getElementById('modal-cli-close');
+    const btnCliSalvar  = document.getElementById('btn-cli-salvar');
+    const cliErro       = document.getElementById('cli-edit-erro');
+
+    function abrirModalCli(id, nome, tel) {
+        document.getElementById('cli-edit-id').value   = id;
+        document.getElementById('cli-edit-nome').value = nome;
+        document.getElementById('cli-edit-tel').value  = tel;
+        cliErro.textContent = '';
+        modalOverlay.classList.add('open');
+    }
+
+    function fecharModalCli() {
+        modalOverlay.classList.remove('open');
+    }
+
+    btnCliCancelar.addEventListener('click', fecharModalCli);
+    btnCliClose.addEventListener('click', fecharModalCli);
+    modalOverlay.addEventListener('click', e => {
+        if (e.target === modalOverlay) fecharModalCli();
+    });
+
+    // Abre modal ao clicar no botão ✎
+    document.addEventListener('click', e => {
+        const btn = e.target.closest('.btn-cli-edit');
+        if (!btn) return;
+        abrirModalCli(btn.dataset.id, btn.dataset.nome, btn.dataset.tel);
+    });
+
+    // Salvar edição
+    btnCliSalvar.addEventListener('click', async () => {
+        const id    = document.getElementById('cli-edit-id').value;
+        const nome  = document.getElementById('cli-edit-nome').value.trim();
+        const tel   = document.getElementById('cli-edit-tel').value.trim();
+
+        if (!nome || !tel) { cliErro.textContent = '⚠ Preencha todos os campos.'; return; }
+
+        btnCliSalvar.textContent = 'Salvando...';
+        btnCliSalvar.disabled    = true;
+        cliErro.textContent      = '';
+
+        try {
+            const res  = await fetch(`/clientes/${id}`, {
+                method:  'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ nome, telefone: tel })
+            });
+            const json = await res.json();
+
+            if (json.sucesso) {
+                // Atualiza tabela sem recarregar
+                document.getElementById(`cli-nome-${id}`).textContent = nome;
+                document.getElementById(`cli-tel-${id}`).textContent  = tel;
+
+                // Atualiza data-attributes da linha e do botão
+                const row = tbody.querySelector(`tr[data-id="${id}"]`);
+                if (row) { row.dataset.nome = nome; row.dataset.telefone = tel; }
+                const btn = document.querySelector(`.btn-cli-edit[data-id="${id}"]`);
+                if (btn) { btn.dataset.nome = nome; btn.dataset.tel = tel; }
+
+                fecharModalCli();
+            } else {
+                cliErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar.');
+            }
+        } catch {
+            cliErro.textContent = '⚠ Erro de conexão.';
+        } finally {
+            btnCliSalvar.textContent = 'Salvar';
+            btnCliSalvar.disabled    = false;
+        }
+    });
 </script>

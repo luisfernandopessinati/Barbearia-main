@@ -65,6 +65,34 @@ app.use('/', require('./routes/empresaRoutes'));
 //app.get('/clientes', isAdminAuthenticated, clienteController.listar);
 app.use('/', require('./routes/clienteRoutes')(isAdminAuthenticated));
 
+// PATCH /clientes/:id — edita nome e telefone
+app.patch('/clientes/:id', isAdminAuthenticated, async (req, res) => {
+    try {
+        const { nome, telefone } = req.body;
+        const telefoneNormalizado = normalizarTelefone(telefone);
+
+        const cliente = await Cliente.findOne({
+            where: { id: req.params.id, idEmpresa: req.user.idEmpresa }
+        });
+        if (!cliente) return res.status(404).json({ erro: 'Cliente não encontrado.' });
+
+        // Atualiza o telefone nos agendamentos também
+        await Agendamento.update(
+            { telefone: telefoneNormalizado },
+            { where: { telefone: cliente.telefone, idEmpresa: req.user.idEmpresa } }
+        );
+
+        await cliente.update({
+            nome: nome.trim(),
+            telefone: telefoneNormalizado
+        });
+
+        res.json({ sucesso: true });
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao atualizar: ' + error.message });
+    }
+});
+
 app.engine('handlebars', engine({
     helpers: {
         substr: (str, start, len) => {

@@ -28,6 +28,9 @@ const app = express();
 const PORT = process.env.PORT || 3333;
 
 const clienteController = require('./controllers/clienteController');
+const uploadAdmins = require('./config/multerAdmins'); 
+const path = require('path');
+const fs   = require('fs');
 
 // desconectar automaticamente 
 app.use(session({
@@ -197,7 +200,7 @@ app.get('/agendar/:token', async (req, res) => {
             }),
             Admin.findAll({
                 where: { idEmpresa, ativo: 'S' },
-                attributes: ['id', 'nome'] // 👈 adicionamos id aqui
+                attributes: ['id', 'nome', 'foto'] 
             })
         ]);
 
@@ -207,15 +210,16 @@ app.get('/agendar/:token', async (req, res) => {
         }));
 
         const servicosFormatados = servicos.map(s => ({
-            id: s.id,                       // 👈 adicionamos id
+            id: s.id,                      
             nome: s.nome,
             valor: parseFloat(s.valor).toFixed(2).replace('.', ','),
-            duracao_minutos: s.duracao_minutos  // 👈 adicionamos duração
+            duracao_minutos: s.duracao_minutos  
         }));
 
         const barbeiros = admins.map(a => ({
-            id: a.id,       // 👈 agora é objeto com id e nome
-            nome: a.nome
+            id: a.id,       
+            nome: a.nome,
+            foto: a.foto || null
         }));
 
         const agendamentoSucesso = req.session.agendamentoSucesso || null;
@@ -379,7 +383,7 @@ app.get('/admins', isAdminAuthenticated, async (req, res) => {
     try {
         const admins = await Admin.findAll({
             where: { idEmpresa: req.user.idEmpresa },
-            attributes: ['id', 'nome', 'email', 'role', 'ativo', 'telefone'],
+            attributes: ['id', 'nome', 'email', 'role', 'ativo', 'telefone','foto'],
             order: [['nome', 'ASC']]
         });
         res.json({ admins });
@@ -488,6 +492,26 @@ app.patch('/admins/:id/telefone', isAdminAuthenticated, async (req, res) => {
         res.json({ sucesso: true });
     } catch (error) {
         res.status(500).json({ erro: 'Erro ao atualizar telefone: ' + error.message });
+    }
+});
+
+// alterar foto do admin
+app.post('/admins/:id/foto', isAdminAuthenticated, uploadAdmins.single('foto'), async (req, res) => {
+    try {
+        const admin = await Admin.findOne({
+            where: { id: req.params.id, idEmpresa: req.user.idEmpresa }
+        });
+        if (!admin) return res.status(404).json({ erro: 'Admin não encontrado.' });
+
+        if (admin.foto) {
+            const fotoAntiga = path.join(__dirname, '../public', admin.foto);
+            if (fs.existsSync(fotoAntiga)) fs.unlinkSync(fotoAntiga);
+        }
+
+        await admin.update({ foto: `/uploads/admins/${req.file.filename}` });
+        res.json({ sucesso: true });
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao salvar foto: ' + error.message });
     }
 });
 

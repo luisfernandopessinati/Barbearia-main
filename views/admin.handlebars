@@ -1577,6 +1577,117 @@
             max-width: 350px;
         }
     }
+        /* ── Admin cards (nova estrutura) ── */
+    .admin-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 12px;
+    }
+    .admin-card.admin-inativo { opacity: 0.5; }
+
+    .admin-avatar-wrap {
+        position: relative;
+        flex-shrink: 0;
+        cursor: pointer;
+        width: 36px;
+        height: 36px;
+    }
+    .admin-avatar-wrap .admin-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--gold), #6b4c00);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 14px;
+        color: #fff;
+        overflow: hidden;
+    }
+    .admin-avatar-overlay {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 9px;
+        color: #fff;
+        letter-spacing: 0.5px;
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+    .admin-avatar-wrap:hover .admin-avatar-overlay { opacity: 1; }
+
+    .admin-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .admin-info-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .admin-nome { font-size: 13px; font-weight: 500; color: var(--text); }
+    .admin-meta { font-size: 11px; color: var(--muted); }
+
+    .admin-badge {
+        font-size: 9px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 2px 7px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        background: var(--bg);
+        white-space: nowrap;
+    }
+    .admin-badge.owner { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+    .admin-badge.inativo { background: var(--danger-dim); border-color: var(--danger); color: var(--danger); }
+
+    .admin-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+    .icon-btn {
+        background: none;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 14px;
+        padding: 4px 6px;
+        border-radius: 5px;
+        line-height: 1;
+        transition: all 0.15s;
+    }
+    .icon-btn:hover { background: var(--bg); color: var(--text); }
+    .icon-btn.danger:hover { color: var(--danger); background: var(--danger-dim); }
+    .icon-btn.success:hover { color: #27ae60; background: #27ae6011; }
+
+    .admin-edit-panel input {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        color: var(--text);
+        outline: none;
+        width: 100%;
+        transition: border-color 0.2s;
+    }
+    .admin-edit-panel input:focus { border-color: var(--gold); }
+    .admin-save-btn {
+        background: var(--gold);
+        border: none;
+        color: #000;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 14px;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: background 0.2s;
+        align-self: flex-start;
+    }
+    .admin-save-btn:hover { background: var(--gold-light); }
 </style>
 
 <!-- ── Header ── -->
@@ -1825,10 +1936,9 @@
         <div class="modal-title">Administradores</div>
         <p class="modal-sub">Gerencie os usuários com acesso ao painel</p>
         <div class="modal-grid">
-            <div class="modal-field full"><label>Nome</label><input type="text" id="admin-nome-input"
-                    placeholder="Ex: João Silva"></div>
-            <div class="modal-field full"><label>E-mail</label><input type="email" id="admin-email-input"
-                    placeholder="joao@barbearia.com"></div>
+            <div class="modal-field full"><label>Nome</label><input type="text" id="admin-nome-input" placeholder="Ex: João Silva"></div>
+            <div class="modal-field full"><label>E-mail</label><input type="email" id="admin-email-input" placeholder="joao@barbearia.com"></div>
+            <div class="modal-field full"><label>Telefone</label><input type="tel" id="admin-tel-input" placeholder="(00) 00000-0000"></div>
             <div class="modal-field">
                 <label>Senha</label>
                 <div class="input-pass-wrap">
@@ -1843,13 +1953,24 @@
                     <option value="owner">Owner (acesso total)</option>
                 </select>
             </div>
+            <div class="modal-field full">
+                <label>Foto (opcional)</label>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div id="admin-foto-preview" style="width:36px;height:36px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);overflow:hidden;flex-shrink:0;">?</div>
+                    <label for="admin-foto-input" style="cursor:pointer;font-size:12px;padding:6px 12px;border:1px solid var(--border);border-radius:6px;color:var(--muted);transition:all .2s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">Escolher foto</label>
+                    <input type="file" id="admin-foto-input" accept="image/*" style="display:none" onchange="
+                        const f=this.files[0]; if(!f) return;
+                        const r=new FileReader(); r.onload=e=>{
+                            const p=document.getElementById('admin-foto-preview');
+                            p.innerHTML='<img src=\''+e.target.result+'\' style=\'width:100%;height:100%;object-fit:cover;border-radius:50%;\'>';
+                        }; r.readAsDataURL(f);">
+                </div>
+            </div>
         </div>
-        <div style="margin-top:4px;"><button class="btn-confirmar" id="btn-add-admin"
-                style="width:100%;font-size:15px;padding:10px;">+ Adicionar Admin</button></div>
+        <div style="margin-top:4px;"><button class="btn-confirmar" id="btn-add-admin" style="width:100%;font-size:15px;padding:10px;">+ Adicionar Admin</button></div>
         <div class="modal-erro" id="admin-erro"></div>
         <div class="admins-sep"></div>
-        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">
-            Admins cadastrados</p>
+        <p style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">Admins cadastrados</p>
         <div class="admin-lista" id="admin-lista">
             <div class="admins-empty">Carregando...</div>
         </div>
@@ -2457,145 +2578,196 @@
     servicosOverlay.addEventListener('click', e => { if (e.target === servicosOverlay) servicosOverlay.classList.remove('open'); });
 
     // ── Modal Admins ──────────────────────────────────────
-    const adminsOverlay = document.getElementById('modal-admins-overlay');
-    const adminLista = document.getElementById('admin-lista');
-    const adminErro = document.getElementById('admin-erro');
-    const btnAddAdmin = document.getElementById('btn-add-admin');
-    const btnTogglePass = document.getElementById('btn-toggle-pass');
-    const adminSenhaInput = document.getElementById('admin-senha-input');
+const adminsOverlay = document.getElementById('modal-admins-overlay');
+const adminLista    = document.getElementById('admin-lista');
+const adminErro     = document.getElementById('admin-erro');
+const btnAddAdmin   = document.getElementById('btn-add-admin');
+const btnTogglePass = document.getElementById('btn-toggle-pass');
+const adminSenhaInput = document.getElementById('admin-senha-input');
 
-    btnTogglePass.addEventListener('click', () => {
-        const show = adminSenhaInput.type === 'password';
-        adminSenhaInput.type = show ? 'text' : 'password';
-        btnTogglePass.textContent = show ? '🙈' : '👁';
-    });
+btnTogglePass.addEventListener('click', () => {
+    const show = adminSenhaInput.type === 'password';
+    adminSenhaInput.type = show ? 'text' : 'password';
+    btnTogglePass.textContent = show ? '🙈' : '👁';
+});
 
-    async function carregarAdmins() {
-        adminLista.innerHTML = '<div class="admins-empty">Carregando...</div>';
-        try {
-            const res = await fetch('/admins');
-            const json = await res.json();
-            if (!json.admins?.length) { adminLista.innerHTML = '<div class="admins-empty">Nenhum admin cadastrado</div>'; return; }
-            adminLista.innerHTML = '';
-            json.admins.forEach(a => {
-                const item = document.createElement('div');
-                item.className = `admin-item ${a.ativo === 'S' ? '' : 'admin-inativo'}`;
-                item.innerHTML = `
-                    <div class="admin-avatar" style="${a.ativo !== 'S' ? 'opacity:.4;filter:grayscale(1)' : ''}">${a.nome.charAt(0).toUpperCase()}</div>
-                    <div class="admin-item-info">
-                        <span class="admin-item-nome" id="nome-label-${a.id}">${a.nome}${a.ativo !== 'S' ? ' <span style="font-size:10px;color:#c0392b;letter-spacing:1px;text-transform:uppercase;">● Inativo</span>' : ''}</span>
-                        <input id="nome-input-${a.id}" value="${a.nome}" style="display:none;background:#181818;border:1px solid #b8860b;border-radius:6px;padding:4px 8px;color:#e8e8e8;font-size:14px;width:140px;">
-                        <span class="admin-item-email">${a.email}</span>
-                        <span class="admin-item-tel" id="tel-label-${a.id}">${a.telefone || '—'}</span>
-                        <input id="tel-input-${a.id}" value="${a.telefone || ''}" type="tel" style="display:none;background:#181818;border:1px solid #b8860b;border-radius:6px;padding:4px 8px;color:#e8e8e8;font-size:13px;width:130px;">
-                    </div>
-                    <span class="admin-item-role ${a.role === 'owner' ? 'owner' : ''}">${a.role}</span>
-                    <button class="admin-edit-tel" data-id="${a.id}" style="background:none;border:none;color:#555;font-size:14px;cursor:pointer;" title="Editar telefone">✎</button>
-                    <button class="admin-edit-nome" data-id="${a.id}" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;" title="Editar nome">✎</button>
-                    ${a.role !== 'owner' ? (a.ativo !== 'S'
-                        ? `<button class="admin-reativar" data-id="${a.id}" style="background:none;border:1px solid #b8860b;color:#b8860b;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;">↺ Reativar</button>`
-                        : `<button class="admin-del" data-id="${a.id}" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;">✕</button>`
-                    ) : ''}`;
-                adminLista.appendChild(item);
-            });
+// ── Helpers ──
+function setErro(msg) { adminErro.textContent = msg ? '⚠ ' + msg : ''; }
 
-            adminLista.querySelectorAll('.admin-edit-nome').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const id = btn.dataset.id;
-                    const label = document.getElementById(`nome-label-${id}`);
-                    const input = document.getElementById(`nome-input-${id}`);
-                    if (input.style.display === 'none') {
-                        label.style.display = 'none'; input.style.display = 'inline-block'; input.focus();
-                        btn.textContent = '✔'; btn.style.color = '#b8860b';
-                    } else {
-                        const novoNome = input.value.trim();
-                        if (!novoNome) return;
-                        try {
-                            const res = await fetch(`/admins/${id}/nome`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome: novoNome }) });
-                            const json = await res.json();
-                            if (json.sucesso) carregarAdmins();
-                            else adminErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar.');
-                        } catch (e) { adminErro.textContent = '⚠ Erro de conexão.'; }
-                    }
-                });
-            });
+async function uploadFoto(id, file) {
+    const fd = new FormData();
+    fd.append('foto', file);
+    const res = await fetch(`/admins/${id}/foto`, { method: 'POST', body: fd });
+    return res.json();
+}
 
-            adminLista.querySelectorAll('.admin-edit-tel').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const id = btn.dataset.id;
-                    const label = document.getElementById(`tel-label-${id}`);
-                    const input = document.getElementById(`tel-input-${id}`);
-                    if (input.style.display === 'none') {
-                        label.style.display = 'none'; input.style.display = 'inline-block'; input.focus();
-                        btn.textContent = '✔'; btn.style.color = '#b8860b';
-                    } else {
-                        const novoTel = input.value.trim();
-                        if (!novoTel) return;
-                        try {
-                            const res = await fetch(`/admins/${id}/telefone`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ telefone: novoTel }) });
-                            const json = await res.json();
-                            if (json.sucesso) carregarAdmins();
-                            else adminErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar.');
-                        } catch (e) { adminErro.textContent = '⚠ Erro de conexão.'; }
-                    }
-                });
-            });
+// ── Abrir file picker para foto de admin existente ──
+adminLista.addEventListener('change', async e => {
+    const input = e.target.closest('.admin-foto-input');
+    if (!input || !input.files[0]) return;
+    const id = input.dataset.id;
+    try {
+        const json = await uploadFoto(id, input.files[0]);
+        if (json.sucesso) carregarAdmins();
+        else setErro(json.erro || 'Erro ao salvar foto.');
+    } catch { setErro('Erro de conexão.'); }
+});
 
-            adminLista.querySelectorAll('.admin-del').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    if (!confirm('Inativar este admin?')) return;
-                    try {
-                        const res = await fetch(`/admins/${btn.dataset.id}`, { method: 'DELETE' });
-                        const json = await res.json();
-                        if (json.sucesso) carregarAdmins();
-                        else adminErro.textContent = '⚠ ' + (json.erro || 'Erro ao inativar.');
-                    } catch (e) { adminErro.textContent = '⚠ Erro de conexão.'; }
-                });
-            });
-
-            adminLista.querySelectorAll('.admin-reativar').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    if (!confirm('Reativar este admin?')) return;
-                    try {
-                        const res = await fetch(`/admins/${btn.dataset.id}/reativar`, { method: 'PATCH' });
-                        const json = await res.json();
-                        if (json.sucesso) carregarAdmins();
-                        else adminErro.textContent = '⚠ ' + (json.erro || 'Erro ao reativar.');
-                    } catch (e) { adminErro.textContent = '⚠ Erro de conexão.'; }
-                });
-            });
-
-        } catch (e) { adminLista.innerHTML = '<div class="admins-empty">Erro ao carregar.</div>'; }
+// ── Painel de edição inline (nome + telefone juntos) ──
+adminLista.addEventListener('click', async e => {
+    // Abrir/fechar painel
+    if (e.target.closest('.admin-edit-btn')) {
+        const btn = e.target.closest('.admin-edit-btn');
+        const id  = btn.dataset.id;
+        const panel = document.getElementById(`edit-panel-${id}`);
+        const aberto = panel.style.display !== 'none';
+        panel.style.display = aberto ? 'none' : 'flex';
+        btn.textContent = aberto ? '✎' : '✕';
+        return;
     }
 
-    btnAddAdmin.addEventListener('click', async () => {
-        adminErro.textContent = '';
-        const nome = document.getElementById('admin-nome-input').value.trim();
-        const email = document.getElementById('admin-email-input').value.trim();
-        const senha = adminSenhaInput.value;
-        const role = document.getElementById('admin-role-select').value;
-        const telefone = document.getElementById('admin-tel-input').value.trim();
-        if (!nome || !email || !senha || !telefone) { adminErro.textContent = '⚠ Preencha todos os campos.'; return; }
-        if (senha.length < 6) { adminErro.textContent = '⚠ Senha mínima de 6 caracteres.'; return; }
-        btnAddAdmin.textContent = 'Salvando...'; btnAddAdmin.disabled = true;
+    // Salvar edição
+    if (e.target.closest('.admin-save-btn')) {
+        const btn  = e.target.closest('.admin-save-btn');
+        const id   = btn.dataset.id;
+        const nome = document.getElementById(`ep-nome-${id}`).value.trim();
+        const tel  = document.getElementById(`ep-tel-${id}`).value.trim();
+        if (!nome) { setErro('Nome não pode ser vazio.'); return; }
+        setErro('');
         try {
-            const res = await fetch('/admins', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome, email, senha, role, telefone }) });
-            const json = await res.json();
-            if (json.sucesso) {
-                document.getElementById('admin-nome-input').value = '';
-                document.getElementById('admin-email-input').value = '';
-                document.getElementById('admin-tel-input').value = '';
-                adminSenhaInput.value = '';
-                document.getElementById('admin-role-select').value = 'admin';
-                carregarAdmins();
-            } else adminErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar.');
-        } catch (e) { adminErro.textContent = '⚠ Erro de conexão.'; }
-        finally { btnAddAdmin.textContent = '+ Adicionar Admin'; btnAddAdmin.disabled = false; }
-    });
+            const promises = [
+                fetch(`/admins/${id}/nome`, { method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ nome }) })
+            ];
+            if (tel) {
+                promises.push(fetch(`/admins/${id}/telefone`, { method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ telefone: tel }) }));
+            }
+            const results = await Promise.all(promises);
+            const jsons   = await Promise.all(results.map(r => r.json()));
+            const erro    = jsons.find(j => !j.sucesso);
+            if (erro) setErro(erro.erro || 'Erro ao salvar.');
+            else carregarAdmins();
+        } catch { setErro('Erro de conexão.'); }
+        return;
+    }
 
-    document.getElementById('modal-admins-close').addEventListener('click', () => adminsOverlay.classList.remove('open'));
-    adminsOverlay.addEventListener('click', e => { if (e.target === adminsOverlay) adminsOverlay.classList.remove('open'); });
-    // ── Modal Horários ────────────────────────────────────
+    // Inativar
+    if (e.target.closest('.admin-del')) {
+        const btn = e.target.closest('.admin-del');
+        if (!confirm('Inativar este admin?')) return;
+        try {
+            const res  = await fetch(`/admins/${btn.dataset.id}`, { method: 'DELETE' });
+            const json = await res.json();
+            if (json.sucesso) carregarAdmins();
+            else setErro(json.erro || 'Erro ao inativar.');
+        } catch { setErro('Erro de conexão.'); }
+        return;
+    }
+
+    // Reativar
+    if (e.target.closest('.admin-reativar')) {
+        const btn = e.target.closest('.admin-reativar');
+        if (!confirm('Reativar este admin?')) return;
+        try {
+            const res  = await fetch(`/admins/${btn.dataset.id}/reativar`, { method: 'PATCH' });
+            const json = await res.json();
+            if (json.sucesso) carregarAdmins();
+            else setErro(json.erro || 'Erro ao reativar.');
+        } catch { setErro('Erro de conexão.'); }
+    }
+});
+
+// ── Renderizar lista ──
+async function carregarAdmins() {
+    adminLista.innerHTML = '<div class="admins-empty">Carregando...</div>';
+    setErro('');
+    try {
+        const res  = await fetch('/admins');
+        const json = await res.json();
+        if (!json.admins?.length) {
+            adminLista.innerHTML = '<div class="admins-empty">Nenhum admin cadastrado</div>';
+            return;
+        }
+        adminLista.innerHTML = '';
+        json.admins.forEach(a => {
+            const ativo    = a.ativo === 'S';
+            const inicial  = a.nome.charAt(0).toUpperCase();
+            const avatarEl = a.foto
+                ? `<img src="${a.foto}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+                : inicial;
+
+            const item = document.createElement('div');
+            item.className = `admin-card${ativo ? '' : ' admin-inativo'}`;
+            item.innerHTML = `
+              <div class="admin-avatar-wrap" title="${ativo ? 'Trocar foto' : ''}" ${ativo ? `onclick="document.getElementById('foto-${a.id}').click()"` : ''}>
+                <div class="admin-avatar">${avatarEl}</div>
+                ${ativo ? `<div class="admin-avatar-overlay">foto</div>` : ''}
+                ${ativo ? `<input class="admin-foto-input" id="foto-${a.id}" data-id="${a.id}" type="file" accept="image/*" style="display:none">` : ''}
+              </div>
+
+              <div class="admin-info">
+                <div class="admin-info-top">
+                  <span class="admin-nome">${a.nome}</span>
+                  <span class="admin-badge${a.role === 'owner' ? ' owner' : ''}">${a.role}</span>
+                  ${!ativo ? '<span class="admin-badge inativo">inativo</span>' : ''}
+                </div>
+                <div class="admin-meta">${a.email}&nbsp;·&nbsp;${a.telefone || '—'}</div>
+
+                <div class="admin-edit-panel" id="edit-panel-${a.id}" style="display:none;flex-direction:column;gap:6px;margin-top:8px;padding-top:8px;border-top:0.5px solid var(--border)">
+                  <input id="ep-nome-${a.id}" value="${a.nome}" placeholder="Nome">
+                  <input id="ep-tel-${a.id}"  value="${a.telefone || ''}" placeholder="Telefone" type="tel">
+                  <button class="admin-save-btn" data-id="${a.id}">Salvar</button>
+                </div>
+              </div>
+
+              <div class="admin-actions">
+                ${ativo ? `<button class="admin-edit-btn icon-btn" data-id="${a.id}" title="Editar">✎</button>` : ''}
+                ${a.role !== 'owner'
+                    ? ativo
+                        ? `<button class="admin-del icon-btn danger" data-id="${a.id}" title="Inativar">✕</button>`
+                        : `<button class="admin-reativar icon-btn success" data-id="${a.id}" title="Reativar">↺</button>`
+                    : ''}
+              </div>`;
+            adminLista.appendChild(item);
+        });
+    } catch { adminLista.innerHTML = '<div class="admins-empty">Erro ao carregar.</div>'; }
+}
+
+// ── Adicionar admin ──
+const fotoNewInput = document.getElementById('admin-foto-input'); // novo input no HTML
+
+btnAddAdmin.addEventListener('click', async () => {
+    setErro('');
+    const nome     = document.getElementById('admin-nome-input').value.trim();
+    const email    = document.getElementById('admin-email-input').value.trim();
+    const senha    = adminSenhaInput.value;
+    const role     = document.getElementById('admin-role-select').value;
+    const telefone = document.getElementById('admin-tel-input').value.trim();
+    if (!nome || !email || !senha || !telefone) { setErro('Preencha todos os campos.'); return; }
+    if (senha.length < 6) { setErro('Senha mínima de 6 caracteres.'); return; }
+
+    btnAddAdmin.textContent = 'Salvando...';
+    btnAddAdmin.disabled    = true;
+    try {
+        const res  = await fetch('/admins', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ nome, email, senha, role, telefone }) });
+        const json = await res.json();
+        if (json.sucesso) {
+            // Upload de foto se selecionada
+            if (fotoNewInput?.files[0]) await uploadFoto(json.id, fotoNewInput.files[0]);
+
+            ['admin-nome-input','admin-email-input','admin-tel-input'].forEach(id => document.getElementById(id).value = '');
+            adminSenhaInput.value = '';
+            document.getElementById('admin-role-select').value = 'admin';
+            if (fotoNewInput) fotoNewInput.value = '';
+            carregarAdmins();
+        } else setErro(json.erro || 'Erro ao salvar.');
+    } catch { setErro('Erro de conexão.'); }
+    finally { btnAddAdmin.textContent = '+ Adicionar Admin'; btnAddAdmin.disabled = false; }
+});
+
+document.getElementById('modal-admins-close').addEventListener('click', () => adminsOverlay.classList.remove('open'));
+adminsOverlay.addEventListener('click', e => { if (e.target === adminsOverlay) adminsOverlay.classList.remove('open'); });
+
+// ── Modal Horários ────────────────────────────────────
     const horariosOverlay = document.getElementById('modal-horarios-overlay');
     const horarioLista = document.getElementById('horario-lista');
     const horarioErro = document.getElementById('horario-erro');

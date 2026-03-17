@@ -98,7 +98,7 @@ module.exports = {
 
     // PUT /api/empresa — atualiza dados + logo
     atualizarDados: async (req, res) => {
-        try {
+        try {   
             const empresa = await Empresa.findByPk(req.user.idEmpresa);
             if (!empresa) return res.status(404).json({ erro: 'Empresa não encontrada.' });
 

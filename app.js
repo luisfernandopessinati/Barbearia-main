@@ -49,12 +49,14 @@ app.use(passport.session());
 
 app.set('view engine', 'handlebars');
 
+//imagens
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(bodyParser.urlencoded({ extended: false, limit: '10mb' }));
 app.use(bodyParser.json({ limit: '10mb' }));
-
-app.use(express.static('public'));
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Rotas  
 app.use('/', require('./routes/produtoRoutes'));
@@ -67,12 +69,7 @@ app.use('/api', authRoutes);
 
 app.use('/', require('./routes/empresaRoutes'));
 
-//app.use('/', require('./routes/clienteRoutes'));
-//app.get('/clientes', isAdminAuthenticated, clienteController.listar);
 app.use('/', require('./routes/clienteRoutes')(isAdminAuthenticated));
-
-app.get('/api/empresa', isAdminAuthenticated, empresaController.getDados);
-app.put('/api/empresa', isAdminAuthenticated, upload.single('logo'), empresaController.atualizarDados);
 
 // PATCH /clientes/:id — edita nome e telefone
 app.patch('/clientes/:id', isAdminAuthenticated, async (req, res) => {

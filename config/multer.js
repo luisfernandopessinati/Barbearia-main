@@ -33,7 +33,7 @@ const storage = multer.diskStorage({
 
 // Tipos permitidos
 const tiposPermitidos = /jpeg|jpg|png|webp/;
-
+/*
 const fileFilter = function (req, file, cb) {
     const extOk = tiposPermitidos.test(path.extname(file.originalname).toLowerCase());
     const mimeOk = /jpeg|jpg|png|webp|image\/png/.test(file.mimetype);
@@ -43,6 +43,22 @@ const fileFilter = function (req, file, cb) {
     } else {
         cb(new Error('Apenas imagens JPG, PNG e WEBP são permitidas.'));
     }
+};*/
+
+const fileFilter = function (req, file, cb) {
+
+    const ext = path.extname(file.originalname).toLowerCase();
+    const extensoesPermitidas = ['.jpg', '.jpeg', '.png', '.webp'];
+
+    if (!extensoesPermitidas.includes(ext)) {
+        return cb(new Error('Formato de imagem não permitido.'));
+    }
+
+    if (!file.mimetype.startsWith('image/')) {
+        return cb(new Error('Arquivo precisa ser uma imagem.'));
+    }
+
+    cb(null, true);
 };
 
 module.exports = multer({

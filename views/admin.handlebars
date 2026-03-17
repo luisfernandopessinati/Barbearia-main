@@ -1846,7 +1846,14 @@
                 <div class="modal-field full"><label>Telefone</label><input type="tel" name="telefone"
                         placeholder="(00) 00000-0000" required></div>
                 <div class="modal-field full">
-                    <label>Barbeiro</label>
+                    <label>Observação / Aviso para clientes</label>
+                    <textarea id="empresa-observacao-input" placeholder="Ex: Cancelamentos com menos de 2 dias terão cobrança de 50% no próximo atendimento." 
+                        style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .2s;width:100%;resize:vertical;min-height:80px;"
+                        onfocus="this.style.borderColor='var(--gold)'" 
+                        onblur="this.style.borderColor='var(--border)'"></textarea>
+                </div>                        
+                <div class="modal-field full">
+                    <label>Funcionário</label>
                     <select name="barbeiro" id="modal-barbeiro" required>
                         <option value="">Selecione</option>
                         {{#each barbeiros}}<option value="{{nome}}" data-id="{{id}}">{{nome}}</option>{{/each}}
@@ -1865,7 +1872,7 @@
                 <div class="modal-field">
                     <label>Horário</label>
                     <select name="horario" id="modal-horario" required>
-                        <option value="">Selecione barbeiro, serviço e data</option>
+                        <option value="">Selecione Funcionário, serviço e data</option>
                     </select>
                 </div>
                 <input type="hidden" name="profissional_id" id="modal-profissional-id">
@@ -2752,6 +2759,7 @@ const camposEmpresa = {
     numero:   document.getElementById('empresa-numero-input'),
     bairro:   document.getElementById('empresa-bairro-input'),
     cidade:   document.getElementById('empresa-cidade-input'),
+    observacao: document.getElementById('empresa-observacao-input'), 
 };
 
 async function carregarDadosEmpresa() {
@@ -2770,6 +2778,7 @@ async function carregarDadosEmpresa() {
         camposEmpresa.numero.value   = data.numero    || '';
         camposEmpresa.bairro.value   = data.bairro    || '';
         camposEmpresa.cidade.value   = data.cidade    || '';
+        camposEmpresa.observacao.value = data.observacao || '';
 
         const preview = document.getElementById('empresa-logo-preview');
         preview.innerHTML = data.logo

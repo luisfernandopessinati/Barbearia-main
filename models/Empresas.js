@@ -64,8 +64,11 @@ const Empresa = sequelize.define('Empresa', {
     logo: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    observacao: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
-
 }, {
     tableName: 'empresas',
     timestamps: true

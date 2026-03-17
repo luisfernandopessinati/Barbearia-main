@@ -604,19 +604,20 @@ app.get('/horarios-ocupados', async (req, res) => {
 });
 
 // FUNÇÃO AUXILIAR - verifica conflito de horário
-async function verificarConflito(barbeiro, data, horario, idEmpresa, idIgnorar = null) {
+async function verificarConflito(barbeiro, data, horaInicio, horaFim, idEmpresa, idIgnorar = null) {
     const inicioDia = new Date(`${data}T00:00:00.000Z`);
     const proximoDia = new Date(`${data}T00:00:00.000Z`);
     proximoDia.setUTCDate(proximoDia.getUTCDate() + 1);
 
     const where = {
         barbeiro,
-        horario,
         idEmpresa,
         data: {
             [Op.gte]: inicioDia,
             [Op.lt]: proximoDia
-        }
+        },
+        hora_inicio: { [Op.lt]: horaFim },   // começa antes do fim do novo
+        hora_fim:    { [Op.gt]: horaInicio } // termina depois do início do novo
     };
 
     if (idIgnorar) where.id = { [Op.ne]: idIgnorar };
@@ -686,11 +687,21 @@ app.post('/agendar/:token', async function (req, res) {
 
         const idEmpresa = empresa.id;
 
-        const ocupado = await verificarConflito(barbeiro, data, horario, idEmpresa);
+        // Extrai hora_inicio e hora_fim do horario caso não venham separados
+        let hiInicio = hora_inicio;
+        let hiFim = hora_fim;
+
+        if (!hiInicio || !hiFim) {
+            const partes = horario.split(/\s*[–-]\s*/);
+            hiInicio = partes[0]?.trim();
+            hiFim = partes[1]?.trim();
+        }
+
+        const ocupado = await verificarConflito(barbeiro, data, hiInicio, hiFim, idEmpresa);
 
         if (ocupado) {
             return res.render('agendar', {
-                erro: `${barbeiro} já tem agendamento às ${horario} neste dia.`
+                erro: `${barbeiro} já tem agendamento às ${hiInicio} neste dia.`
             });
         }
 
@@ -705,18 +716,17 @@ app.post('/agendar/:token', async function (req, res) {
             nome: req.session.clienteNome,
             telefone: req.session.clienteTelefone,
             data,
-            horario,
+            horario: hiInicio,  // 👈 salva só "13:00" igual ao padrão do banco
             servico,
             valor,
             idEmpresa,
             profissional_id: profissional_id || null,
-            hora_inicio: hora_inicio || horario || null,
-            hora_fim: hora_fim || null,
+            hora_inicio: hiInicio,
+            hora_fim: hiFim || null,
             servico_id: servico_id || null,
             status: 'pendente'
         });
 
-        // 👇 Busca o admin/profissional pelo profissional_id para pegar o telefone
         let whatsappLink = null;
 
         if (profissional_id) {
@@ -726,14 +736,18 @@ app.post('/agendar/:token', async function (req, res) {
             });
 
             const telefoneLimpo = adminProf?.telefone?.replace(/\D/g, '');
+            const empresaObj = await Empresa.findByPk(idEmpresa, {
+                attributes: ['observacao']
+            });
 
             if (telefoneLimpo) {
                 const mensagem = encodeURIComponent(
                     `Olá! Acabei de agendar:\n` +
                     `📅 Data: ${data}\n` +
-                    `⏰ Horário: ${horario}\n` +
+                    `⏰ Horário: ${hiInicio}\n` +   // 👈 usa hiInicio
                     `✂️ Serviço: ${servico}\n` +
-                    `👤 Profissional: ${barbeiro}`
+                    `👤 Profissional: ${barbeiro}` +
+                    (empresaObj?.observacao ? `\n📌 ${empresaObj.observacao}` : '')
                 );
                 whatsappLink = `https://wa.me/55${telefoneLimpo}?text=${mensagem}`;
             }
@@ -755,7 +769,7 @@ app.post('/agendar/:token', async function (req, res) {
 
 // ADMIN AGENDA
 app.post('/admin/agendar', isAdminAuthenticated, async (req, res) => {
-    const { barbeiro, nome, telefone, data, horario, servico, profissional_id, hora_inicio, hora_fim, servico_id } = req.body; // 👈 adicionamos os novos
+    const { barbeiro, nome, telefone, data, horario, servico, profissional_id, hora_inicio, hora_fim, servico_id } = req.body;
     const idEmpresa = req.user.idEmpresa;
 
     try {
@@ -763,11 +777,22 @@ app.post('/admin/agendar', isAdminAuthenticated, async (req, res) => {
             return res.status(403).json({ erro: 'Empresa não identificada.' });
         }
 
-        const ocupado = await verificarConflito(barbeiro, data, horario, idEmpresa);
+        // Extrai hora_inicio e hora_fim do horario caso não venham separados
+        let hiInicio = hora_inicio;
+        let hiFim = hora_fim;
+
+        if (!hiInicio || !hiFim) {
+            const partes = horario.split(/\s*[–-]\s*/); // aceita – ou -
+            hiInicio = partes[0]?.trim();
+            hiFim = partes[1]?.trim();
+        }
+
+        // Passa os dois horários separados para verificar sobreposição real
+        const ocupado = await verificarConflito(barbeiro, data, hiInicio, hiFim, idEmpresa);
 
         if (ocupado) {
             return res.status(409).json({
-                erro: `${barbeiro} já tem agendamento às ${horario} neste dia.`
+                erro: `${barbeiro} já tem agendamento às ${hiInicio} neste dia.`
             });
         }
 
@@ -783,15 +808,15 @@ app.post('/admin/agendar', isAdminAuthenticated, async (req, res) => {
             email: null,
             telefone,
             data,
-            horario,
+            horario: hiInicio,   // 👈 salva só "13:00" igual ao padrão do banco
             servico,
             valor,
             idEmpresa,
-            profissional_id: profissional_id || null,    // 👈 novo
-            hora_inicio: hora_inicio || horario || null,  // 👈 novo
-            hora_fim: hora_fim || null,                   // 👈 novo
-            servico_id: servico_id || null,               // 👈 novo
-            status: 'pendente'                            // 👈 novo
+            profissional_id: profissional_id || null,
+            hora_inicio: hiInicio,
+            hora_fim: hiFim || null,
+            servico_id: servico_id || null,
+            status: 'pendente'
         });
 
         return res.status(200).json({ sucesso: true });

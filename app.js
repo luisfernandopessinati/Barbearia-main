@@ -29,6 +29,10 @@ const PORT = process.env.PORT || 3333;
 
 const clienteController = require('./controllers/clienteController');
 const uploadAdmins = require('./config/multerAdmins'); 
+
+const upload = require('./config/multer');
+const empresaController = require('./controllers/empresaController');
+
 const path = require('path');
 const fs   = require('fs');
 
@@ -64,6 +68,9 @@ app.use('/', require('./routes/empresaRoutes'));
 //app.use('/', require('./routes/clienteRoutes'));
 //app.get('/clientes', isAdminAuthenticated, clienteController.listar);
 app.use('/', require('./routes/clienteRoutes')(isAdminAuthenticated));
+
+app.get('/api/empresa', isAdminAuthenticated, empresaController.getDados);
+app.put('/api/empresa', isAdminAuthenticated, upload.single('logo'), empresaController.atualizarDados);
 
 // PATCH /clientes/:id — edita nome e telefone
 app.patch('/clientes/:id', isAdminAuthenticated, async (req, res) => {

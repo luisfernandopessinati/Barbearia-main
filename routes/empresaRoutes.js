@@ -32,8 +32,4 @@ router.get('/cadastro', (req, res, next) => {
 
 router.post('/api/cadastro', empresaController.cadastrar);
 
-// Dados da empresa (admin autenticado)
-router.get('/api/empresa', empresaController.getDados);
-router.put('/api/empresa', upload.single('logo'), empresaController.atualizarDados);
-
 module.exports = router;

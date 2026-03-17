@@ -786,10 +786,12 @@ app.post('/admin/agendar', isAdminAuthenticated, async (req, res) => {
             hiInicio = partes[0]?.trim();
             hiFim = partes[1]?.trim();
         }
+        console.log('>>> BODY:', { barbeiro, data, horario, hora_inicio, hora_fim });
+        console.log('>>> PARSED:', { hiInicio, hiFim });
 
         // Passa os dois horários separados para verificar sobreposição real
         const ocupado = await verificarConflito(barbeiro, data, hiInicio, hiFim, idEmpresa);
-
+console.log('>>> CONFLITO:', ocupado);
         if (ocupado) {
             return res.status(409).json({
                 erro: `${barbeiro} já tem agendamento às ${hiInicio} neste dia.`

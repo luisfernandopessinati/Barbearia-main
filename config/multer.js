@@ -23,13 +23,13 @@ const storage = multer.diskStorage({
 const tiposPermitidos = /jpeg|jpg|png|webp/;
 
 const fileFilter = function (req, file, cb) {
-    const extOk = tiposPermitidos.test(path.extname(file.originalname).toLowerCase());
-    const mimeOk = tiposPermitidos.test(file.mimetype);
+    const extOk = /jpeg|jpg|png|webp|svg/.test(path.extname(file.originalname).toLowerCase());
+    const mimeOk = /jpeg|jpg|png|webp|svg|image/.test(file.mimetype);
 
     if (extOk && mimeOk) {
         cb(null, true);
     } else {
-        cb(new Error('Apenas imagens JPG, PNG e WEBP são permitidas.'));
+        cb(new Error('Apenas imagens JPG, PNG, SVG e WEBP são permitidas.'));
     }
 };
 

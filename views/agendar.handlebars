@@ -511,7 +511,7 @@
   <!-- ── Painel Esquerdo: Profissionais ── -->
   <div class="panel-left">
     <div class="big-letter">B</div>
-    <p class="barbers-label">Escolha seu barbeiro</p>
+    <p class="barbers-label">Escolha o Profissional</p>
     <div class="barbers-list" id="barbers-list">
       {{#if barbeiros}}
       {{#each barbeiros}}
@@ -550,7 +550,19 @@
     {{#if Sucesso}}
     <div class="msg-sucesso">
       ✓ {{Sucesso}}
-      <a href="{{whatsappLink}}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;margin-top:12px;
+      <script>
+         window.onload = function() {
+            const link = "{{{whatsappLink}}}"; 
+
+            if (link && link !== "null" && link !== "") {
+                setTimeout(function() {
+                    // Redireciona a aba atual para o WhatsApp
+                    window.location.href = link;
+                }, 1000); // 1 segundo para o usuário ler a mensagem de sucesso
+            }
+          };
+        </script>    
+      <a href="{{{whatsappLink}}}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;margin-top:12px;
             background:#25d366;color:#fff;padding:12px 20px;border-radius:8px;
             text-decoration:none;font-size:13px;font-weight:500;">
         <svg width="16" height="16" viewBox="0 0 32 32" fill="currentColor">

@@ -278,7 +278,7 @@ app.get('/loginUsuario/:token', async (req, res) => {
     const empresa = await Empresa.findOne({ where: { token_agendamento: token } });
     if (!empresa) return res.status(404).send('Empresa não encontrada');
 
-    res.render('loginUsuario', { token }); // 👈 passa o token para o EJS
+    res.render('loginUsuario', { token,logo: empresa.logo }); 
 });
 
 app.get('/loginUsuarioNovo/:token', async (req, res) => {

@@ -1,5 +1,7 @@
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
+const fs = require('fs');
+const path = require('path');
 const Empresa = require('../models/Empresas');
 const Admin = require('../models/Admin');
 
@@ -32,54 +34,34 @@ module.exports = {
     cadastrar: async (req, res) => {
         const { nome, fantasia, cnpj, celular, endereco, numero, bairro, cidade, segmento, email, senha } = req.body;
 
-        // Validações
-        if (!email || !senha) {
+        if (!email || !senha)
             return res.status(400).json({ erro: 'E-mail e senha são obrigatórios.' });
-        }
 
-        if (senha.length < 6) {
+        if (senha.length < 6)
             return res.status(400).json({ erro: 'A senha precisa ter no mínimo 6 caracteres.' });
-        }
 
-        if (!validarCNPJ(cnpj)) {
+        if (!validarCNPJ(cnpj))
             return res.status(400).json({ erro: 'CNPJ inválido.' });
-        }
 
         try {
             const cnpjLimpo = cnpj.replace(/[^\d]/g, '');
             const emailNormalizado = email.trim().toLowerCase();
 
-            // Verifica CNPJ duplicado
             const cnpjExiste = await Empresa.findOne({ where: { cnpj: cnpjLimpo } });
-            if (cnpjExiste) {
-                return res.status(409).json({ erro: 'CNPJ já cadastrado.' });
-            }
+            if (cnpjExiste) return res.status(409).json({ erro: 'CNPJ já cadastrado.' });
 
-            // Verifica email duplicado
             const emailExiste = await Admin.findOne({ where: { email: emailNormalizado } });
-            if (emailExiste) {
-                return res.status(409).json({ erro: 'E-mail já cadastrado.' });
-            }
+            if (emailExiste) return res.status(409).json({ erro: 'E-mail já cadastrado.' });
 
             const token_agendamento = crypto.randomBytes(16).toString('hex');
             const hashSenha = await bcrypt.hash(senha, 10);
 
-            // Cria empresa
             const empresa = await Empresa.create({
-                nome,
-                fantasia,
-                cnpj: cnpjLimpo,
-                celular,
-                endereco,
-                numero,
-                bairro,
-                cidade,
-                segmento,
-                ativo: 'S',
-                token_agendamento
+                nome, fantasia, cnpj: cnpjLimpo, celular,
+                endereco, numero, bairro, cidade, segmento,
+                ativo: 'S', token_agendamento
             });
 
-            // Cria admin owner vinculado à empresa
             await Admin.create({
                 nome: fantasia,
                 email: emailNormalizado,
@@ -94,6 +76,56 @@ module.exports = {
 
         } catch (error) {
             res.status(500).json({ erro: 'Erro ao cadastrar: ' + error.message });
+        }
+    },
+
+    // GET /api/empresa — retorna dados da empresa logada
+    getDados: async (req, res) => {
+        try {
+            const empresa = await Empresa.findByPk(req.user.idEmpresa, {
+                attributes: ['id', 'nome', 'fantasia', 'cnpj', 'celular',
+                             'endereco', 'numero', 'bairro', 'cidade',
+                             'segmento', 'logo']
+            });
+
+            if (!empresa) return res.status(404).json({ erro: 'Empresa não encontrada.' });
+
+            res.json(empresa);
+        } catch (error) {
+            res.status(500).json({ erro: 'Erro ao buscar dados: ' + error.message });
+        }
+    },
+
+    // PUT /api/empresa — atualiza dados + logo
+    atualizarDados: async (req, res) => {
+        try {
+            const empresa = await Empresa.findByPk(req.user.idEmpresa);
+            if (!empresa) return res.status(404).json({ erro: 'Empresa não encontrada.' });
+
+            const { nome, fantasia, celular, endereco, numero, bairro, cidade, segmento } = req.body;
+
+            // Se veio um novo logo, apaga o anterior (se existir e não for externo)
+            if (req.file && empresa.logo) {
+                const logoAntigo = path.join(__dirname, '../public', empresa.logo);
+                if (fs.existsSync(logoAntigo)) fs.unlinkSync(logoAntigo);
+            }
+
+            await empresa.update({
+                nome,
+                fantasia,
+                celular,
+                endereco,
+                numero,
+                bairro,
+                cidade,
+                segmento,
+                ...(req.file && { logo: `/uploads/logos/${req.file.filename}` })
+            });
+
+            res.json({ sucesso: true, logo: empresa.logo });
+
+        } catch (error) {
+            res.status(500).json({ erro: 'Erro ao salvar: ' + error.message });
         }
     }
 };

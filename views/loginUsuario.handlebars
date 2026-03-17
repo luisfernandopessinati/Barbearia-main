@@ -1,14 +1,19 @@
 <div class="login login2">
-  <h1 class="titulo">Agendar</h1>
+  <h1 class="titulo">Agende seu horário!</h1>
   <form action="/loginUsuario/{{token}}" method="post" class="form-login">
-    <a href="/"><img src="/img/logo2.svg" alt="Logo da barbearia" class="login-logo"></a>
+    {{#if logo}}
+      <img src="{{logo}}" alt="Logo da empresa" class="login-logo">
+    {{else}}
+      <img src="/img/logo2.svg" alt="Logo da barbearia" class="login-logo">
+    {{/if}}
 
     <label for="nome">Nome / Apelido:</label>
     <input type="text" name="nome" id="nome" placeholder="Como te chamam?" required autocomplete="off">
 
     <label for="telefone">Celular:</label>
     {{!<input type="tel" name="telefone" id="telefone" placeholder="(00) 00000-0000" required autocomplete="tel">}}
-    <input type="text" name="telefone" id="telefone" placeholder="Digite seu celular com DDD" required autocomplete="off">
+    <input type="text" name="telefone" id="telefone" placeholder="Digite seu celular com DDD" required
+      autocomplete="off">
 
     <input type="submit" value="Entrar" class="btn-login">
     <a href="/loginAdmin">Administrador</a>

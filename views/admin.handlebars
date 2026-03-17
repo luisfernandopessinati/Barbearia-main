@@ -1728,16 +1728,6 @@
                     </span>
                 </a>
                 {{/if}}
-                <div class="config-dropdown-label">Agenda</div>
-                <button class="config-dropdown-item" id="menu-feriados">
-                    <span class="item-icon">📅</span>
-                    <span class="item-label"><span>Feriados</span><small>Datas bloqueadas</small></span>
-                </button>
-                <button class="config-dropdown-item" id="menu-horarios">
-                    <span class="item-icon">🕐</span>
-                    <span class="item-label"><span>Horários</span><small>Funcionamento por dia</small></span>
-                </button>
-                <div class="config-dropdown-sep"></div>
                 <div class="config-dropdown-label">Sistema</div>
                 <button class="config-dropdown-item" id="menu-dashboard">
                     <span class="item-icon">📊</span>
@@ -1751,6 +1741,10 @@
                 </button>
                 <div class="config-dropdown-sep"></div>
                 <div class="config-dropdown-label">Cadastros</div>
+                <button class="config-dropdown-item" id="menu-empresa">
+                    <span class="item-icon">🏢</span>
+                    <span class="item-label"><span>Empresa</span><small>Dados e identidade visual</small></span>
+                </button>
                 <button class="config-dropdown-item" id="menu-admins">
                     <span class="item-icon">👤</span>
                     <span class="item-label"><span>Admins</span><small>Usuários e acessos</small></span>
@@ -1770,6 +1764,16 @@
                     <span class="item-label"><span>Produtos</span><small>Produtos</small></span>
                     <span class="item-badgeBlock">Block</span>
                 </button>
+                <div class="config-dropdown-sep"></div>
+                <div class="config-dropdown-label">Agenda</div>
+                <button class="config-dropdown-item" id="menu-feriados">
+                    <span class="item-icon">📅</span>
+                    <span class="item-label"><span>Feriados</span><small>Datas bloqueadas</small></span>
+                </button>
+                <button class="config-dropdown-item" id="menu-horarios">
+                    <span class="item-icon">🕐</span>
+                    <span class="item-label"><span>Horários</span><small>Funcionamento por dia</small></span>
+                </button>                
             </div>
         </div>
         <button class="btn-sair" id="btn-sair">Sair</button>
@@ -1929,6 +1933,56 @@
     </div>
 </div>
 
+<!-- MODAL EMPRESA -->
+<div class="modal-overlay" id="modal-empresa-overlay">
+    <div class="modal">
+        <button class="modal-close" id="modal-empresa-close">✕</button>
+        <div class="modal-title">Dados da Empresa</div>
+        <p class="modal-sub">Informações cadastrais e identidade visual</p>
+        <div class="modal-grid">
+            <div class="modal-field full">
+                <label>Logo da Empresa</label>
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div id="empresa-logo-preview" style="width:56px;height:56px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);overflow:hidden;flex-shrink:0;">Logo</div>
+                    <div style="display:flex;flex-direction:column;gap:4px;">
+                        <label for="empresa-logo-input" style="cursor:pointer;font-size:12px;padding:6px 12px;border:1px solid var(--border);border-radius:6px;color:var(--muted);transition:all .2s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">Escolher imagem</label>
+                        <span style="font-size:10px;color:var(--muted);">PNG, JPG ou SVG · máx. 2MB</span>
+                    </div>
+                    <input type="file" id="empresa-logo-input" accept="image/*" style="display:none" onchange="
+                        const f=this.files[0]; if(!f) return;
+                        const r=new FileReader(); r.onload=e=>{
+                            const p=document.getElementById('empresa-logo-preview');
+                            p.innerHTML='<img src=\''+e.target.result+'\' style=\'width:100%;height:100%;object-fit:contain;border-radius:6px;padding:4px;\'>';
+                        }; r.readAsDataURL(f);">
+                </div>
+            </div>
+            <div class="modal-field full"><label>Razão Social</label><input type="text" id="empresa-nome-input" placeholder="Ex: Silva Ltda"></div>
+            <div class="modal-field"><label>Nome Fantasia</label><input type="text" id="empresa-fantasia-input" placeholder="Ex: Silva"></div>
+            <div class="modal-field"><label>CNPJ</label><input type="text" id="empresa-cnpj-input" placeholder="00.000.000/0001-00" maxlength="18" oninput="
+                let v=this.value.replace(/\D/g,'');
+                v=v.replace(/^(\d{2})(\d)/,'$1.$2');
+                v=v.replace(/^(\d{2})\.(\d{3})(\d)/,'$1.$2.$3');
+                v=v.replace(/\.(\d{3})(\d)/,'.$1/$2');
+                v=v.replace(/(\d{4})(\d)/,'$1-$2');
+                this.value=v;"></div>
+            <div class="modal-field"><label>Celular / WhatsApp</label><input type="tel" id="empresa-celular-input" placeholder="(00) 00000-0000" maxlength="15" oninput="
+                let v=this.value.replace(/\D/g,'');
+                v=v.replace(/^(\d{2})(\d)/,'($1) $2');
+                v=v.replace(/(\d{5})(\d{4})$/,'$1-$2');
+                this.value=v;"></div>
+            <div class="modal-field"><label>Segmento</label><input type="text" id="empresa-segmento-input" placeholder="Ex: Barbearia, Salão, Clínica..."></div>
+            <div class="modal-field full"><label>Endereço</label><input type="text" id="empresa-endereco-input" placeholder="Rua, Avenida..."></div>
+            <div class="modal-field" style="max-width:120px;"><label>Número</label><input type="text" id="empresa-numero-input" placeholder="123"></div>
+            <div class="modal-field"><label>Bairro</label><input type="text" id="empresa-bairro-input" placeholder="Centro"></div>
+            <div class="modal-field"><label>Cidade</label><input type="text" id="empresa-cidade-input" placeholder="São Paulo"></div>
+        </div>
+        <div style="margin-top:16px;">
+            <button class="btn-confirmar" id="btn-salvar-empresa" style="width:100%;font-size:15px;padding:10px;">Salvar Dados da Empresa</button>
+        </div>
+        <div class="modal-erro" id="empresa-erro"></div>
+    </div>
+</div>
+
 <!-- MODAL ADMINS -->
 <div class="modal-overlay" id="modal-admins-overlay">
     <div class="modal">
@@ -1937,7 +1991,7 @@
         <p class="modal-sub">Gerencie os usuários com acesso ao painel</p>
         <div class="modal-grid">
             <div class="modal-field full"><label>Nome</label><input type="text" id="admin-nome-input" placeholder="Ex: João Silva"></div>
-            <div class="modal-field full"><label>E-mail</label><input type="email" id="admin-email-input" placeholder="joao@barbearia.com"></div>
+            <div class="modal-field full"><label>E-mail</label><input type="email" id="admin-email-input" placeholder="joao@gmail.com"></div>
             <div class="modal-field full"><label>Telefone</label><input type="tel" id="admin-tel-input" placeholder="(00) 00000-0000"></div>
             <div class="modal-field">
                 <label>Senha</label>
@@ -1974,6 +2028,98 @@
         <div class="admin-lista" id="admin-lista">
             <div class="admins-empty">Carregando...</div>
         </div>
+    </div>
+</div>
+
+<!-- MODAL EMPRESA -->
+<div class="modal-overlay" id="modal-empresa-overlay">
+    <div class="modal">
+        <button class="modal-close" id="modal-empresa-close">✕</button>
+        <div class="modal-title">Dados da Empresa</div>
+        <p class="modal-sub">Informações cadastrais e identidade visual</p>
+
+        <div class="modal-grid">
+
+            <!-- LOGO -->
+            <div class="modal-field full">
+                <label>Logo da Empresa</label>
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div id="empresa-logo-preview" style="width:56px;height:56px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);overflow:hidden;flex-shrink:0;">
+                        Logo
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:4px;">
+                        <label for="empresa-logo-input" style="cursor:pointer;font-size:12px;padding:6px 12px;border:1px solid var(--border);border-radius:6px;color:var(--muted);transition:all .2s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">Escolher imagem</label>
+                        <span style="font-size:10px;color:var(--muted);">PNG, JPG ou SVG · máx. 2MB</span>
+                    </div>
+                    <input type="file" id="empresa-logo-input" accept="image/*" style="display:none" onchange="
+                        const f=this.files[0]; if(!f) return;
+                        const r=new FileReader(); r.onload=e=>{
+                            const p=document.getElementById('empresa-logo-preview');
+                            p.innerHTML='<img src=\''+e.target.result+'\' style=\'width:100%;height:100%;object-fit:contain;border-radius:6px;padding:4px;\'>';
+                        }; r.readAsDataURL(f);">
+                </div>
+            </div>
+
+            <!-- IDENTIFICAÇÃO -->
+            <div class="modal-field full">
+                <label>Razão Social</label>
+                <input type="text" id="empresa-nome-input" placeholder="Ex: Barbearia Silva Ltda">
+            </div>
+            <div class="modal-field">
+                <label>Nome Fantasia</label>
+                <input type="text" id="empresa-fantasia-input" placeholder="Ex: Barbearia Silva">
+            </div>
+            <div class="modal-field">
+                <label>CNPJ</label>
+                <input type="text" id="empresa-cnpj-input" placeholder="00.000.000/0001-00" maxlength="18" oninput="
+                    let v=this.value.replace(/\D/g,'');
+                    v=v.replace(/^(\d{2})(\d)/,'$1.$2');
+                    v=v.replace(/^(\d{2})\.(\d{3})(\d)/,'$1.$2.$3');
+                    v=v.replace(/\.(\d{3})(\d)/,'.$1/$2');
+                    v=v.replace(/(\d{4})(\d)/,'$1-$2');
+                    this.value=v;">
+            </div>
+
+            <!-- CONTATO -->
+            <div class="modal-field">
+                <label>Celular / WhatsApp</label>
+                <input type="tel" id="empresa-celular-input" placeholder="(00) 00000-0000" maxlength="15" oninput="
+                    let v=this.value.replace(/\D/g,'');
+                    v=v.replace(/^(\d{2})(\d)/,'($1) $2');
+                    v=v.replace(/(\d{5})(\d{4})$/,'$1-$2');
+                    this.value=v;">
+            </div>
+            <div class="modal-field">
+                <label>Segmento</label>
+                <input type="text" id="empresa-segmento-input" placeholder="Ex: Barbearia, Salão, Clínica...">
+            </div>
+
+            <!-- ENDEREÇO -->
+            <div class="modal-field full">
+                <label>Endereço</label>
+                <input type="text" id="empresa-endereco-input" placeholder="Rua, Avenida...">
+            </div>
+            <div class="modal-field" style="max-width:120px;">
+                <label>Número</label>
+                <input type="text" id="empresa-numero-input" placeholder="123">
+            </div>
+            <div class="modal-field">
+                <label>Bairro</label>
+                <input type="text" id="empresa-bairro-input" placeholder="Centro">
+            </div>
+            <div class="modal-field">
+                <label>Cidade</label>
+                <input type="text" id="empresa-cidade-input" placeholder="São Paulo">
+            </div>
+
+        </div>
+
+        <div style="margin-top:16px;">
+            <button class="btn-confirmar" id="btn-salvar-empresa" style="width:100%;font-size:15px;padding:10px;">
+                Salvar Dados da Empresa
+            </button>
+        </div>
+        <div class="modal-erro" id="empresa-erro"></div>
     </div>
 </div>
 
@@ -2591,6 +2737,77 @@ btnTogglePass.addEventListener('click', () => {
     btnTogglePass.textContent = show ? '🙈' : '👁';
 });
 
+// ── Modal Empresa ─────────────────────────────────────
+const empresaOverlay   = document.getElementById('modal-empresa-overlay');
+const empresaErro      = document.getElementById('empresa-erro');
+const btnSalvarEmpresa = document.getElementById('btn-salvar-empresa');
+
+const camposEmpresa = {
+    nome:     document.getElementById('empresa-nome-input'),
+    fantasia: document.getElementById('empresa-fantasia-input'),
+    cnpj:     document.getElementById('empresa-cnpj-input'),
+    celular:  document.getElementById('empresa-celular-input'),
+    segmento: document.getElementById('empresa-segmento-input'),
+    endereco: document.getElementById('empresa-endereco-input'),
+    numero:   document.getElementById('empresa-numero-input'),
+    bairro:   document.getElementById('empresa-bairro-input'),
+    cidade:   document.getElementById('empresa-cidade-input'),
+};
+
+async function carregarDadosEmpresa() {
+    empresaErro.textContent = '';
+    try {
+        const res  = await fetch('/api/empresa');
+        if (!res.ok) throw new Error('Erro ao carregar dados.');
+        const data = await res.json();
+
+        camposEmpresa.nome.value     = data.nome     || '';
+        camposEmpresa.fantasia.value = data.fantasia  || '';
+        camposEmpresa.cnpj.value     = (data.cnpj || '').replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+        camposEmpresa.celular.value  = data.celular   || '';
+        camposEmpresa.segmento.value = data.segmento  || '';
+        camposEmpresa.endereco.value = data.endereco  || '';
+        camposEmpresa.numero.value   = data.numero    || '';
+        camposEmpresa.bairro.value   = data.bairro    || '';
+        camposEmpresa.cidade.value   = data.cidade    || '';
+
+        const preview = document.getElementById('empresa-logo-preview');
+        preview.innerHTML = data.logo
+            ? `<img src="${data.logo}" style="width:100%;height:100%;object-fit:contain;border-radius:6px;padding:4px;">`
+            : 'Logo';
+
+    } catch (err) {
+        empresaErro.textContent = '⚠ ' + err.message;
+    }
+}
+
+btnSalvarEmpresa.addEventListener('click', async () => {
+    empresaErro.textContent = '';
+    btnSalvarEmpresa.textContent = 'Salvando...';
+    btnSalvarEmpresa.disabled = true;
+    try {
+        const formData = new FormData();
+        Object.entries(camposEmpresa).forEach(([k, el]) => formData.append(k, el.value.trim()));
+
+        const logoInput = document.getElementById('empresa-logo-input');
+        if (logoInput.files[0]) formData.append('logo', logoInput.files[0]);
+
+        const res  = await fetch('/api/empresa', { method: 'PUT', body: formData });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.erro || 'Erro ao salvar.');
+
+        empresaOverlay.classList.remove('open');
+    } catch (err) {
+        empresaErro.textContent = '⚠ ' + err.message;
+    } finally {
+        btnSalvarEmpresa.textContent = 'Salvar Dados da Empresa';
+        btnSalvarEmpresa.disabled = false;
+    }
+});
+
+document.getElementById('modal-empresa-close').addEventListener('click', () => empresaOverlay.classList.remove('open'));
+empresaOverlay.addEventListener('click', e => { if (e.target === empresaOverlay) empresaOverlay.classList.remove('open'); });
+
 // ── Helpers ──
 function setErro(msg) { adminErro.textContent = msg ? '⚠ ' + msg : ''; }
 
@@ -2883,6 +3100,7 @@ adminsOverlay.addEventListener('click', e => { if (e.target === adminsOverlay) a
     bindMenuItemToModal('menu-servicos', 'modal-servicos-overlay', carregarServicos);
     bindMenuItemToModal('menu-admins', 'modal-admins-overlay', carregarAdmins);
     bindMenuItemToModal('menu-horarios', 'modal-horarios-overlay', carregarHorarios);
+    bindMenuItemToModal('menu-empresa', 'modal-empresa-overlay', carregarDadosEmpresa);
 
     document.getElementById('menu-dashboard').addEventListener('click', () => { toggleDropdown(false); window.location.href = '/admin/dashboard'; });
     document.getElementById('menu-produtos').addEventListener('click', () => { toggleDropdown(false); window.location.href = '/admin/produtos'; });

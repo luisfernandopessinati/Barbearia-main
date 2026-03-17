@@ -60,7 +60,12 @@ const Empresa = sequelize.define('Empresa', {
         type: DataTypes.STRING,
         allowNull: true,
         unique: 'token_agendamento'
+    },
+    logo: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
+
 }, {
     tableName: 'empresas',
     timestamps: true

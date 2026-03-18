@@ -1968,15 +1968,7 @@
                 <div id="campoNome" class="modal-field full"><label>Nome do cliente</label><input type="text" name="nome"
                         placeholder="Nome completo"></div>
                 <div id="campoTelefone" class="modal-field full"><label>Telefone</label><input type="tel" name="telefone"
-                        placeholder="(00) 00000-0000"></div>
-                <div id="campoObservacao" class="modal-field full">
-                    <label>Observação / Aviso para clientes</label>
-                    <textarea id="empresa-observacao-input"
-                        placeholder="Ex: Cancelamentos com menos de 2 dias terão cobrança de 50% no próximo atendimento."
-                        style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .2s;width:100%;resize:vertical;min-height:80px;"
-                        onfocus="this.style.borderColor='var(--gold)'"
-                        onblur="this.style.borderColor='var(--border)'"></textarea>
-                </div>
+                        placeholder="(00) 00000-0000"></div>                
                 <div class="modal-field full">
                     <label>Funcionário</label>
                     <select name="barbeiro" id="modal-barbeiro" required>
@@ -2086,6 +2078,14 @@
                             imagem</label>
                         <span style="font-size:10px;color:var(--muted);">PNG, JPG ou SVG · máx. 2MB</span>
                     </div>
+                    <div id="campoObservacao" class="modal-field full">
+                    <label>Observação / Aviso para clientes</label>
+                    <textarea id="empresa-observacao-input"
+                        placeholder="Ex: Cancelamentos com menos de 2 dias terão cobrança de 50% no próximo atendimento."
+                        style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .2s;width:100%;resize:vertical;min-height:80px;"
+                        onfocus="this.style.borderColor='var(--gold)'"
+                        onblur="this.style.borderColor='var(--border)'"></textarea>
+                    </div>  
                     <input type="file" id="empresa-logo-input" accept="image/*" style="display:none" onchange="
                         const f=this.files[0]; if(!f) return;
                         const r=new FileReader(); r.onload=e=>{
@@ -2133,7 +2133,7 @@
 
 <!-- MODAL ADMINS -->
 <div class="modal-overlay" id="modal-admins-overlay">
-    <div class="modal">
+    <div class="modal" style="max-height: 90vh; overflow-y: auto;">
         <button class="modal-close" id="modal-admins-close">✕</button>
         <div class="modal-title">Administradores</div>
         <p class="modal-sub">Gerencie os usuários com acesso ao painel</p>

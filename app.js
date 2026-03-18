@@ -16,6 +16,7 @@ const Feriado = require('./models/feriado');
 const HorarioFuncionamento = require('./models/HorarioFuncionamento');
 const Servico = require('./models/servico');
 const produto = require('./models/produto');
+const Pacote = require('./models/Pacotes');
 const { getSlotsDisponiveis, minutesToTime, temColisao, timeToMinutes } = require('./services/slotService');
 
 const passport = require('passport');
@@ -212,6 +213,9 @@ app.get('/admin/slots', isAdminAuthenticated, async (req, res) => {
 app.get('/agendar/:token', async (req, res) => {
     try {
         const { token } = req.params;
+        if (!req.session.clienteNome || !req.session.clienteTelefone) {
+            return res.redirect(`/loginUsuario/${token}`);
+        }        
         const empresa = await Empresa.findOne({
             where: { token_agendamento: token }
         });
@@ -247,7 +251,8 @@ app.get('/agendar/:token', async (req, res) => {
             id: s.id,                      
             nome: s.nome,
             valor: parseFloat(s.valor).toFixed(2).replace('.', ','),
-            duracao_minutos: s.duracao_minutos  
+            duracao_minutos: s.duracao_minutos,
+            qtd_sessoes: s.qtd_sessoes || null  
         }));
 
         const barbeiros = admins.map(a => ({
@@ -848,7 +853,8 @@ app.get('/admin', isAdminAuthenticated, async (req, res) => {
         const servicosFormatados = servicos.map(s => ({
             id: s.id,
             nome: s.nome,
-            valor: parseFloat(s.valor).toFixed(2).replace('.', ',')
+            valor: parseFloat(s.valor).toFixed(2).replace('.', ','),
+            qtd_sessoes: s.qtd_sessoes || null
         }));
 
         const agendamentosFormatados = agendamentos.map(agendamento => {
@@ -863,9 +869,11 @@ app.get('/admin', isAdminAuthenticated, async (req, res) => {
                 hora_fim: agendamento.hora_fim ? agendamento.hora_fim.substring(0, 5) : '',
                 servico: agendamento.servico,
                 barbeiro: agendamento.barbeiro,
-                pago: agendamento.pago || 0 
+                pago: agendamento.pago || 0 ,
+                pacote_id: agendamento.pacote_id || null
             };
         });
+//console.log('>>> AGENDAMENTOS:', agendamentosFormatados.map(a => ({ id: a.id, pacote_id: a.pacote_id })));
 
         // Agora passamos o objeto 'empresa' para a view
         res.render('admin', { 
@@ -879,34 +887,213 @@ app.get('/admin', isAdminAuthenticated, async (req, res) => {
     }
 });
 
+// ajustar pagamento 
 const { QueryTypes } = require('sequelize');
-
 app.patch('/agendamentos/:id/pago', isAdminAuthenticated, async (req, res) => {
     try {
         const id = req.params.id;
         const idEmpresa = req.user.idEmpresa;
 
+        // Busca o agendamento atual com pacote_id
         const rows = await sequelize.query(
-            'SELECT pago FROM Agendamentos WHERE id = :id AND idEmpresa = :idEmpresa',
-            { 
-                replacements: { id, idEmpresa },
-                type: QueryTypes.SELECT
-            }
+            'SELECT pago, pacote_id FROM Agendamentos WHERE id = :id AND idEmpresa = :idEmpresa',
+            { replacements: { id, idEmpresa }, type: QueryTypes.SELECT }
         );
 
         if (!rows.length) return res.status(404).json({ erro: 'Não encontrado' });
 
         const novoPago = rows[0].pago ? 0 : 1;
+        const pacoteId = rows[0].pacote_id;
 
-        await sequelize.query(
-            'UPDATE Agendamentos SET pago = :novoPago WHERE id = :id AND idEmpresa = :idEmpresa',
-            { 
-                replacements: { novoPago, id, idEmpresa },
-                type: QueryTypes.UPDATE
-            }
-        );
+        if (pacoteId) {
+            // É pacote — atualiza todos os agendamentos do pacote
+            await sequelize.query(
+                'UPDATE Agendamentos SET pago = :novoPago WHERE pacote_id = :pacoteId AND idEmpresa = :idEmpresa',
+                { replacements: { novoPago, pacoteId, idEmpresa }, type: QueryTypes.UPDATE }
+            );
+
+            // Atualiza também a tabela Pacotes
+            await sequelize.query(
+                'UPDATE Pacotes SET pago = :novoPago WHERE id = :pacoteId AND idEmpresa = :idEmpresa',
+                { replacements: { novoPago, pacoteId, idEmpresa }, type: QueryTypes.UPDATE }
+            );
+        } else {
+            // Agendamento normal — atualiza só esse
+            await sequelize.query(
+                'UPDATE Agendamentos SET pago = :novoPago WHERE id = :id AND idEmpresa = :idEmpresa',
+                { replacements: { novoPago, id, idEmpresa }, type: QueryTypes.UPDATE }
+            );
+        }
+
         return res.json({ sucesso: true, pago: novoPago });
     } catch (e) {
+        return res.status(500).json({ erro: e.message });
+    }
+});
+
+//Agendar pacotes 
+app.post('/admin/pacote', isAdminAuthenticated, async (req, res) => {
+    const { nome, telefone, servico, servico_id, barbeiro, profissional_id, sessoes } = req.body;
+    
+    try {
+        const sessoesArray = JSON.parse(sessoes);
+        
+        // Verifica conflitos
+        for (const s of sessoesArray) {
+            const ocupado = await verificarConflito(barbeiro, s.data, s.hora_inicio, s.hora_fim, req.user.idEmpresa);
+            if (ocupado) {
+                return res.status(409).json({ erro: `Conflito no horário ${s.hora_inicio} do dia ${s.data}` });
+            }
+        }
+
+        // Cria o pacote
+        const pacote = await Pacote.create({
+            idEmpresa: req.user.idEmpresa,
+            servico_id,
+            cliente_nome: nome,
+            cliente_telefone: telefone,
+            total_sessoes: sessoesArray.length,
+            status: 'pendente'
+        });
+
+        const servicoObj = await Servico.findOne({ where: { id: servico_id, idEmpresa: req.user.idEmpresa } });
+        const valor = servicoObj ? parseFloat(servicoObj.valor) : 0;
+
+        for (const s of sessoesArray) {
+            const ag = await Agendamento.create({
+                barbeiro,
+                nome,
+                telefone,
+                email: null,
+                data: s.data,
+                horario: s.hora_inicio,
+                hora_inicio: s.hora_inicio,
+                hora_fim: s.hora_fim,
+                servico,
+                valor,
+                idEmpresa: req.user.idEmpresa,
+                profissional_id: profissional_id || null,
+                servico_id: servico_id || null,
+                pacote_id: pacote.id,  // 👈
+                status: 'pendente',
+                pago: 0
+            });
+            await sequelize.query(
+                'UPDATE Agendamentos SET pacote_id = :pacoteId WHERE id = :id AND idEmpresa = :idEmpresa',
+                { 
+                    replacements: { 
+                        pacoteId: pacote.id, 
+                        id: ag.id,
+                        idEmpresa: req.user.idEmpresa  // 👈
+                    }, 
+                    type: QueryTypes.UPDATE 
+                }
+            );            
+        }
+
+        return res.status(200).json({ sucesso: true, pacote_id: pacote.id });
+
+    } catch (e) {
+        return res.status(500).json({ erro: e.message });
+    }
+});
+// cliente agendar pacotes
+app.post('/pacote/:token', async (req, res) => {
+    const { token } = req.params;
+    const { barbeiro, profissional_id, servico, servico_id, sessoes } = req.body;
+
+    try {
+        const empresa = await Empresa.findOne({ where: { token_agendamento: token } });
+        if (!empresa) return res.status(404).json({ erro: 'Empresa não encontrada' });
+
+        const idEmpresa = empresa.id;
+        const nome = req.session.clienteNome;
+        const telefone = req.session.clienteTelefone;
+
+        if (!nome || !telefone) return res.status(401).json({ erro: 'Sessão expirada. Faça login novamente.' });
+
+        const sessoesArray = JSON.parse(sessoes);
+
+        // Verifica conflitos em todos os horários
+        for (const s of sessoesArray) {
+            const ocupado = await verificarConflito(barbeiro, s.data, s.hora_inicio, s.hora_fim, idEmpresa);
+            if (ocupado) {
+                return res.status(409).json({ 
+                    erro: `Conflito no horário ${s.hora_inicio} do dia ${s.data}` 
+                });
+            }
+        }
+
+        // Cria o pacote
+        const pacote = await Pacote.create({
+            idEmpresa,
+            servico_id,
+            cliente_nome: nome,
+            cliente_telefone: telefone,
+            total_sessoes: sessoesArray.length,
+            status: 'pendente'
+        });
+
+        // Busca valor do serviço
+        const servicoObj = await Servico.findOne({ where: { id: servico_id, idEmpresa } });
+        const valor = servicoObj ? parseFloat(servicoObj.valor) : 0;
+
+        // Cria os agendamentos
+        for (const s of sessoesArray) {
+            const ag = await Agendamento.create({
+                barbeiro,
+                nome,
+                telefone,
+                email: null,
+                data: s.data,
+                horario: s.hora_inicio,
+                hora_inicio: s.hora_inicio,
+                hora_fim: s.hora_fim,
+                servico,
+                valor,
+                idEmpresa,
+                profissional_id: profissional_id || null,
+                servico_id: servico_id || null,
+                status: 'pendente',
+                pago: 0
+            });
+
+            // Vincula ao pacote via query raw
+            await sequelize.query(
+                'UPDATE Agendamentos SET pacote_id = :pacoteId WHERE id = :id AND idEmpresa = :idEmpresa',
+                { 
+                    replacements: { pacoteId: pacote.id, id: ag.id, idEmpresa },
+                    type: QueryTypes.UPDATE
+                }
+            );
+        }
+
+        // Monta link WhatsApp do profissional
+        let whatsappLink = null;
+        if (profissional_id) {
+            const adminProf = await Admin.findOne({
+                where: { id: profissional_id, idEmpresa },
+                attributes: ['telefone']
+            });
+            const telefoneLimpo = adminProf?.telefone?.replace(/\D/g, '');
+            if (telefoneLimpo) {
+                const datasTexto = sessoesArray.map((s, i) => 
+                    `📅 Sessão ${i+1}: ${s.data} às ${s.hora_inicio}`
+                ).join('\n');
+                const mensagem = encodeURIComponent(
+                    `Olá! Acabei de agendar um pacote:\n` +
+                    `✂️ Serviço: ${servico}\n` +
+                    `👤 Profissional: ${barbeiro}\n` +
+                    `${datasTexto}`
+                );
+                whatsappLink = `https://wa.me/55${telefoneLimpo}?text=${mensagem}`;
+            }
+        }
+
+        return res.json({ sucesso: true, pacote_id: pacote.id, whatsappLink });
+
+    } catch (e) {
+        console.log('>>> ERRO PACOTE CLIENTE:', e.message);
         return res.status(500).json({ erro: e.message });
     }
 });
@@ -1084,7 +1271,8 @@ app.get('/editar/:id', isAdminAuthenticated, async (req, res) => {
         const barbeiros = admins.map(a => ({ id: a.id, nome: a.nome }));
         const servicosFormatados = servicos.map(s => ({
             nome: s.nome,
-            valor: parseFloat(s.valor).toFixed(2).replace('.', ',')
+            valor: parseFloat(s.valor).toFixed(2).replace('.', ','),
+            qtd_sessoes: s.qtd_sessoes || null 
         }));
 
         res.render('editar', {
@@ -1106,11 +1294,12 @@ app.get('/servicos/admin', isAdminAuthenticated, async (req, res) => {
 
 // ADICIONA NOVO SERVIÇO
 app.post('/servicos', isAdminAuthenticated, async (req, res) => {
-    const { nome, valor, duracao_minutos  } = req.body;
+    const { nome, valor, duracao_minutos , qtd_sessoes  } = req.body;
     try {
-        await Servico.create({ nome, valor,duracao_minutos , idEmpresa: req.user.idEmpresa });
+        await Servico.create({ nome, valor,duracao_minutos, qtd_sessoes: qtd_sessoes || null , idEmpresa: req.user.idEmpresa });
         res.json({ sucesso: true });
     } catch (e) {
+       
         res.status(500).json({ erro: e.message });
     }
 });

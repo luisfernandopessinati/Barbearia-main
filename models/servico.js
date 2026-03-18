@@ -18,11 +18,16 @@ const Servico = sequelize.define('Servico', {
         type: DataTypes.BOOLEAN,
         defaultValue: true
     },
+    qtd_sessoes:{
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: null        
+    },
     duracao_minutos: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    defaultValue: 60,
-    comment: 'Duração do serviço em minutos'
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 60,
+        comment: 'Duração do serviço em minutos'
 }
 });
 

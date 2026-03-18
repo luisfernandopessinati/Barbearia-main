@@ -416,13 +416,24 @@
     }
 
     /* ── Evento ── */
-    .cal-event {
+  /*  .cal-event {
         background: linear-gradient(135deg, var(--gold), #6b4c00);
         border-radius: 5px;
         padding: 4px 7px;
         cursor: pointer;
         transition: opacity 0.15s, transform 0.15s;
         overflow: hidden;
+        flex: 1;
+        min-width: 80px;
+    }
+*/
+    .cal-event {
+        background: var(--bg3) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 4px !important;
+        transition: transform 0.2s, border-color 0.2s;
+        padding: 5px !important;
+        margin-bottom: 2px;
         flex: 1;
         min-width: 80px;
     }
@@ -451,6 +462,23 @@
         text-overflow: ellipsis;
     }
 
+    .cal-event.pacote {
+        border-left: 3px solid #e74c3c !important;
+        background: #1a0a0a !important;
+    }
+
+    .cal-event.pacote:hover {
+        border-color: #e74c3c !important;
+    }
+
+    .cal-event.pacote-pago {
+        border-left: 3px solid #27ae60 !important;
+        background: #0a1a0a !important;
+    }
+
+    .cal-event.pacote-pago:hover {
+        border-color: #27ae60 !important;
+    }
     /* ── Slot vazio ── */
     .cal-slot-vazio {
         width: 100%;
@@ -688,6 +716,8 @@
         padding: 36px;
         width: 100%;
         max-width: 480px;
+        max-height: 90vh;      
+        overflow-y: auto; 
         transform: translateY(16px);
         transition: transform 0.25s;
         position: relative;
@@ -1980,9 +2010,13 @@
                     <label>Serviço</label>
                     <select name="servico" id="modal-servico">
                         <option value="">Selecione</option>
-                        {{#each servicos}}<option value="{{nome}}" data-id="{{id}}">{{nome}} — R$ {{valor}}</option>
+                        {{#each servicos}}<option value="{{nome}}" data-id="{{id}}" data-sessoes="{{qtd_sessoes}}" >{{nome}} — R$ {{valor}}</option>
                         {{/each}}
                     </select>
+                </div>
+                <div id="campoPacote" style="display:none;" class="modal-field full">
+                    <label style="font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:8px;display:block;">Sessões do Pacote</label>
+                    <div id="lista-sessoes" style="display:flex;flex-direction:column;gap:10px;"></div>
                 </div>
                 <div class="modal-field"><label>Data</label><input type="date" name="data" id="modal-data" required>
                 </div>
@@ -2043,6 +2077,7 @@
                     placeholder="0,00" step="0.01" min="0"></div>
             <div class="modal-field"><label>Duração (min)</label><input type="number" id="servico-duracao-input"
                     placeholder="Ex: 30" min="1"></div>
+            <div class="modal-field"><label>Sessões (pacote)</label><input type="number" id="servico-sessoes-input" placeholder="Ex: 4 (deixe vazio se não for pacote)" min="2"></div>                    
             <div class="modal-field" style="justify-content:flex-end;"><label>&nbsp;</label><button
                     class="btn-confirmar" id="btn-add-servico" style="padding:10px 16px;font-size:15px;">+
                     Adicionar</button></div>
@@ -2330,7 +2365,7 @@
     // ── Dados do backend ──────────────────────────────────
     const todosAgendamentos = [
         {{#each agendamentos}}
-        { id: {{id}}, nome: "{{nome}}", telefone: "{{telefone}}", data: "{{data}}", horario: "{{horario}}", hora_fim: "{{hora_fim}}", servico: "{{servico}}", barbeiro: "{{barbeiro}}", pago: {{#if pago}}1{{else}}0{{/if}} },
+        { id: {{id}}, nome: "{{nome}}", telefone: "{{telefone}}", data: "{{data}}", horario: "{{horario}}", hora_fim: "{{hora_fim}}", servico: "{{servico}}", barbeiro: "{{barbeiro}}", pago: {{#if pago}}1{{else}}0{{/if}}, pacote_id: "{{pacote_id}}" },
         {{/each}}
     ];
 
@@ -2453,9 +2488,20 @@
         const json = await res.json();
         if (json.sucesso) {
             const ag = todosAgendamentos.find(a => a.id == id);
-            if (ag) ag.pago = json.pago;
+            
+            if (ag?.pacote_id) {
+                // Atualiza todos do mesmo pacote no array
+                todosAgendamentos
+                    .filter(a => a.pacote_id == ag.pacote_id)
+                    .forEach(a => a.pago = json.pago);
+            } else {
+                if (ag) ag.pago = json.pago;
+            }
+            
             btn.className = `btn-pago-mini ${json.pago ? 'pago' : 'nao-pago'}`;
             btn.title = json.pago ? 'Pago ✅' : 'Não pago — clique para marcar';
+            popup.classList.remove('open');
+            renderCalendar();
         }
     });
     // Agendamento / compromisso 
@@ -2556,19 +2602,23 @@
                 );
 
                 if (eventos.length > 0) {
-                    eventos.forEach(a => {
-                        const ev = document.createElement('div');
-                        ev.className = 'cal-event';
-                        ev.innerHTML = `
-                                <div style="border-left: 3px solid var(--gold); padding-left: 5px; display: flex; flex-direction: column;">
-                                    <span class="cal-event-nome" style="font-weight: bold; color: var(--gold-light); font-size: 11px; text-transform: uppercase;">${a.barbeiro}</span>
-                                    <span class="cal-event-nome" style="color: #fff; font-size: 13px;">${a.nome}</span>
-                                    <span class="cal-event-tel" style="font-size: 10px; opacity: 0.6;">${a.servico}</span>
-                                </div>`;
-                        ev.addEventListener('click', e => abrirPopup(e, a));
-                        cell.appendChild(ev);
+                eventos.forEach(a => {
+                    const ev = document.createElement('div');
+                    const isPacote = a.pacote_id && a.pacote_id !== 'undefined' && a.pacote_id !== '';
+                    const cor = isPacote ? (a.pago ? '#27ae60' : '#e74c3c') : 'var(--gold)';
+
+                    ev.className = 'cal-event' + (isPacote ? (a.pago ? ' pacote-pago' : ' pacote') : '');
+                    ev.innerHTML = `
+                        <div style="border-left: 3px solid ${cor}; padding-left: 5px; display: flex; flex-direction: column; position: relative;">
+                            ${isPacote && !a.pago ? `<span style="position:absolute;top:-4px;right:-4px;width:8px;height:8px;background:#e74c3c;border-radius:50%;"></span>` : ''}
+                            <span style="font-weight:bold;color:${cor};font-size:11px;text-transform:uppercase;">${a.barbeiro}</span>
+                            <span style="color:#fff;font-size:13px;">${a.nome}</span>
+                            <span style="font-size:10px;opacity:0.6;">${a.servico}${isPacote ? ' 📦' : ''}</span>
+                        </div>`;
+                    ev.addEventListener('click', e => abrirPopup(e, a));
+                    cell.appendChild(ev);
                     });
-                } else {
+                    } else {
                     const vazio = document.createElement('div');
                     vazio.className = 'cal-slot-vazio';
                     vazio.textContent = '+';
@@ -2686,20 +2736,26 @@
                 body.appendChild(empty);
             } else {
                 eventos.forEach(a => {
+                    const isPacote = a.pacote_id && a.pacote_id !== 'undefined' && a.pacote_id !== '';
+                    const cor = isPacote ? (a.pago ? '#27ae60' : '#e74c3c') : 'var(--gold-dim)';
+                    const corBorda = isPacote ? (a.pago ? '#27ae60' : '#e74c3c') : 'var(--border)';
+
                     const ev = document.createElement('div');
                     ev.className = 'cal-mobile-event';
                     ev.style.cssText = 'display:flex;align-items:stretch;margin-bottom:10px;cursor:pointer;';
                     ev.innerHTML = `
-                    <div style="font-family:'Bebas Neue';font-size:1.15rem;color:var(--gold-light);min-width:52px;padding-top:2px;">${a.horario}</div>
-                    <div style="width:2px;background:var(--gold-dim);margin:0 12px;position:relative;">
-                        <div style="width:7px;height:7px;background:var(--gold);border-radius:50%;position:absolute;left:-3px;top:5px;"></div>
-                    </div>
-                    <div style="flex:1;background:var(--bg3);padding:8px 10px;border-radius:8px;border:1px solid var(--border);">
-                        <div style="font-weight:bold;color:var(--text);font-size:13px;">${a.nome}</div>
-                        <div style="font-size:11px;color:var(--muted);margin-top:2px;">
-                            ✂️ ${a.servico} &nbsp;·&nbsp; 👤 ${a.barbeiro}
+                        <div style="font-family:'Bebas Neue';font-size:1.15rem;color:${isPacote ? cor : 'var(--gold-light)'};min-width:52px;padding-top:2px;">${a.horario}</div>
+                        <div style="width:2px;background:${cor};margin:0 12px;position:relative;">
+                            <div style="width:7px;height:7px;background:${isPacote ? cor : 'var(--gold)'};border-radius:50%;position:absolute;left:-3px;top:5px;"></div>
                         </div>
-                    </div>`;
+                        <div style="flex:1;background:var(--bg3);padding:8px 10px;border-radius:8px;border:1px solid ${corBorda};">
+                            <div style="font-weight:bold;color:var(--text);font-size:13px;">
+                                ${a.nome} ${isPacote ? '📦' : ''}
+                            </div>
+                            <div style="font-size:11px;color:var(--muted);margin-top:2px;">
+                                ✂️ ${a.servico} &nbsp;·&nbsp; 👤 ${a.barbeiro}
+                            </div>
+                        </div>`;
                     ev.addEventListener('click', e => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -2793,14 +2849,71 @@
     formAdmin.addEventListener('submit', async (e) => {
         e.preventDefault();
         modalErro.textContent = '';
-        btnConfirmar.textContent = 'Salvando...'; btnConfirmar.disabled = true;
+        btnConfirmar.textContent = 'Salvando...';
+        btnConfirmar.disabled = true;
+
         try {
-            const res = await fetch('/admin/agendar/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(new FormData(formAdmin)).toString() });
-            const json = await res.json();
-            if (res.ok && json.sucesso) { fecharModal(); window.location.reload(); }
-            else modalErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar agendamento.');
-        } catch (err) { modalErro.textContent = '⚠ Erro de conexão.'; }
-        finally { btnConfirmar.textContent = 'Salvar'; btnConfirmar.disabled = false; }
+            const servicoOpt = document.getElementById('modal-servico').selectedOptions[0];
+            const qtdSessoes = servicoOpt?.dataset.sessoes;
+            const isPacote = qtdSessoes && qtdSessoes !== 'null' && qtdSessoes !== '';
+
+            if (isPacote) {
+                // Monta array de sessões
+                const sessoes = [];
+                document.querySelectorAll('#lista-sessoes > div').forEach(sessao => {
+                    const data = sessao.querySelector('.sessao-data')?.value;
+                    const horaInicio = sessao.querySelector('.sessao-hora-inicio')?.value;
+                    const horaFim = sessao.querySelector('.sessao-hora-fim')?.value;
+                    if (data && horaInicio) {
+                        sessoes.push({ data, hora_inicio: horaInicio, hora_fim: horaFim });
+                    }
+                });
+
+                if (sessoes.length === 0) {
+                    modalErro.textContent = '⚠ Preencha ao menos uma sessão.';
+                    return;
+                }
+
+                const barbeiroSel = document.getElementById('modal-barbeiro');
+                const profId = barbeiroSel.selectedOptions[0]?.dataset.id;
+
+                const body = new URLSearchParams({
+                    nome: document.querySelector('[name="nome"]').value,
+                    telefone: document.querySelector('[name="telefone"]').value,
+                    servico: servicoOpt.value,
+                    servico_id: servicoOpt.dataset.id,
+                    barbeiro: barbeiroSel.value,
+                    profissional_id: profId || '',
+                    sessoes: JSON.stringify(sessoes)
+                });
+
+                const res = await fetch('/admin/pacote', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: body.toString()
+                });
+                const json = await res.json();
+                if (res.ok && json.sucesso) { fecharModal(); window.location.reload(); }
+                else modalErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar pacote.');
+
+            } else {
+                // Agendamento normal
+                const res = await fetch('/admin/agendar/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(new FormData(formAdmin)).toString()
+                });
+                const json = await res.json();
+                if (res.ok && json.sucesso) { fecharModal(); window.location.reload(); }
+                else modalErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar agendamento.');
+            }
+
+        } catch (err) {
+            modalErro.textContent = '⚠ Erro de conexão.';
+        } finally {
+            btnConfirmar.textContent = 'Salvar';
+            btnConfirmar.disabled = false;
+        }
     });
 
     // ── Modal Feriados ────────────────────────────────────
@@ -2859,7 +2972,8 @@
     const servicoErro = document.getElementById('servico-erro');
     const servicoNomeInput = document.getElementById('servico-nome-input');
     const servicoValorInput = document.getElementById('servico-valor-input');
-    const servicoDuracaoInput = document.getElementById('servico-duracao-input'); // 👈
+    const servicoDuracaoInput = document.getElementById('servico-duracao-input'); 
+    const servicoSessoesInput = document.getElementById('servico-sessoes-input');
     const btnAddServico = document.getElementById('btn-add-servico');
 
     async function carregarServicos() {
@@ -2932,7 +3046,8 @@
         servicoErro.textContent = '';
         const nome = servicoNomeInput.value.trim();
         const valor = parseFloat(servicoValorInput.value);
-        const duracao_minutos = parseInt(servicoDuracaoInput.value); // 👈
+        const duracao_minutos = parseInt(servicoDuracaoInput.value); 
+        const qtd_sessoes = parseInt(servicoSessoesInput.value) || null;
         if (!nome || isNaN(valor) || valor < 0) { servicoErro.textContent = '⚠ Preencha nome e valor.'; return; }
         if (isNaN(duracao_minutos) || duracao_minutos < 1) { servicoErro.textContent = '⚠ Informe a duração em minutos.'; return; } // 👈
         btnAddServico.textContent = 'Salvando...'; btnAddServico.disabled = true;
@@ -2940,10 +3055,10 @@
             const res = await fetch('/servicos', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nome, valor, duracao_minutos }) // 👈
+                body: JSON.stringify({ nome, valor, duracao_minutos, qtd_sessoes }) // 👈
             });
             const json = await res.json();
-            if (json.sucesso) { servicoNomeInput.value = ''; servicoValorInput.value = ''; servicoDuracaoInput.value = ''; carregarServicos(); }
+            if (json.sucesso) { servicoNomeInput.value = ''; servicoValorInput.value = ''; servicoDuracaoInput.value = '';servicoSessoesInput.value = ''; carregarServicos(); }
             else servicoErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar.');
         } catch (e) { servicoErro.textContent = '⚠ Erro de conexão.'; }
         finally { btnAddServico.textContent = '+ Adicionar'; btnAddServico.disabled = false; }
@@ -3322,8 +3437,92 @@
         document.getElementById('modal-servico-id').value = document.getElementById('modal-servico').selectedOptions[0]?.dataset.id || '';
     });
 
-    //document.getElementById('modal-barbeiro').addEventListener('change', buscarSlotsAdmin);
-    document.getElementById('modal-servico').addEventListener('change', buscarSlotsAdmin);
+    async function gerarCamposSessoes(qtd) {
+        const lista = document.getElementById('lista-sessoes');
+        lista.innerHTML = '';
+
+        for (let i = 0; i < qtd; i++) {
+            const sessao = document.createElement('div');
+            sessao.style.cssText = 'background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:8px;';
+            sessao.innerHTML = `
+                <span style="font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;">Sessão ${i + 1}</span>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                    <div class="modal-field">
+                        <label>Data</label>
+                        <input type="date" class="sessao-data" data-index="${i}">
+                    </div>
+                    <div class="modal-field">
+                        <label>Horário</label>
+                        <select class="sessao-horario" data-index="${i}">
+                            <option value="">Selecione a data</option>
+                        </select>
+                    </div>
+                </div>
+                <input type="hidden" class="sessao-hora-inicio" data-index="${i}">
+                <input type="hidden" class="sessao-hora-fim" data-index="${i}">
+            `;
+            lista.appendChild(sessao);
+
+            sessao.querySelector('.sessao-data').addEventListener('change', async function() {
+                const data = this.value;
+                const selectHorario = sessao.querySelector('.sessao-horario');
+                const profId = document.getElementById('modal-barbeiro').selectedOptions[0]?.dataset.id;
+                const servicoId = document.getElementById('modal-servico').selectedOptions[0]?.dataset.id;
+
+                if (!profId || !servicoId || !data) return;
+
+                selectHorario.innerHTML = '<option value="">Carregando...</option>';
+                try {
+                    const res = await fetch(`/admin/slots?profissional_id=${profId}&servico_id=${servicoId}&data=${data}`);
+                    const json = await res.json();
+                    const slots = (json.slots || []).filter(s => s.status === 'disponivel');
+                    selectHorario.innerHTML = slots.length 
+                        ? '<option value="">Selecione</option>' 
+                        : '<option value="">Nenhum horário disponível</option>';
+                    slots.forEach(s => {
+                        const opt = document.createElement('option');
+                        opt.value = s.hora_inicio.substring(0, 5);
+                        opt.dataset.horaInicio = s.hora_inicio;
+                        opt.dataset.horaFim = s.hora_fim;
+                        opt.textContent = `${s.hora_inicio.substring(0, 5)} – ${s.hora_fim.substring(0, 5)}`;
+                        selectHorario.appendChild(opt);
+                    });
+                } catch { 
+                    selectHorario.innerHTML = '<option value="">Erro ao carregar</option>'; 
+                }
+            });
+
+            sessao.querySelector('.sessao-horario').addEventListener('change', function() {
+                const opt = this.selectedOptions[0];
+                sessao.querySelector('.sessao-hora-inicio').value = opt?.dataset.horaInicio || '';
+                sessao.querySelector('.sessao-hora-fim').value = opt?.dataset.horaFim || '';
+            });
+        }
+    }   
+
+    document.getElementById('modal-servico').addEventListener('change', function() {
+        const opt = this.selectedOptions[0];
+        const qtdSessoes = opt?.dataset.sessoes;
+        const campoPacote = document.getElementById('campoPacote');
+        const campoData = document.getElementById('modal-data').closest('.modal-field');
+        const campoHorario = document.getElementById('modal-horario').closest('.modal-field');
+
+        if (qtdSessoes && qtdSessoes !== 'null' && qtdSessoes !== '') {
+            campoPacote.style.display = '';
+            campoData.style.display = 'none';
+            campoHorario.style.display = 'none';
+            document.getElementById('modal-data').required = false;    // 👈
+            document.getElementById('modal-horario').required = false; // 👈
+            gerarCamposSessoes(parseInt(qtdSessoes));
+        } else {
+            campoPacote.style.display = 'none';
+            campoData.style.display = '';
+            campoHorario.style.display = '';
+            document.getElementById('modal-data').required = true;    // 👈
+            document.getElementById('modal-horario').required = false; // horário não tem required
+            buscarSlotsAdmin();
+        }
+    });
     document.getElementById('modal-data').addEventListener('change', buscarSlotsAdmin);
 
     // ── Vincular dropdown aos modais ──────────────────────

@@ -63,10 +63,15 @@ const Agendamento = sequelize.define('Agendamentos', {
         defaultValue: 'pendente'
     },
     pago: {
-    type: DataTypes.TINYINT(1),
-    defaultValue: 0,
-    allowNull: false
-}
+        type: DataTypes.TINYINT(1),
+        defaultValue: 0,
+        allowNull: false
+    },        
+    pacote_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: null
+    }
 });
 
 //Agendamento.sync({ alter: true });

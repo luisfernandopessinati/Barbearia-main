@@ -61,7 +61,12 @@ const Agendamento = sequelize.define('Agendamentos', {
         type: DataTypes.ENUM('pendente', 'confirmado', 'cancelado', 'concluido'),
         allowNull: false,
         defaultValue: 'pendente'
-    }
+    },
+    pago: {
+    type: DataTypes.TINYINT(1),
+    defaultValue: 0,
+    allowNull: false
+}
 });
 
 //Agendamento.sync({ alter: true });

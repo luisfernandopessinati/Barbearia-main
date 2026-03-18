@@ -605,19 +605,13 @@ app.get('/horarios-ocupados', async (req, res) => {
 
 // FUNÇÃO AUXILIAR - verifica conflito de horário
 async function verificarConflito(barbeiro, data, horaInicio, horaFim, idEmpresa, idIgnorar = null) {
-    const inicioDia = new Date(`${data}T00:00:00.000Z`);
-    const proximoDia = new Date(`${data}T00:00:00.000Z`);
-    proximoDia.setUTCDate(proximoDia.getUTCDate() + 1);
-
+    // 'data' já vem como string '2026-03-21', usa direto sem converter para Date
     const where = {
         barbeiro,
         idEmpresa,
-        data: {
-            [Op.gte]: inicioDia,
-            [Op.lt]: proximoDia
-        },
-        hora_inicio: { [Op.lt]: horaFim },   // começa antes do fim do novo
-        hora_fim:    { [Op.gt]: horaInicio } // termina depois do início do novo
+        data,  // 👈 compara string direto com o campo do banco
+        hora_inicio: { [Op.lt]: horaFim },
+        hora_fim:    { [Op.gt]: horaInicio }
     };
 
     if (idIgnorar) where.id = { [Op.ne]: idIgnorar };
@@ -771,54 +765,63 @@ app.post('/agendar/:token', async function (req, res) {
 app.post('/admin/agendar', isAdminAuthenticated, async (req, res) => {
     const { barbeiro, nome, telefone, data, horario, servico, profissional_id, hora_inicio, hora_fim, servico_id } = req.body;
     const idEmpresa = req.user.idEmpresa;
-
+    const tipo = req.body.tipo || 'agendamento';
+    const isCompromisso = tipo === 'compromisso';
     try {
         if (!idEmpresa) {
             return res.status(403).json({ erro: 'Empresa não identificada.' });
         }
 
-        // Extrai hora_inicio e hora_fim do horario caso não venham separados
-        let hiInicio = hora_inicio;
-        let hiFim = hora_fim;
+        let hiInicio, hiFim;
 
-        if (!hiInicio || !hiFim) {
-            const partes = horario.split(/\s*[–-]\s*/); // aceita – ou -
-            hiInicio = partes[0]?.trim();
-            hiFim = partes[1]?.trim();
+        if (isCompromisso) {
+            // Compromisso usa os campos próprios de hora
+            hiInicio = req.body.compromisso_inicio;
+            hiFim = req.body.compromisso_fim;
+
+            if (!hiInicio || !hiFim) {
+                return res.status(400).json({ erro: 'Informe hora início e fim do compromisso.' });
+            }
+        } else {
+            // Agendamento normal
+            hiInicio = hora_inicio;
+            hiFim = hora_fim;
+
+            if (!hiInicio || !hiFim) {
+                const partes = (horario || '').split(/\s*[–-]\s*/);
+                hiInicio = partes[0]?.trim();
+                hiFim = partes[1]?.trim();
+            }
         }
-        console.log('>>> BODY:', { barbeiro, data, horario, hora_inicio, hora_fim });
-        console.log('>>> PARSED:', { hiInicio, hiFim });
 
-        // Passa os dois horários separados para verificar sobreposição real
         const ocupado = await verificarConflito(barbeiro, data, hiInicio, hiFim, idEmpresa);
-console.log('>>> CONFLITO:', ocupado);
         if (ocupado) {
             return res.status(409).json({
                 erro: `${barbeiro} já tem agendamento às ${hiInicio} neste dia.`
             });
         }
 
-        const servicoObj = await Servico.findOne({
-            where: { nome: servico, idEmpresa }
-        });
+        const servicoObj = !isCompromisso
+            ? await Servico.findOne({ where: { nome: servico, idEmpresa } })
+            : null;
 
         const valor = servicoObj ? parseFloat(servicoObj.valor) : 0;
 
         await Agendamento.create({
             barbeiro,
-            nome,
+            nome: isCompromisso ? (req.body.motivo || 'Compromisso') : nome,
             email: null,
-            telefone,
+            telefone: isCompromisso ? '999999999' : telefone,
             data,
-            horario: hiInicio,   // 👈 salva só "13:00" igual ao padrão do banco
-            servico,
+            horario: hiInicio,
+            servico: isCompromisso ? null : servico,
             valor,
             idEmpresa,
             profissional_id: profissional_id || null,
             hora_inicio: hiInicio,
             hora_fim: hiFim || null,
-            servico_id: servico_id || null,
-            status: 'pendente'
+            servico_id: isCompromisso ? null : (servico_id || null),
+            status: isCompromisso ? 'compromisso' : 'pendente'
         });
 
         return res.status(200).json({ sucesso: true });
@@ -857,8 +860,10 @@ app.get('/admin', isAdminAuthenticated, async (req, res) => {
                 telefone: agendamento.telefone,
                 data: `${String(data.getDate()).padStart(2, '0')}/${String(data.getMonth() + 1).padStart(2, '0')}/${data.getFullYear()}`,
                 horario: agendamento.horario,
+                hora_fim: agendamento.hora_fim ? agendamento.hora_fim.substring(0, 5) : '',
                 servico: agendamento.servico,
-                barbeiro: agendamento.barbeiro
+                barbeiro: agendamento.barbeiro,
+                pago: agendamento.pago || 0 
             };
         });
 
@@ -871,6 +876,38 @@ app.get('/admin', isAdminAuthenticated, async (req, res) => {
         });
     } catch (error) {
         res.render('admin', { erro: "Erro ao buscar dados: " + error.message });
+    }
+});
+
+const { QueryTypes } = require('sequelize');
+
+app.patch('/agendamentos/:id/pago', isAdminAuthenticated, async (req, res) => {
+    try {
+        const id = req.params.id;
+        const idEmpresa = req.user.idEmpresa;
+
+        const rows = await sequelize.query(
+            'SELECT pago FROM Agendamentos WHERE id = :id AND idEmpresa = :idEmpresa',
+            { 
+                replacements: { id, idEmpresa },
+                type: QueryTypes.SELECT
+            }
+        );
+
+        if (!rows.length) return res.status(404).json({ erro: 'Não encontrado' });
+
+        const novoPago = rows[0].pago ? 0 : 1;
+
+        await sequelize.query(
+            'UPDATE Agendamentos SET pago = :novoPago WHERE id = :id AND idEmpresa = :idEmpresa',
+            { 
+                replacements: { novoPago, id, idEmpresa },
+                type: QueryTypes.UPDATE
+            }
+        );
+        return res.json({ sucesso: true, pago: novoPago });
+    } catch (e) {
+        return res.status(500).json({ erro: e.message });
     }
 });
 

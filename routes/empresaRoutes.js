@@ -2,12 +2,7 @@ const express = require('express');
 const router = express.Router();
 const empresaController = require('../controllers/empresaController');
 const upload = require('../config/multer');
-
-// Middleware de autenticação próprio (igual ao produtoRoutes)
-function isAdminAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) return next();
-    res.redirect('/loginAdmin');
-}
+const { isAdminAuthenticated } = require('../middlewares/adminMiddleware'); // 👈 importa aqui
 
 // Cadastro público
 router.get('/cadastro', empresaController.exibirCadastro);

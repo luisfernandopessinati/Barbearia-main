@@ -2,12 +2,8 @@ const express = require('express');
 const router = express.Router();
 const produtoController = require('../controllers/produtoController');
 const upload = require('../config/multer');
+const { isAdminAuthenticated } = require('../middlewares/adminMiddleware');
 
-// Middleware de autenticação
-function isAdminAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) return next();
-    res.redirect('/loginAdmin');
-}
 
 router.get('/admin/produtos', isAdminAuthenticated, produtoController.listar);
 router.post('/produtos', isAdminAuthenticated, upload.single('imagem'), produtoController.criar);

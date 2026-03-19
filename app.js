@@ -7,6 +7,8 @@ const bodyParser = require('body-parser');
 const sequelize = require('./config/db');
 const bcrypt = require('bcryptjs');
 
+const { isAdminAuthenticated } = require('./middlewares/adminMiddleware');
+
 const Admin = require('./models/Admin');
 const Agendamento = require('./models/Agendamento');
 const Bloqueio = require('./models/Bloqueio');
@@ -22,6 +24,8 @@ const { getSlotsDisponiveis, minutesToTime, temColisao, timeToMinutes } = requir
 const passport = require('passport');
 const session = require('express-session');
 require('./config/auth')(passport);
+
+const { verificarConflito } = require('./helpers/conflito');
 
 const { Op } = require('sequelize');
 
@@ -60,17 +64,19 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Rotas  
-app.use('/', require('./routes/produtoRoutes'));
 
 const agendamentoRoutes = require('./routes/agendamentoRoutes');
 app.use('/api', agendamentoRoutes);
 
 const authRoutes = require('./routes/authRoutes');
 app.use('/api', authRoutes);
-
+app.use('/', require('./routes/produtoRoutes'));
 app.use('/', require('./routes/empresaRoutes'));
-
-app.use('/', require('./routes/clienteRoutes')(isAdminAuthenticated));
+app.use('/', require('./routes/clienteRoutes')); 
+app.use('/', require('./routes/feriadoRoutes'));
+app.use('/', require('./routes/horarioRoutes'));
+app.use('/', require('./routes/servicoRoutes'));
+app.use('/', require('./routes/adminRoutes'));
 
 // PATCH /clientes/:id — edita nome e telefone
 app.patch('/clientes/:id', isAdminAuthenticated, async (req, res) => {
@@ -112,11 +118,6 @@ app.engine('handlebars', engine({
         add: (a, b) => a + b
     }
 }));
-
-function isAdminAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) return next();
-    res.redirect('/loginAdmin');
-}
 
 app.post('/loginAdmin', passport.authenticate('admin-local', {
     successRedirect: '/admin',
@@ -160,53 +161,6 @@ app.get('/site/:nome', (req, res) => {
         if (err) return res.status(404).send('Site não encontrado');
         res.send(html);
     });
-});
-
-// GET /admin/slots — para o painel admin, sem validação de horário de funcionamento
-app.get('/admin/slots', isAdminAuthenticated, async (req, res) => {
-    const { profissional_id, servico_id, data } = req.query;
-    const idEmpresa = req.user.idEmpresa;
-
-    try {
-        const servico = await Servico.findOne({ where: { id: servico_id, idEmpresa } });
-        if (!servico) return res.status(404).json({ erro: 'Serviço não encontrado' });
-
-        const duracao = servico.duracao_minutos;
-
-        // Gera slots das 07:00 às 22:00
-        const slots = [];
-        let atual = 7 * 60;
-        const fim = 22 * 60;
-        while (atual + duracao <= fim) {
-            slots.push({
-                hora_inicio: minutesToTime(atual),
-                hora_fim: minutesToTime(atual + duracao)
-            });
-            atual += duracao;
-        }
-
-        // Verifica conflitos
-        const agendamentos = await Agendamento.findAll({
-            where: {
-                profissional_id,
-                idEmpresa,
-                data,
-                status: { [Op.notIn]: ['cancelado'] },
-                hora_inicio: { [Op.not]: null }
-            },
-            attributes: ['hora_inicio', 'hora_fim']
-        });
-
-        const resultado = slots.map(slot => {
-            const ocupado = agendamentos.some(a => temColisao(slot, a));
-            return { ...slot, status: ocupado ? 'indisponivel' : 'disponivel' };
-        });
-
-        res.json({ slots: resultado });
-
-    } catch (e) {
-        res.status(500).json({ erro: e.message });
-    }
 });
 
 
@@ -433,146 +387,6 @@ async function criarServicosIniciais() {
 }
 criarServicosIniciais();
 
-// ============================================================
-// ROTAS ADMINS
-// ============================================================
-
-// GET /admins — lista todos os admins (para o modal)
-app.get('/admins', isAdminAuthenticated, async (req, res) => {
-    try {
-        const admins = await Admin.findAll({
-            where: { idEmpresa: req.user.idEmpresa },
-            attributes: ['id', 'nome', 'email', 'role', 'ativo', 'telefone','foto'],
-            order: [['nome', 'ASC']]
-        });
-        res.json({ admins });
-    } catch (error) {
-        res.status(500).json({ erro: 'Erro ao buscar admins: ' + error.message });
-    }
-});
-
-// POST /admins — cria um novo admin
-app.post('/admins', isAdminAuthenticated, async (req, res) => {
-    try {
-        const { nome, email, senha, role, telefone } = req.body;
-
-        if (!nome || !email || !senha || !telefone) {
-            return res.status(400).json({ erro: 'Nome, e-mail e senha são obrigatórios.' });
-        }
-        if (senha.length < 6) {
-            return res.status(400).json({ erro: 'A senha precisa ter no mínimo 6 caracteres.' });
-        }
-
-        const emailNormalizado = email.trim().toLowerCase();
-
-        const jaExiste = await Admin.findOne({ where: { email: emailNormalizado } });
-        if (jaExiste) {
-            return res.status(409).json({ erro: 'Já existe um admin com este e-mail.' });
-        }
-
-        const hashSenha = await bcrypt.hash(senha, 10);
-
-        await Admin.create({
-            nome: nome.trim(),
-            email: emailNormalizado,
-            senha: hashSenha,
-            telefone: telefone.trim(),
-            idEmpresa: req.user.idEmpresa,
-            ativo: 'S',
-            role: role === 'owner' ? 'owner' : 'admin'
-        });
-
-        res.json({ sucesso: true });
-    } catch (error) {
-        res.status(500).json({ erro: 'Erro ao criar admin: ' + error.message });
-    }
-});
-
-// DELETE /admins/:id — remove um admin (nunca remove o próprio usuário logado nem owners)
-app.delete('/admins/:id', isAdminAuthenticated, async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const admin = await Admin.findOne({
-            where: { id, idEmpresa: req.user.idEmpresa } // 👈 garante que é da mesma empresa
-        });
-        if (!admin) {
-            return res.status(404).json({ erro: 'Admin não encontrado.' });
-        }
-
-        // Proteção: não deixa excluir owner nem o próprio usuário logado
-        if (admin.role === 'owner') {
-            return res.status(403).json({ erro: 'Não é possível remover um Owner.' });
-        }
-        if (req.session?.adminId && String(admin.id) === String(req.session.adminId)) {
-            return res.status(403).json({ erro: 'Você não pode remover sua própria conta.' });
-        }
-
-        await admin.update({ ativo: false });
-        res.json({ sucesso: true });
-    } catch (error) {
-        res.status(500).json({ erro: 'Erro ao remover admin: ' + error.message });
-    }
-});
-
-//reativar admin
-app.patch('/admins/:id/reativar', isAdminAuthenticated, async (req, res) => {
-    try {
-        const admin = await Admin.findOne({ where: { id: req.params.id, idEmpresa: req.user.idEmpresa } });
-        if (!admin) return res.status(404).json({ erro: 'Admin não encontrado.' });
-        await admin.update({ ativo: 'S' });
-        res.json({ sucesso: true });
-    } catch (error) {
-        res.status(500).json({ erro: 'Erro ao reativar: ' + error.message });
-    }
-});
-
-// alterar o admin
-app.patch('/admins/:id/nome', isAdminAuthenticated, async (req, res) => {
-    try {
-        const { nome } = req.body;
-        if (!nome || nome.trim().length < 2) return res.status(400).json({ erro: 'Nome inválido.' });
-        const admin = await Admin.findOne({ where: { id: req.params.id, idEmpresa: req.user.idEmpresa } });
-        if (!admin) return res.status(404).json({ erro: 'Admin não encontrado.' });
-        await admin.update({ nome: nome.trim() });
-        res.json({ sucesso: true });
-    } catch (error) {
-        res.status(500).json({ erro: 'Erro ao atualizar nome: ' + error.message });
-    }
-}); 
-
-app.patch('/admins/:id/telefone', isAdminAuthenticated, async (req, res) => {
-    try {
-        const { telefone } = req.body;
-        if (!telefone || telefone.trim().length < 8) return res.status(400).json({ erro: 'Telefone inválido.' });
-        const admin = await Admin.findOne({ where: { id: req.params.id, idEmpresa: req.user.idEmpresa } });
-        if (!admin) return res.status(404).json({ erro: 'Admin não encontrado.' });
-        await admin.update({ telefone: telefone.trim() });
-        res.json({ sucesso: true });
-    } catch (error) {
-        res.status(500).json({ erro: 'Erro ao atualizar telefone: ' + error.message });
-    }
-});
-
-// alterar foto do admin
-app.post('/admins/:id/foto', isAdminAuthenticated, uploadAdmins.single('foto'), async (req, res) => {
-    try {
-        const admin = await Admin.findOne({
-            where: { id: req.params.id, idEmpresa: req.user.idEmpresa }
-        });
-        if (!admin) return res.status(404).json({ erro: 'Admin não encontrado.' });
-
-        if (admin.foto) {
-            const fotoAntiga = path.join(__dirname, '../public', admin.foto);
-            if (fs.existsSync(fotoAntiga)) fs.unlinkSync(fotoAntiga);
-        }
-
-        await admin.update({ foto: `/uploads/admins/${req.file.filename}` });
-        res.json({ sucesso: true });
-    } catch (error) {
-        res.status(500).json({ erro: 'Erro ao salvar foto: ' + error.message });
-    }
-});
 
 // RETORNA HORÁRIOS OCUPADOS POR BARBEIRO E DATA
 app.get('/horarios-ocupados', async (req, res) => {
@@ -605,70 +419,6 @@ app.get('/horarios-ocupados', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.json({ ocupados: [] });
-    }
-});
-
-// FUNÇÃO AUXILIAR - verifica conflito de horário
-async function verificarConflito(barbeiro, data, horaInicio, horaFim, idEmpresa, idIgnorar = null) {
-    // 'data' já vem como string '2026-03-21', usa direto sem converter para Date
-    const where = {
-        barbeiro,
-        idEmpresa,
-        data,  // 👈 compara string direto com o campo do banco
-        hora_inicio: { [Op.lt]: horaFim },
-        hora_fim:    { [Op.gt]: horaInicio }
-    };
-
-    if (idIgnorar) where.id = { [Op.ne]: idIgnorar };
-
-    const conflito = await Agendamento.findOne({ where });
-    return !!conflito;
-}
-
-// GET — lista horários de um profissional
-app.get('/horarios-funcionamento', isAdminAuthenticated, async (req, res) => {
-    const { profissional_id } = req.query;
-    try {
-        const horarios = await HorarioFuncionamento.findAll({
-            where: { profissional_id, idEmpresa: req.user.idEmpresa },
-            order: [['dia_semana', 'ASC']]
-        });
-        res.json({ horarios });
-    } catch (e) {
-        res.status(500).json({ erro: e.message });
-    }
-});
-
-// POST — cria novo horário
-app.post('/horarios-funcionamento', isAdminAuthenticated, async (req, res) => {
-    const { profissional_id, dia_semana, hora_inicio, hora_fim } = req.body;
-    const idEmpresa = req.user.idEmpresa;
-    try {
-        // Verifica se já existe esse dia para esse profissional
-        const existente = await HorarioFuncionamento.findOne({
-            where: { profissional_id, dia_semana, idEmpresa }
-        });
-        if (existente) {
-            return res.status(409).json({ erro: 'Já existe um horário para este dia. Remova o anterior primeiro.' });
-        }
-        await HorarioFuncionamento.create({
-            profissional_id, dia_semana, hora_inicio, hora_fim, idEmpresa, ativo: true
-        });
-        res.json({ sucesso: true });
-    } catch (e) {
-        res.status(500).json({ erro: e.message });
-    }
-});
-
-// DELETE — remove um horário
-app.delete('/horarios-funcionamento/:id', isAdminAuthenticated, async (req, res) => {
-    try {
-        await HorarioFuncionamento.destroy({
-            where: { id: req.params.id, idEmpresa: req.user.idEmpresa }
-        });
-        res.json({ sucesso: true });
-    } catch (e) {
-        res.status(500).json({ erro: e.message });
     }
 });
 
@@ -766,76 +516,6 @@ app.post('/agendar/:token', async function (req, res) {
     }
 });
 
-// ADMIN AGENDA
-app.post('/admin/agendar', isAdminAuthenticated, async (req, res) => {
-    const { barbeiro, nome, telefone, data, horario, servico, profissional_id, hora_inicio, hora_fim, servico_id } = req.body;
-    const idEmpresa = req.user.idEmpresa;
-    const tipo = req.body.tipo || 'agendamento';
-    const isCompromisso = tipo === 'compromisso';
-    try {
-        if (!idEmpresa) {
-            return res.status(403).json({ erro: 'Empresa não identificada.' });
-        }
-
-        let hiInicio, hiFim;
-
-        if (isCompromisso) {
-            // Compromisso usa os campos próprios de hora
-            hiInicio = req.body.compromisso_inicio;
-            hiFim = req.body.compromisso_fim;
-
-            if (!hiInicio || !hiFim) {
-                return res.status(400).json({ erro: 'Informe hora início e fim do compromisso.' });
-            }
-        } else {
-            // Agendamento normal
-            hiInicio = hora_inicio;
-            hiFim = hora_fim;
-
-            if (!hiInicio || !hiFim) {
-                const partes = (horario || '').split(/\s*[–-]\s*/);
-                hiInicio = partes[0]?.trim();
-                hiFim = partes[1]?.trim();
-            }
-        }
-
-        const ocupado = await verificarConflito(barbeiro, data, hiInicio, hiFim, idEmpresa);
-        if (ocupado) {
-            return res.status(409).json({
-                erro: `${barbeiro} já tem agendamento às ${hiInicio} neste dia.`
-            });
-        }
-
-        const servicoObj = !isCompromisso
-            ? await Servico.findOne({ where: { nome: servico, idEmpresa } })
-            : null;
-
-        const valor = servicoObj ? parseFloat(servicoObj.valor) : 0;
-
-        await Agendamento.create({
-            barbeiro,
-            nome: isCompromisso ? (req.body.motivo || 'Compromisso') : nome,
-            email: null,
-            telefone: isCompromisso ? '999999999' : telefone,
-            data,
-            horario: hiInicio,
-            servico: isCompromisso ? null : servico,
-            valor,
-            idEmpresa,
-            profissional_id: profissional_id || null,
-            hora_inicio: hiInicio,
-            hora_fim: hiFim || null,
-            servico_id: isCompromisso ? null : (servico_id || null),
-            status: isCompromisso ? 'compromisso' : 'pendente'
-        });
-
-        return res.status(200).json({ sucesso: true });
-
-    } catch (error) {
-        return res.status(500).json({ erro: error.message });
-    }
-});
-
 // BUSCAR AGENDAMENTOS - ADMINS e SERVICOS
 app.get('/admin', isAdminAuthenticated, async (req, res) => {
     try {
@@ -873,7 +553,6 @@ app.get('/admin', isAdminAuthenticated, async (req, res) => {
                 pacote_id: agendamento.pacote_id || null
             };
         });
-//console.log('>>> AGENDAMENTOS:', agendamentosFormatados.map(a => ({ id: a.id, pacote_id: a.pacote_id })));
 
         // Agora passamos o objeto 'empresa' para a view
         res.render('admin', { 
@@ -889,114 +568,8 @@ app.get('/admin', isAdminAuthenticated, async (req, res) => {
 
 // ajustar pagamento 
 const { QueryTypes } = require('sequelize');
-app.patch('/agendamentos/:id/pago', isAdminAuthenticated, async (req, res) => {
-    try {
-        const id = req.params.id;
-        const idEmpresa = req.user.idEmpresa;
 
-        // Busca o agendamento atual com pacote_id
-        const rows = await sequelize.query(
-            'SELECT pago, pacote_id FROM Agendamentos WHERE id = :id AND idEmpresa = :idEmpresa',
-            { replacements: { id, idEmpresa }, type: QueryTypes.SELECT }
-        );
 
-        if (!rows.length) return res.status(404).json({ erro: 'Não encontrado' });
-
-        const novoPago = rows[0].pago ? 0 : 1;
-        const pacoteId = rows[0].pacote_id;
-
-        if (pacoteId) {
-            // É pacote — atualiza todos os agendamentos do pacote
-            await sequelize.query(
-                'UPDATE Agendamentos SET pago = :novoPago WHERE pacote_id = :pacoteId AND idEmpresa = :idEmpresa',
-                { replacements: { novoPago, pacoteId, idEmpresa }, type: QueryTypes.UPDATE }
-            );
-
-            // Atualiza também a tabela Pacotes
-            await sequelize.query(
-                'UPDATE Pacotes SET pago = :novoPago WHERE id = :pacoteId AND idEmpresa = :idEmpresa',
-                { replacements: { novoPago, pacoteId, idEmpresa }, type: QueryTypes.UPDATE }
-            );
-        } else {
-            // Agendamento normal — atualiza só esse
-            await sequelize.query(
-                'UPDATE Agendamentos SET pago = :novoPago WHERE id = :id AND idEmpresa = :idEmpresa',
-                { replacements: { novoPago, id, idEmpresa }, type: QueryTypes.UPDATE }
-            );
-        }
-
-        return res.json({ sucesso: true, pago: novoPago });
-    } catch (e) {
-        return res.status(500).json({ erro: e.message });
-    }
-});
-
-//Agendar pacotes 
-app.post('/admin/pacote', isAdminAuthenticated, async (req, res) => {
-    const { nome, telefone, servico, servico_id, barbeiro, profissional_id, sessoes } = req.body;
-    
-    try {
-        const sessoesArray = JSON.parse(sessoes);
-        
-        // Verifica conflitos
-        for (const s of sessoesArray) {
-            const ocupado = await verificarConflito(barbeiro, s.data, s.hora_inicio, s.hora_fim, req.user.idEmpresa);
-            if (ocupado) {
-                return res.status(409).json({ erro: `Conflito no horário ${s.hora_inicio} do dia ${s.data}` });
-            }
-        }
-
-        // Cria o pacote
-        const pacote = await Pacote.create({
-            idEmpresa: req.user.idEmpresa,
-            servico_id,
-            cliente_nome: nome,
-            cliente_telefone: telefone,
-            total_sessoes: sessoesArray.length,
-            status: 'pendente'
-        });
-
-        const servicoObj = await Servico.findOne({ where: { id: servico_id, idEmpresa: req.user.idEmpresa } });
-        const valor = servicoObj ? parseFloat(servicoObj.valor) : 0;
-
-        for (const s of sessoesArray) {
-            const ag = await Agendamento.create({
-                barbeiro,
-                nome,
-                telefone,
-                email: null,
-                data: s.data,
-                horario: s.hora_inicio,
-                hora_inicio: s.hora_inicio,
-                hora_fim: s.hora_fim,
-                servico,
-                valor,
-                idEmpresa: req.user.idEmpresa,
-                profissional_id: profissional_id || null,
-                servico_id: servico_id || null,
-                pacote_id: pacote.id,  // 👈
-                status: 'pendente',
-                pago: 0
-            });
-            await sequelize.query(
-                'UPDATE Agendamentos SET pacote_id = :pacoteId WHERE id = :id AND idEmpresa = :idEmpresa',
-                { 
-                    replacements: { 
-                        pacoteId: pacote.id, 
-                        id: ag.id,
-                        idEmpresa: req.user.idEmpresa  // 👈
-                    }, 
-                    type: QueryTypes.UPDATE 
-                }
-            );            
-        }
-
-        return res.status(200).json({ sucesso: true, pacote_id: pacote.id });
-
-    } catch (e) {
-        return res.status(500).json({ erro: e.message });
-    }
-});
 // cliente agendar pacotes
 app.post('/pacote/:token', async (req, res) => {
     const { token } = req.params;
@@ -1187,66 +760,6 @@ app.get('/admin/dashboard/dados', isAdminAuthenticated, async (req, res) => {
     }
 });
 
-// GET /admin/dashboard — renderiza a view
-app.get('/admin/dashboard', isAdminAuthenticated, async (req, res) => {
-    try {
-        const admins = await Admin.findAll({ attributes: ['nome'], where: { idEmpresa: req.user.idEmpresa } });
-        const barbeiros = admins.map(a => ({ id: a.id, nome: a.nome }));
-        res.render('dashboard', { barbeiros });
-    } catch (error) {
-        res.status(500).send('Erro: ' + error.message);
-    }
-});
-
-// GET - lista feriados (público, cliente também acessa)
-app.get('/feriados', async (req, res) => {
-    try {
-        const dominio = req.hostname;
-        const empresa = await Empresa.findOne({ where: { dominio } });
-
-        if (!empresa) {
-            return res.status(404).json({ erro: 'Empresa não encontrada' });
-        }
-
-        const feriados = await Feriado.findAll({
-            attributes: ['data', 'descricao'],
-            where: { idEmpresa: empresa.id }
-        });
-
-        res.json({
-            feriados: feriados.map(f => ({
-                data: f.data,
-                descricao: f.descricao
-            }))
-        });
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ erro: 'Erro ao buscar feriados' });
-    }
-});
-
-// POST - admin cadastra feriado
-app.post('/feriados', isAdminAuthenticated, async (req, res) => {
-    const { data, descricao } = req.body;
-    try {
-        await Feriado.create({ data, descricao, idEmpresa: req.user.idEmpresa });
-        res.json({ sucesso: true });
-    } catch (error) {
-        res.status(500).json({ erro: 'Data já cadastrada ou erro ao salvar.' });
-    }
-});
-
-// DELETE - admin remove feriado
-app.delete('/feriados/:data', isAdminAuthenticated, async (req, res) => {
-    try {
-        await Feriado.destroy({ where: { data: req.params.data, idEmpresa: req.user.idEmpresa } });
-        res.json({ sucesso: true });
-    } catch (error) {
-        res.status(500).json({ erro: 'Erro ao remover.' });
-    }
-});
-
 // EXIBIR OS DADOS NO INPUT E ATUALIZAR OS DADOS
 app.get('/editar/:id', isAdminAuthenticated, async (req, res) => {
     try {
@@ -1283,46 +796,6 @@ app.get('/editar/:id', isAdminAuthenticated, async (req, res) => {
 
     } catch (error) {
         res.status(500).send('Erro ao buscar agendamento: ' + error.message);
-    }
-});
-
-// LISTA TODOS OS SERVIÇOS (admin — inclui inativos)
-app.get('/servicos/admin', isAdminAuthenticated, async (req, res) => {
-    const servicos = await Servico.findAll({ where: { idEmpresa: req.user.idEmpresa }, order: [['nome', 'ASC']] });
-    res.json({ servicos: servicos.map(s => ({ id: s.id, nome: s.nome, valor: s.valor, ativo: s.ativo, duracao_minutos: s.duracao_minutos })) }); 
-});
-
-// ADICIONA NOVO SERVIÇO
-app.post('/servicos', isAdminAuthenticated, async (req, res) => {
-    const { nome, valor, duracao_minutos , qtd_sessoes  } = req.body;
-    try {
-        await Servico.create({ nome, valor,duracao_minutos, qtd_sessoes: qtd_sessoes || null , idEmpresa: req.user.idEmpresa });
-        res.json({ sucesso: true });
-    } catch (e) {
-       
-        res.status(500).json({ erro: e.message });
-    }
-});
-
-// EDITA NOME E VALOR
-app.put('/servicos/:id', isAdminAuthenticated, async (req, res) => {
-    const { nome, valor, duracao_minutos  } = req.body;
-    try {
-        await Servico.update({ nome, valor, duracao_minutos  }, { where: { id: req.params.id } });
-        res.json({ sucesso: true });
-    } catch (e) {
-        res.status(500).json({ erro: e.message });
-    }
-});
-
-// ATIVA / DESATIVA
-app.put('/servicos/:id/toggle', isAdminAuthenticated, async (req, res) => {
-    try {
-        const s = await Servico.findByPk(req.params.id);
-        await s.update({ ativo: !s.ativo });
-        res.json({ sucesso: true });
-    } catch (e) {
-        res.status(500).json({ erro: e.message });
     }
 });
 

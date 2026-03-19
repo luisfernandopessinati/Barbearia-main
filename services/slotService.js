@@ -13,12 +13,17 @@ async function getSlotsDisponiveis({ profissional_id, servico_id, data, idEmpres
 
     if (!horario) return [];
 
-    const servico = await Servico.findOne({
-        where: { id: servico_id, idEmpresa }
-    });
+    const servico = await Servico.findOne({ where: { id: servico_id, idEmpresa } });
     if (!servico) throw new Error('Serviço não encontrado');
 
-    const slots = gerarSlots(horario.hora_inicio, horario.hora_fim, servico.duracao_minutos);
+    // Verifica se é hoje para filtrar horários passados
+    const hoje = new Date().toISOString().split('T')[0];
+    const isHoje = data === hoje;
+    const minutosAgora = isHoje 
+        ? new Date().getHours() * 60 + new Date().getMinutes()
+        : 0;
+
+    const slots = gerarSlots(horario.hora_inicio, horario.hora_fim, servico.duracao_minutos, minutosAgora);
 
     const agendamentos = await Agendamento.findAll({
         where: {
@@ -56,16 +61,20 @@ async function getSlotsDisponiveis({ profissional_id, servico_id, data, idEmpres
     });
 }
 
-function gerarSlots(horaInicio, horaFim, duracaoMinutos) {
+function gerarSlots(horaInicio, horaFim, duracaoMinutos, minutosAgora = 0) {
     const slots = [];
     let atual = timeToMinutes(horaInicio);
     const fim = timeToMinutes(horaFim);
+
     while (atual + duracaoMinutos <= fim) {
-        slots.push({
-            hora_inicio: minutesToTime(atual),
-            hora_fim: minutesToTime(atual + duracaoMinutos)
-        });
-        atual += duracaoMinutos;
+        // Pula slots que já passaram se for hoje
+        if (atual > minutosAgora) {
+            slots.push({
+                hora_inicio: minutesToTime(atual),
+                hora_fim: minutesToTime(atual + duracaoMinutos)
+            });
+        }
+        atual += 30; // 👈 slots de 30 em 30
     }
     return slots;
 }

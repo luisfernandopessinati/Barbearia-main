@@ -319,6 +319,19 @@ router.patch('/agendamentos/:id/pago', isAdminAuthenticated, async (req, res) =>
     }
 });
 
+//atualizar agendamentos
+router.get('/admin/agendamentos-json', isAdminAuthenticated, async (req, res) => {
+    try {
+        const agendamentos = await Agendamento.findAll({
+            where: { empresa_id: req.session.adminUser.empresa_id },
+            order: [['data', 'ASC'], ['horario', 'ASC']]
+        });
+        res.json({ agendamentos });
+    } catch (e) {
+        res.status(500).json({ erro: 'Erro ao buscar agendamentos' });
+    }
+});
+
 // ── Dashboard ──
 router.get('/admin/dashboard', isAdminAuthenticated, async (req, res) => {
     try {

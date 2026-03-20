@@ -1661,10 +1661,8 @@ button {
         /* Modal vira bottom sheet rolável */
         #modal-overlay .modal {
             width: 100%;
-            max-width: 100%;
-            max-height: 90dvh;
-            height: auto;
             border-radius: 18px 18px 0 0;
+            max-height: 90dvh;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             padding-bottom: env(safe-area-inset-bottom, 20px);
@@ -1675,17 +1673,15 @@ button {
             padding: 0;
         }
         .config-dropdown {
-            position: fixed !important;
-            top: 56px !important;        /* altura do seu header */
-            left: 0 !important;
-            right: 0 !important;
-            width: 100% !important;
-            max-height: calc(100dvh - 56px) !important;
-            overflow-y: auto !important;
-            -webkit-overflow-scrolling: touch;
+            position: fixed;
+            top: 56px;
+            left: 0;
+            right: 0;
+            width: 100%;
             border-radius: 0 0 12px 12px;
-            z-index: 9999;
-        }        
+            max-height: calc(100dvh - 56px);
+            transform-origin: top center;
+        }      
         
     }
 

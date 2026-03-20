@@ -817,7 +817,16 @@
     }
 
     function renderMobile(grid, weekDates, todayStr) {
-        weekDates.forEach(d => {
+        // Salva quais dias estão expandidos antes de limpar
+        const expandidos = new Set();
+        grid.querySelectorAll('.cal-mobile-day').forEach((day, i) => {
+            const body = day.querySelector('div:last-child');
+            if (body && body.style.maxHeight !== '0px' && body.style.maxHeight !== '') {
+                expandidos.add(i);
+            }
+        });
+
+        weekDates.forEach((d, index) => {
             const str = fmtDate(d);
             const isToday = str === todayStr;
             const eventos = todosAgendamentos.filter(a =>
@@ -828,18 +837,17 @@
             day.className = 'cal-mobile-day';
             day.style.cssText = 'border-radius:10px;overflow:hidden;border:1px solid var(--border);margin-bottom:6px;';
 
-            // ── Header compacto (sempre visível) ──────────────
             const header = document.createElement('div');
             header.className = 'cal-mobile-day-header' + (isToday ? ' today' : '');
             header.style.cssText = `
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 14px;
-            cursor: pointer;
-            user-select: none;
-            background: ${isToday ? 'var(--bg3)' : 'var(--bg2)'};
-        `;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 10px 14px;
+                cursor: pointer;
+                user-select: none;
+                background: ${isToday ? 'var(--bg3)' : 'var(--bg2)'};
+            `;
 
             const leftInfo = document.createElement('div');
             leftInfo.style.cssText = 'display:flex;align-items:center;gap:12px;';
@@ -850,14 +858,14 @@
 
             const badge = document.createElement('span');
             badge.style.cssText = `
-            font-size: 11px;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-weight: 600;
-            background: ${eventos.length > 0 ? 'rgba(184,134,11,0.18)' : 'transparent'};
-            color: ${eventos.length > 0 ? 'var(--gold-light)' : 'var(--muted)'};
-            border: ${eventos.length > 0 ? '1px solid var(--gold-dim)' : 'none'};
-        `;
+                font-size: 11px;
+                padding: 2px 8px;
+                border-radius: 20px;
+                font-weight: 600;
+                background: ${eventos.length > 0 ? 'rgba(184,134,11,0.18)' : 'transparent'};
+                color: ${eventos.length > 0 ? 'var(--gold-light)' : 'var(--muted)'};
+                border: ${eventos.length > 0 ? '1px solid var(--gold-dim)' : 'none'};
+            `;
             badge.textContent = eventos.length > 0 ? `${eventos.length} agend.` : 'livre';
 
             leftInfo.appendChild(dateLabel);
@@ -870,18 +878,17 @@
             header.appendChild(leftInfo);
             header.appendChild(arrow);
 
-            // ── Corpo expansível ──────────────────────────────
             const body = document.createElement('div');
             body.style.cssText = `
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease, padding 0.2s;
-            background: var(--bg1);
-            padding: 0 14px;
-        `;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease, padding 0.2s;
+                background: var(--bg1);
+                padding: 0 14px;
+            `;
 
-            // Estado: hoje abre por padrão
-            let expanded = isToday;
+            // Expande se era hoje OU se estava aberto antes do re-render
+            let expanded = isToday || expandidos.has(index);
 
             function toggleDay() {
                 expanded = !expanded;
@@ -896,16 +903,14 @@
                 }
             }
 
-            // Inicializa estado do "hoje"
-            if (isToday) {
-                body.style.maxHeight = eventos.length > 0 ? '2000px' : '48px'; 
+            if (expanded) {
+                body.style.maxHeight = eventos.length > 0 ? '2000px' : '48px';
                 body.style.padding = '10px 14px';
                 arrow.style.transform = 'rotate(180deg)';
             }
 
             header.addEventListener('click', toggleDay);
 
-            // ── Conteúdo do corpo ─────────────────────────────
             if (eventos.length === 0) {
                 const empty = document.createElement('div');
                 empty.style.cssText = 'font-size:12px;color:var(--muted);padding:4px 0 8px;';
@@ -971,8 +976,13 @@
     document.getElementById('btn-hoje').addEventListener('click', () => { weekOffset = 0; renderCalendar(); renderCounts(); });
     document.getElementById('btn-sair').addEventListener('click', () => { window.location.href = '/logout'; });
     document.getElementById('menu-clientes').addEventListener('click', () => { window.location.href = '/clientes'; });
-    window.addEventListener('resize', renderCalendar);
-
+    let _lastWidth = window.innerWidth;
+    window.addEventListener('resize', () => {
+        if (window.innerWidth !== _lastWidth) {
+            _lastWidth = window.innerWidth;
+            renderCalendar();
+        }
+    });
     // ── Filtro barbeiros ──────────────────────────────────
     document.querySelectorAll('.barber-chip-top').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -1070,7 +1080,7 @@
                     body: body.toString()
                 });
                 const json = await res.json();
-                if (res.ok && json.sucesso) { fecharModal(); window.location.reload(); }
+                if (res.ok && json.sucesso) { fecharModal(); await recarregarAgendamentos(); }
                 else modalErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar pacote.');
 
             } else {
@@ -1081,7 +1091,7 @@
                     body: new URLSearchParams(new FormData(formAdmin)).toString()
                 });
                 const json = await res.json();
-                if (res.ok && json.sucesso) { fecharModal(); window.location.reload(); }
+                if (res.ok && json.sucesso) { fecharModal(); await recarregarAgendamentos(); }
                 else modalErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar agendamento.');
             }
 
@@ -1702,6 +1712,19 @@
     });
     document.getElementById('modal-data').addEventListener('change', buscarSlotsAdmin);
 
+    async function recarregarAgendamentos() {
+        try {
+            const res = await fetch('/admin/agendamentos-json');
+            const json = await res.json();
+            todosAgendamentos.length = 0;
+            todosAgendamentos.push(...json.agendamentos);
+            renderStats();
+            renderCalendar();
+            renderCounts();
+        } catch (e) {
+            console.error('Erro ao recarregar:', e);
+        }
+    }
     // ── Vincular dropdown aos modais ──────────────────────
     bindMenuItemToModal('menu-feriados', 'modal-feriados-overlay', carregarFeriados);
     bindMenuItemToModal('menu-servicos', 'modal-servicos-overlay', carregarServicos);

@@ -151,3 +151,1859 @@ button {
 .btn-editar:hover {
     background-color: var(--secundario-1);
 }
+
+/*  importado do handlebars*/
+
+
+ @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+
+    *,
+    *::before,
+    *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html {
+        height: 100%;
+        overflow: hidden;
+    }
+ 
+    body {
+        height: 100%;
+        overflow-y: auto;
+        overscroll-behavior-y: contain;
+    }
+
+    :root {
+        --gold: #b8860b;
+        --gold-light: #d4a012;
+        --gold-dim: #b8860b33;
+        --bg: #090909;
+        --bg2: #111111;
+        --bg3: #181818;
+        --border: #222222;
+        --text: #e8e8e8;
+        --muted: #555;
+        --danger: #c0392b;
+        --danger-dim: #c0392b22;
+    }
+
+    body {
+        background: var(--bg);
+        font-family: 'DM Sans', sans-serif;
+        color: var(--text);
+        min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .adm-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 40px;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg2);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .adm-header-left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .adm-back {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 18px;
+        transition: color 0.2s;
+    }
+
+    .adm-back:hover {
+        color: var(--gold);
+    }
+
+    .adm-logo {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 20px;
+        letter-spacing: 3px;
+        color: var(--gold);
+        text-decoration: none;
+    }
+
+    .adm-header-center {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 13px;
+        letter-spacing: 4px;
+        color: var(--muted);
+        text-transform: uppercase;
+    }
+
+    .btn-sair {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 8px 20px;
+        border-radius: 6px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-sair:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+    }
+
+    /* ── Body ── */
+    .adm-body {
+        display: flex;
+        flex-direction: column;
+        min-height: calc(100vh - 65px);
+    }
+
+    /* ── Chips de barbeiros ── */
+    .barber-chips-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 40px;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg2);
+        overflow-x: auto;
+        scrollbar-width: none;
+        flex-shrink: 0;
+    }
+
+    .barber-chips-bar::-webkit-scrollbar {
+        display: none;
+    }
+
+    /*.barber-chip-top { display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0; background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px 6px 10px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--muted); transition: all 0.18s; white-space: nowrap; }*/
+    .barber-chip-top {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 6px 14px 6px 10px;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--muted);
+        transition: all 0.18s;
+        white-space: nowrap;
+    }
+
+    .barber-chip-top:hover {
+        border-color: var(--gold-dim);
+        color: var(--text);
+    }
+
+    .barber-chip-top.active {
+        background: var(--gold-dim);
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .barber-chip-avatar {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--gold), #6b4c00);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 11px;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .barber-chip-top.active .barber-chip-avatar {
+        background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    }
+
+    .barber-chip-count {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 10px;
+        padding: 1px 6px;
+        color: var(--muted);
+    }
+
+    .barber-chip-top.active .barber-chip-count {
+        background: var(--gold-dim);
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    /* ── Content ── */
+    .adm-content {
+        flex: 1;
+        padding: 36px 40px;
+        overflow-x: auto;
+    }
+
+    /* ── Stats ── */
+    .stats-bar {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .stat-item {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px 20px;
+        flex: 1;
+    }
+
+    .stat-label {
+        font-size: 10px;
+        letter-spacing: 2px;
+        color: var(--muted);
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+
+    .stat-value {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 28px;
+        color: var(--text);
+        line-height: 1;
+    }
+
+    .stat-value.gold {
+        color: var(--gold);
+    }
+
+    /* ── Cal Nav ── */
+    .cal-nav {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .cal-nav-label {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 18px;
+        letter-spacing: 2px;
+        color: var(--text);
+        min-width: 180px;
+    }
+
+    .date-nav-btn {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        width: 50px;
+        height: 34px;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .date-nav-btn:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .btn-novo {
+        margin-left: auto;
+        background: var(--gold);
+        border: none;
+        color: #000;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        font-size: 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s, transform 0.15s;
+        flex-shrink: 0;
+        line-height: 1;
+    }
+
+    .btn-novo:hover {
+        background: var(--gold-light);
+        transform: scale(1.08);
+    }
+    
+    .cal-popup-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+    }
+
+    .btn-pago-mini {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        flex-shrink: 0;
+        padding: 0;
+        transition: background 0.2s;
+        margin-top: 2px;
+    }
+
+    .btn-pago-mini.pago { background: #27ae60; }
+    .btn-pago-mini.nao-pago { background: #c0392b; }
+    /* ── Calendário grid ── */
+    .cal-wrap {
+        overflow-x: auto;
+        overflow-y: auto;
+        max-height: calc(100vh - 280px);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+    }
+
+    .cal-wrap::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    .cal-wrap::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+    }
+
+    .cal-grid {
+        display: grid;
+        min-width: 600px;
+    }
+
+    .cal-head-time {
+        background: var(--bg2);
+        border-bottom: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+        padding: 10px 8px;
+        position: sticky;
+        top: 0;
+        left: 0;
+        z-index: 10;
+        min-width: 56px;
+    }
+
+    .cal-head-cell {
+        background: var(--bg2);
+        border-bottom: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+        padding: 10px 8px;
+        text-align: center;
+        position: sticky;
+        top: 0;
+        z-index: 9;
+        min-width: 120px;
+    }
+
+    .cal-head-day {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 15px;
+        letter-spacing: 2px;
+        color: var(--text);
+        display: block;
+    }
+
+    .cal-head-cell.today .cal-head-day {
+        color: var(--gold);
+    }
+
+    .cal-time-cell {
+        background: var(--bg2);
+        border-bottom: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+        padding: 6px 8px;
+        font-size: 11px;
+        color: var(--muted);
+        text-align: right;
+        position: sticky;
+        left: 0;
+        z-index: 5;
+        white-space: nowrap;
+        min-width: 56px;
+    }
+
+    .cal-cell {
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+        padding: 4px;
+        min-height: 52px;
+        position: relative;
+        transition: background 0.15s;
+        cursor: pointer;
+        min-width: 120px;
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        align-content: flex-start;
+    }
+
+    .cal-cell:hover {
+        background: var(--bg3);
+    }
+
+    .cal-cell.hoje-col {
+        background: #b8860b08;
+    }
+
+    /* ── Evento ── */
+  /*  .cal-event {
+        background: linear-gradient(135deg, var(--gold), #6b4c00);
+        border-radius: 5px;
+        padding: 4px 7px;
+        cursor: pointer;
+        transition: opacity 0.15s, transform 0.15s;
+        overflow: hidden;
+        flex: 1;
+        min-width: 80px;
+    }
+*/
+    .cal-event {
+        background: var(--bg3) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 4px !important;
+        transition: transform 0.2s, border-color 0.2s;
+        padding: 5px !important;
+        margin-bottom: 2px;
+        flex: 1;
+        min-width: 80px;
+    }
+
+    .cal-event:hover {
+        opacity: 0.85;
+        transform: scale(1.01);
+    }
+
+    .cal-event-nome {
+        font-size: 11px;
+        font-weight: 600;
+        color: #fff;
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .cal-event-tel {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.75);
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .cal-event.pacote {
+        border-left: 3px solid #e74c3c !important;
+        background: #1a0a0a !important;
+    }
+
+    .cal-event.pacote:hover {
+        border-color: #e74c3c !important;
+    }
+
+    .cal-event.pacote-pago {
+        border-left: 3px solid #27ae60 !important;
+        background: #0a1a0a !important;
+    }
+
+    .cal-event.pacote-pago:hover {
+        border-color: #27ae60 !important;
+    }
+    /* ── Slot vazio ── */
+    .cal-slot-vazio {
+        width: 100%;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: transparent;
+        font-size: 18px;
+        transition: color 0.15s;
+        flex: 1;
+    }
+
+    .cal-cell:hover .cal-slot-vazio {
+        color: var(--border);
+    }
+
+    /* ── Popup ── */
+    .cal-popup {
+        position: fixed;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px;
+        z-index: 500;
+        min-width: 200px;
+        box-shadow: 0 16px 40px #00000099;
+        display: none;
+    }
+
+    .cal-popup.open {
+        display: block;
+    }
+
+    .cal-popup-nome {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text);
+        margin-bottom: 2px;
+    }
+
+    .cal-popup-telefone {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text);
+        margin-bottom: 2px;
+    }
+
+    .cal-popup-meta {
+        font-size: 11px;
+        color: var(--muted);
+        margin-bottom: 12px;
+    }
+
+    .cal-popup-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-whatsapp {
+        flex: 1;
+        padding: 4px 6px;
+        border-radius: 5px;
+        font-size: 11px;
+        font-family: 'DM Sans', sans-serif;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        background: #12a454;
+        border: 1px solid #0e8a43;
+        color: #fff;
+    }
+
+    .btn-whatsapp:hover {
+        background: #0e8a43;
+    }
+
+    /* ── Mobile cal ── */
+    .cal-mobile-day {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 12px;
+    }
+
+    .cal-mobile-day-header {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border);
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 15px;
+        letter-spacing: 2px;
+        color: var(--text);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .cal-mobile-day-header.today {
+        color: var(--gold);
+    }
+
+    .cal-mobile-event {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+    }
+
+    .cal-mobile-event:last-child {
+        border-bottom: none;
+    }
+
+    .cal-mobile-time {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 20px;
+        color: var(--gold);
+        min-width: 50px;
+    }
+
+    .cal-mobile-info {
+        flex: 1;
+    }
+
+    .cal-mobile-nome {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+    }
+
+    .cal-mobile-meta {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .cal-mobile-empty {
+        padding: 16px 14px;
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    /* ── Empty state ── */
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        color: var(--muted);
+        display: none;
+    }
+
+    .empty-state.visible {
+        display: block;
+    }
+
+    .empty-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+        opacity: 0.3;
+    }
+
+    .empty-state p {
+        font-size: 14px;
+    }
+
+    /* ── Buttons ── */
+    .btn-edit,
+    .btn-del {
+        flex: 1;
+        padding: 4px 6px;
+        border-radius: 5px;
+        font-size: 11px;
+        font-family: 'DM Sans', sans-serif;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+    }
+
+    .btn-edit {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        color: var(--muted);
+    }
+
+    .btn-edit:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .btn-del {
+        background: var(--danger-dim);
+        border: 1px solid var(--danger);
+        color: var(--danger);
+    }
+
+    .btn-del:hover {
+        background: var(--danger);
+        color: #fff;
+    }
+
+    /* ── Modais ── */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: #000000cc;
+        backdrop-filter: blur(4px);
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+    }
+
+    .modal-overlay.open {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    .modal {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 36px;
+        width: 100%;
+        max-width: 480px;
+        max-height: 90vh;      
+        overflow-y: auto; 
+        transform: translateY(16px);
+        transition: transform 0.25s;
+        position: relative;
+    }
+
+    .modal-overlay.open .modal {
+        transform: translateY(0);
+    }
+
+    .modal-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 28px;
+        color: var(--text);
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+    }
+
+    .modal-sub {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 28px;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: none;
+        border: none;
+        color: var(--muted);
+        font-size: 20px;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .modal-close:hover {
+        color: var(--text);
+    }
+
+    .modal-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 14px;
+    }
+
+    .modal-grid .full {
+        grid-column: 1 / -1;
+    }
+
+    .modal-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .modal-field label {
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .modal-field input,
+    .modal-field select {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        color: var(--text);
+        outline: none;
+        transition: border-color 0.2s;
+        width: 100%;
+    }
+
+    .modal-field input:focus,
+    .modal-field select:focus {
+        border-color: var(--gold);
+    }
+
+    .modal-field select option {
+        background: var(--bg3);
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 24px;
+    }
+
+    .btn-cancelar {
+        flex: 1;
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 12px;
+        border-radius: 8px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-cancelar:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+    }
+
+    .btn-confirmar {
+        flex: 2;
+        background: var(--gold);
+        border: none;
+        color: #000;
+        padding: 12px;
+        border-radius: 8px;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 18px;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-confirmar:hover {
+        background: var(--gold-light);
+    }
+
+    .modal-erro {
+        font-size: 12px;
+        color: var(--danger);
+        margin-top: 10px;
+        text-align: center;
+        min-height: 16px;
+    }
+
+    /* ── Listas modais ── */
+    .feriado-lista,
+    .servico-lista,
+    .admin-lista {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 16px;
+        overflow-y: auto;
+    }
+
+    .feriado-lista {
+        max-height: 220px;
+    }
+
+    .servico-lista {
+        max-height: 260px;
+    }
+
+    .admin-lista {
+        max-height: 240px;
+    }
+
+    .feriado-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 14px;
+    }
+
+    .feriado-item-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .feriado-item-data {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 16px;
+        color: var(--gold);
+        letter-spacing: 1px;
+    }
+
+    .feriado-item-desc {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .feriado-del {
+        background: none;
+        border: none;
+        color: var(--danger);
+        cursor: pointer;
+        font-size: 14px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: background 0.2s;
+        opacity: 0.6;
+    }
+
+    .feriado-del:hover {
+        background: var(--danger-dim);
+        opacity: 1;
+    }
+
+    .feriados-empty,
+    .servicos-empty,
+    .admins-empty {
+        text-align: center;
+        color: var(--muted);
+        font-size: 12px;
+        padding: 20px;
+    }
+
+    .feriados-sep,
+    .servicos-sep,
+    .admins-sep {
+        height: 1px;
+        background: var(--border);
+        margin: 20px 0;
+    }
+
+    .servico-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 14px;
+        gap: 10px;
+    }
+
+    .servico-item.inativo {
+        opacity: 0.4;
+    }
+
+    .servico-item-nome {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+        flex: 1;
+    }
+
+    .servico-item-valor {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 18px;
+        color: var(--gold);
+        letter-spacing: 1px;
+        min-width: 70px;
+        text-align: right;
+    }
+
+    .servico-item-actions {
+        display: flex;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    .btn-servico-edit {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-servico-edit:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .btn-servico-toggle {
+        background: #27ae6011;
+        border: 1px solid #27ae6055;
+        color: #27ae60;
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-servico-toggle.inativo {
+        border-color: var(--danger);
+        color: var(--danger);
+        background: var(--danger-dim);
+    }
+
+    .btn-servico-toggle:hover {
+        opacity: 0.8;
+    }
+
+    .servico-edit-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-top: 4px;
+    }
+
+    .servico-edit-row input {
+        background: var(--bg);
+        border: 1px solid var(--gold);
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        color: var(--text);
+        outline: none;
+        width: 80px;
+    }
+
+    .admin-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 14px;
+    }
+
+    .admin-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--gold), #6b4c00);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 13px;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .admin-item-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .admin-item-nome {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+    }
+
+    .admin-item-email {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .admin-item-role {
+        font-size: 10px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 2px 8px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        background: var(--bg);
+        white-space: nowrap;
+    }
+
+    .admin-item-role.owner {
+        background: var(--gold-dim);
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .admin-del {
+        background: none;
+        border: none;
+        color: var(--danger);
+        cursor: pointer;
+        font-size: 14px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: background 0.2s;
+        opacity: 0.6;
+    }
+
+    .admin-del:hover {
+        background: var(--danger-dim);
+        opacity: 1;
+    }
+
+    .input-pass-wrap {
+        position: relative;
+    }
+
+    .input-pass-wrap input {
+        padding-right: 40px !important;
+    }
+
+    .btn-toggle-pass {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 13px;
+        padding: 2px;
+        line-height: 1;
+        transition: color 0.2s;
+    }
+
+    .btn-toggle-pass:hover {
+        color: var(--gold);
+    }
+
+    /* ── Menu Configurações ── */
+    .config-menu-wrap {
+        position: relative;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+
+    .btn-config-menu {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 8px 30px;
+        border-radius: 6px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+    .btn-config-menu:hover,
+    .btn-config-menu.open {
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .menu-icon {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        width: 14px;
+    }
+
+    .menu-icon span {
+        display: block;
+        height: 1.5px;
+        background: currentColor;
+        border-radius: 2px;
+        transition: all 0.2s;
+    }
+
+    .btn-config-menu.open .menu-icon span:nth-child(1) {
+        transform: translateY(4.5px) rotate(45deg);
+    }
+
+    .btn-config-menu.open .menu-icon span:nth-child(2) {
+        opacity: 0;
+        transform: scaleX(0);
+    }
+
+    .btn-config-menu.open .menu-icon span:nth-child(3) {
+        transform: translateY(-4.5px) rotate(-45deg);
+    }
+
+    .config-dropdown {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        min-width: 240px;
+        padding: 4px;
+        z-index: 150;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-6px) scale(0.98);
+        transform-origin: top right;
+        transition: opacity 0.18s ease, transform 0.18s ease;
+        box-shadow: 0 16px 40px #00000088;
+        max-height: calc(100vh - 80px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    .config-dropdown.open {
+        opacity: 1;
+        pointer-events: all;
+        transform: translateY(0) scale(1);
+    }
+
+    .config-dropdown-label {
+        font-size: 9px;
+        letter-spacing: 2.5px;
+        color: var(--muted);
+        text-transform: uppercase;
+        padding: 6px 10px 2px;
+    }
+
+    .config-dropdown-sep {
+        height: 1px;
+        background: var(--border);
+        margin: 2px 0;
+    }
+
+    .config-dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        background: none;
+        border: none;
+        color: var(--muted);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        padding: 7px 10px;
+        border-radius: 7px;
+        cursor: pointer;
+        transition: all 0.15s;
+        text-align: left;
+    }
+
+    .config-dropdown-item:hover {
+        background: var(--bg3);
+        color: var(--text);
+    }
+
+    .config-dropdown::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .config-dropdown::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .config-dropdown::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 4px;
+    }
+
+    .config-dropdown::-webkit-scrollbar-thumb:hover {
+        background: var(--gold);
+    }
+
+    .item-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        flex-shrink: 0;
+        transition: all 0.15s;
+    }
+
+    .config-dropdown-item:hover .item-icon {
+        background: var(--gold-dim);
+        border-color: var(--gold);
+    }
+
+    .item-label {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        flex: 1;
+    }
+
+    .item-label span {
+        font-size: 12px;
+        font-weight: 500;
+        color: inherit;
+    }
+
+    .item-label small {
+        font-size: 10px;
+        color: var(--muted);
+        font-weight: 400;
+    }
+
+    .item-badge {
+        font-size: 9px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        background: var(--gold-dim);
+        color: var(--gold);
+        border: 1px solid var(--gold);
+        padding: 1px 6px;
+        border-radius: 10px;
+    }
+
+    .item-badgeBlock {
+        font-size: 9px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        background: var(--danger-dim);
+        color: var(--danger);
+        border: 1px solid var(--danger);
+        padding: 1px 6px;
+        border-radius: 10px;
+    }
+
+    /* ── Horários modal ── */
+    .horario-prof-select {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .horario-prof-chip {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.18s;
+    }
+
+    .horario-prof-chip.active {
+        background: var(--gold-dim);
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .horario-dias-grid {
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+
+    .horario-dia-btn {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.18s;
+    }
+
+    .horario-dia-btn.active {
+        background: var(--gold-dim);
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .horarios-sep {
+        height: 1px;
+        background: var(--border);
+        margin: 20px 0;
+    }
+
+    .horarios-empty {
+        text-align: center;
+        color: var(--muted);
+        font-size: 12px;
+        padding: 20px;
+    }
+
+    .horario-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 14px;
+        margin-bottom: 8px;
+    }
+
+    .horario-item-dia {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 16px;
+        color: var(--gold);
+        min-width: 36px;
+    }
+
+    .horario-item-range {
+        font-size: 13px;
+        color: var(--text);
+        flex: 1;
+    }
+
+    .horario-item-prof {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .horario-del {
+        background: none;
+        border: none;
+        color: var(--danger);
+        cursor: pointer;
+        font-size: 14px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: background 0.2s;
+        opacity: 0.6;
+        margin-left: auto;
+    }
+
+    .horario-del:hover {
+        background: var(--danger-dim);
+        opacity: 1;
+    }
+
+    .horario-lista {
+        max-height: 240px;
+        overflow-y: auto;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+        .adm-header {
+            padding: 14px 16px;
+        }
+
+        .adm-header-center {
+            display: none;
+        }
+
+        .barber-chips-bar {
+            padding: 10px 16px;
+        }
+
+        .adm-content {
+            padding: 16px;
+        }
+
+        .stats-bar {
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .stat-item {
+            padding: 10px 14px;
+        }
+
+        .stat-value {
+            font-size: 22px;
+        }
+
+        .cal-wrap {
+            max-height: none;
+            border: none;
+            border-radius: 0;
+            overflow: visible;
+        }
+
+        .cal-grid {
+            display: flex;
+            flex-direction: column;
+            min-width: unset;
+            gap: 12px;
+        }
+
+        .cal-head-time,
+        .cal-head-cell {
+            display: none;
+        }
+
+        /* Modal vira bottom sheet rolável */
+        #modal-overlay .modal {
+            width: 100%;
+            max-width: 100%;
+            max-height: 90dvh;
+            height: auto;
+            border-radius: 18px 18px 0 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: env(safe-area-inset-bottom, 20px);
+        }
+
+        #modal-overlay {
+            align-items: flex-end;
+            padding: 0;
+        }
+        .config-dropdown {
+            position: fixed !important;
+            top: 56px !important;        /* altura do seu header */
+            left: 0 !important;
+            right: 0 !important;
+            width: 100% !important;
+            max-height: calc(100dvh - 56px) !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 0 0 12px 12px;
+            z-index: 9999;
+        }        
+        
+    }
+
+    .link-card-premium {
+        background: linear-gradient(145deg, #1f1f1f, #252525);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+        margin-bottom: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    }
+
+    .link-card-top {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .link-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+    .link-title {
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .link-subtitle {
+        font-size: 11px;
+        opacity: 0.7;
+    }
+
+    .link-input-area {
+        display: flex;
+        gap: 8px;
+    }
+
+    .link-input-area input {
+        flex: 1;
+        background: #111;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 8px 10px;
+        font-size: 11px;
+        color: #fff;
+    }
+
+    #btn-copiar-link {
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        border: none;
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 11px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    #btn-copiar-link:hover {
+        transform: scale(1.05);
+    }
+
+    .btn-whatsapp {
+        background: #25d366;
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .btn-whatsapp:hover {
+        background: #1ebe5d;
+    }
+
+    /* Efeito de hover nos eventos do calendário */
+    .cal-event {
+        background: var(--bg3) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 4px !important;
+        transition: transform 0.2s, border-color 0.2s;
+        padding: 5px !important;
+        margin-bottom: 2px;
+    }
+
+    .cal-event:hover {
+        transform: scale(1.02);
+        border-color: var(--gold) !important;
+        z-index: 10;
+    }
+
+    /* Ajuste para o slot vazio (o botão +) */
+    .cal-slot-vazio {
+        opacity: 0;
+        transition: opacity 0.2s;
+        color: var(--gold);
+        font-size: 1.5rem;
+    }
+
+    .cal-cell:hover .cal-slot-vazio {
+        opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+        .cal-mobile-day {
+            touch-action: pan-y;
+            /* Melhora a rolagem no celular */
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Garante que o popup não fique cortado ou suma */
+        #popup-agendamento {
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            width: 90vw !important;
+            max-width: 350px;
+        }
+    }
+
+    /* ── Admin cards (nova estrutura) ── */
+    .admin-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 12px;
+    }
+
+    .admin-card.admin-inativo {
+        opacity: 0.5;
+    }
+
+    .admin-avatar-wrap {
+        position: relative;
+        flex-shrink: 0;
+        cursor: pointer;
+        width: 36px;
+        height: 36px;
+    }
+
+    .admin-avatar-wrap .admin-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--gold), #6b4c00);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 14px;
+        color: #fff;
+        overflow: hidden;
+    }
+
+    .admin-avatar-overlay {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 9px;
+        color: #fff;
+        letter-spacing: 0.5px;
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+
+    .admin-avatar-wrap:hover .admin-avatar-overlay {
+        opacity: 1;
+    }
+
+    .admin-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .admin-info-top {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .admin-nome {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+    }
+
+    .admin-meta {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .admin-badge {
+        font-size: 9px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 2px 7px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        background: var(--bg);
+        white-space: nowrap;
+    }
+
+    .admin-badge.owner {
+        background: var(--gold-dim);
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .admin-badge.inativo {
+        background: var(--danger-dim);
+        border-color: var(--danger);
+        color: var(--danger);
+    }
+
+    .admin-actions {
+        display: flex;
+        gap: 4px;
+        flex-shrink: 0;
+    }
+
+    .icon-btn {
+        background: none;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 14px;
+        padding: 4px 6px;
+        border-radius: 5px;
+        line-height: 1;
+        transition: all 0.15s;
+    }
+
+    .icon-btn:hover {
+        background: var(--bg);
+        color: var(--text);
+    }
+
+    .icon-btn.danger:hover {
+        color: var(--danger);
+        background: var(--danger-dim);
+    }
+
+    .icon-btn.success:hover {
+        color: #27ae60;
+        background: #27ae6011;
+    }
+
+    .admin-edit-panel input {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        color: var(--text);
+        outline: none;
+        width: 100%;
+        transition: border-color 0.2s;
+    }
+
+    .admin-edit-panel input:focus {
+        border-color: var(--gold);
+    }
+
+    .admin-save-btn {
+        background: var(--gold);
+        border: none;
+        color: #000;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 14px;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: background 0.2s;
+        align-self: flex-start;
+    }
+
+    .admin-save-btn:hover {
+        background: var(--gold-light);
+    }
+
+    .btn-tipo {
+        padding: 6px 16px;
+        border-radius: 6px;
+        border: 1px solid #555;
+        background: transparent;
+        color: #aaa;
+        cursor: pointer;
+    }
+    .btn-tipo.ativo {
+        background: #c8a951;
+        color: #000;
+        border-color: #c8a951;
+        font-weight: bold;
+    }

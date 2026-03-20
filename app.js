@@ -129,6 +129,29 @@ app.get('/site/:nome', (req, res) => {
     });
 });
 
+app.post('/api/loginAdmin', (req, res, next) => {
+    passport.authenticate('admin-local', (err, user, info) => {
+        if (err) return res.status(500).json({ error: err });
+
+        if (!user) {
+            return res.status(401).json({ success: false, message: 'Login inválido' });
+        }
+
+        req.logIn(user, (err) => {
+            if (err) return res.status(500).json({ error: err });
+
+            return res.json({
+                success: true,
+                user: {
+                    id: user.id,
+                    nome: user.nome,
+                    email: user.email
+                }
+            });
+        });
+    })(req, res, next);
+});
+
 
 app.get('/loginAdmin', (req, res) => {
     res.render('loginAdmin');

@@ -14,9 +14,9 @@ sequelize.authenticate().then(function () {
 
 module.exports = sequelize;
 
-*/
-//web para baixo
 
+//web para baixo
+*/
 const Sequelize = require('sequelize')
 const sequelize = new Sequelize(
     process.env.DB_NAME,

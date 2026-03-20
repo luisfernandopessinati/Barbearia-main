@@ -41,6 +41,13 @@ const empresaController = require('./controllers/empresaController');
 const path = require('path');
 const fs   = require('fs');
 
+
+//api
+const jwt = require('jsonwebtoken');
+const SECRET = 'SEU_SEGREDO_SUPER_FORTE';
+
+
+
 // desconectar automaticamente 
 app.use(session({
     secret: process.env.CHAVE,
@@ -134,7 +141,10 @@ app.post('/api/loginAdmin', (req, res, next) => {
         if (err) return res.status(500).json({ error: err });
 
         if (!user) {
-            return res.status(401).json({ success: false, message: 'Login inválido' });
+            return res.status(401).json({
+                success: false,
+                message: 'Login inválido'
+            });
         }
 
         req.logIn(user, (err) => {
@@ -142,16 +152,22 @@ app.post('/api/loginAdmin', (req, res, next) => {
 
             return res.json({
                 success: true,
+                token: jwt.sign(
+                    {
+                        id: user.id,
+                        empresa_id: user.empresa_id
+                    },
+                    SECRET,
+                    { expiresIn: '7d' }
+                ),
                 user: {
                     id: user.id,
-                    nome: user.nome,
-                    email: user.email
+                    nome: user.nome
                 }
             });
         });
     })(req, res, next);
 });
-
 
 app.get('/loginAdmin', (req, res) => {
     res.render('loginAdmin');

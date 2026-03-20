@@ -41,13 +41,6 @@ const empresaController = require('./controllers/empresaController');
 const path = require('path');
 const fs   = require('fs');
 
-
-//api
-const jwt = require('jsonwebtoken');
-const SECRET = 'SEU_SEGREDO_SUPER_FORTE';
-
-
-
 // desconectar automaticamente 
 app.use(session({
     secret: process.env.CHAVE,
@@ -87,6 +80,14 @@ app.use('/', require('./routes/adminRoutes'));
 app.use('/', require('./routes/clienteRoutes'));
 app.use('/', require('./routes/slotsRoutes'));
 app.use('/', require('./routes/agendamentoAdminRoutes'));
+
+
+//api
+const jwt = require('jsonwebtoken');
+const SECRET = 'SEU_SEGREDO_SUPER_FORTE';
+
+const apiAdminRoutes = require('./routes/api/apiAdmin');
+app.use('/api', apiAdminRoutes);
 
 app.engine('handlebars', engine({
     helpers: {

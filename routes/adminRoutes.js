@@ -343,4 +343,17 @@ router.get('/admin/dashboard', isAdminAuthenticated, async (req, res) => {
     }
 });
 
+//retornar mensagem de confirmação
+router.get('/admin/empresa-observacao', isAdminAuthenticated, async (req, res) => {
+    try {
+        const empresa = await Empresa.findOne({
+            where: { id: req.user.idEmpresa },
+            attributes: ['observacao']
+        });
+        res.json({ observacao: empresa?.observacao || '' });
+    } catch (e) {
+        res.status(500).json({ observacao: '' });
+    }
+});
+
 module.exports = router;

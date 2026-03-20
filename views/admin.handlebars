@@ -619,14 +619,21 @@
         }
     });
 
-    function abrirPopup(e, a) {
+    async function abrirPopup(e, a) {
         e.stopPropagation();
+        const target = e.currentTarget; // 👈 salva aqui
+
         document.getElementById('popup-nome').textContent = a.nome;
         const horaFim = a.hora_fim ? a.hora_fim.substring(0, 5) : '';
         const intervalo = horaFim ? `${a.horario} – ${horaFim}` : a.horario;
         document.getElementById('popup-meta').textContent = `${intervalo} · ${a.servico} · ${a.barbeiro}`;
         document.getElementById('popup-editar').href = `/editar/${a.id}`;
         document.getElementById('popup-excluir').href = `/deletar/${a.id}`;
+
+        // Busca observação da empresa
+        const resp = await fetch('/admin/empresa-observacao');
+        const dados = await resp.json();
+        const observacao = dados.observacao || '';
 
         // 👇 Botão pago
         const btnPago = document.getElementById('popup-pago');
@@ -637,12 +644,14 @@
         // Monta link WhatsApp
         const tel = a.telefone.replace(/\D/g, '');
         const mensagem = encodeURIComponent(
-            `Olá ${a.nome}! 👋\n\nPassando para confirmar seu agendamento:\n📅 Data: ${a.data}\n🕐 Horário: ${a.horario}\n✂️ Serviço: ${a.servico}\n💈 Profissional: ${a.barbeiro}\n\nPor favor, confirme sua presença. Até lá!`
+            `Olá ${a.nome}! 👋\n\nPassando para confirmar seu agendamento:\n📅 Data: ${a.data}\n🕐 Horário: ${a.horario}\n✂️ Serviço: ${a.servico}\n💈 Profissional: ${a.barbeiro}` +
+            (observacao ? `\n📝  ${observacao}` : '') +
+            `\n\nPor favor, confirme sua presença. Até lá!`
         );
         document.getElementById('popup-whatsapp').href = `https://wa.me/55${tel}?text=${mensagem}`;
 
         popup.classList.add('open');
-        const rect = e.currentTarget.getBoundingClientRect();
+        const rect = target.getBoundingClientRect(); // 👈 usa target aqui
         popup.style.top = (rect.bottom + 8 + window.scrollY) + 'px';
         popup.style.left = (rect.left + window.scrollX) + 'px';
         requestAnimationFrame(() => {

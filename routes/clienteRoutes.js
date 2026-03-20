@@ -138,11 +138,9 @@ router.post('/agendar/:token', async (req, res) => {
         if (profissional_id) {
             const adminProf = await Admin.findOne({ where: { id: profissional_id, idEmpresa }, attributes: ['telefone'] });
             const telefoneLimpo = adminProf?.telefone?.replace(/\D/g, '');
-            const empresaObj = await Empresa.findByPk(idEmpresa, { attributes: ['observacao'] });
             if (telefoneLimpo) {
                 const mensagem = encodeURIComponent(
-                    `Olá! Acabei de agendar:\n📅 Data: ${data}\n⏰ Horário: ${hiInicio}\n✂️ Serviço: ${servico}\n👤 Profissional: ${barbeiro}` +
-                    (empresaObj?.observacao ? `\n📌 ${empresaObj.observacao}` : '')
+                    `Olá! Acabei de agendar:\n📅 Data: ${data}\n⏰ Horário: ${hiInicio}\n✂️ Serviço: ${servico}\n👤 Profissional: ${barbeiro}`
                 );
                 whatsappLink = `https://wa.me/55${telefoneLimpo}?text=${mensagem}`;
             }

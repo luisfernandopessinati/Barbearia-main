@@ -13,8 +13,8 @@ sequelize.authenticate().then(function () {
 }) 
 
 module.exports = sequelize;
-*/
 
+*/
 //web para baixo
 
 const Sequelize = require('sequelize')

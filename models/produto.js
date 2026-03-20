@@ -17,7 +17,10 @@ const Produto = sequelize.define('Produtos', {
         type: DataTypes.STRING,
         allowNull: true
     },
-
+    codbarras: {
+        type: DataTypes.STRING(50),
+        allowNull: true
+    },
     custo: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: true
@@ -32,7 +35,11 @@ const Produto = sequelize.define('Produtos', {
         type: DataTypes.INTEGER,
         defaultValue: 0
     },
-
+    est_min: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+    },
     imagem: {
         type: DataTypes.STRING,
         allowNull: true

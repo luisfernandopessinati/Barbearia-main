@@ -84,7 +84,7 @@ app.use('/', require('./routes/agendamentoAdminRoutes'));
 
 //api
 const jwt = require('jsonwebtoken');
-const SECRET = 'SEU_SEGREDO_SUPER_FORTE';
+const SECRET = process.env.JWT_SECRET;
 
 const apiAdminRoutes = require('./routes/api/apiAdmin');
 app.use('/api', apiAdminRoutes);

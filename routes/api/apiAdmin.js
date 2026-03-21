@@ -3,7 +3,7 @@ const router = express.Router();
 
 const authMiddleware = require('../../middlewares/authMiddleware');
 
-const { Agendamento } = require('../../models/Agendamento'); // ajusta se precisar
+const Agendamento = require('../../models/Agendamento'); 
 
 // 🔥 AGENDAMENTOS (APP)
 router.get('/agendamentos', authMiddleware, async (req, res) => {
@@ -29,7 +29,7 @@ router.get('/agendamentos', authMiddleware, async (req, res) => {
             };
         });
 
-        res.json(formatados);
+        res.json({ agendamentos: formatados });
 
     } catch (error) {
         console.error("ERRO API:", error);

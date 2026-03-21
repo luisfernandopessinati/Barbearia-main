@@ -260,33 +260,37 @@ transition:transform .4s;
 
 .dash1{
 top:0;
-left:40px;
+left:20px;
 animation:float1 6s ease-in-out infinite;
+z-index:1;
 }
 
 .dash2{
-top:360px;
-right:40px;
+top:00px;
+right:20px;
 animation:float2 7s ease-in-out infinite;
-z-index:10;
+z-index:1;
 }
 
 .dash3{
 top:180px;
 left:0;
 animation:float3 6s ease-in-out infinite;
+z-index:2;
 }
 
 .dash4{
 bottom:0;
 right:60px;
 animation:float4 8s ease-in-out infinite;
+z-index:2;
 }
 
 .dash5{
 top:40px;
 left:180px;
 animation:float5 7s ease-in-out infinite;
+z-index:4;
 }
 
 @keyframes float1{
@@ -383,6 +387,63 @@ transform:scale(1.05);
 
   .hero-buttons a {
     margin-right: 0;
+  }
+
+}
+
+/* ========================= */
+/* 📱 MOBILE COMPLETO */
+/* ========================= */
+
+@media (max-width: 768px) {
+
+  /* NAVBAR */
+  nav {
+    display: none;
+  }
+
+  .logo-lp {
+    height: 60px;
+  }
+
+  /* HERO */
+  .hero {
+    padding: 60px 0 40px;
+  }
+
+  .hero h1 {
+    font-size: 30px;
+  }
+
+  /* GRID GLOBAL */
+  .grid-3 {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  /* SECTIONS */
+  .section {
+    padding: 60px 0;
+  }
+
+  /* CARDS */
+  .card {
+    padding: 20px;
+  }
+
+  /* CTA */
+  .cta {
+    padding: 70px 0;
+  }
+
+  .cta h2 {
+    font-size: 26px;
+  }
+
+  /* BOTÕES */
+  .btn-gold, .btn-outline {
+    width: 100%;
+    text-align: center;
   }
 
 }

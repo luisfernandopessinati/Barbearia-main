@@ -19,13 +19,17 @@ exports.login = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: empresa.id },
+            { id: empresa.id, empresa_id: empresa.id },
             process.env.JWT_SECRET,
-            { expiresIn: '1d' }
+            { expiresIn: '7d' }
         );
 
-        res.json({ token });
-
+        res.json({
+            success: true,        // ✅ adiciona success
+            token,
+            user: { id: empresa.id, nome: empresa.nome } // ✅ adiciona user
+        });
+        
     } catch (error) {
         res.status(500).json({ erro: 'Erro no login' });
     }

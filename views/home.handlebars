@@ -22,7 +22,7 @@
       <a href="#funcionalidades">Sistema</a>
       <a href="#como">Como funciona</a>
       <a href="/admin" class="btn-outline">Entrar</a>
-      <a href="/cadastro" class="btn-gold">Começar</a>
+     
     </nav>
 
   </div>
@@ -294,3 +294,20 @@ flex-shrink:0;
 
 }
 </style>
+
+<script>
+const toggle = document.querySelector('.menu-toggle');
+const menu = document.querySelector('.menu');
+
+// abre/fecha no botão
+toggle.addEventListener('click', () => {
+  menu.classList.toggle('active');
+});
+
+// fecha ao clicar em qualquer link
+document.querySelectorAll('.menu a').forEach(link => {
+  link.addEventListener('click', () => {
+    menu.classList.remove('active');
+  });
+});
+</script>

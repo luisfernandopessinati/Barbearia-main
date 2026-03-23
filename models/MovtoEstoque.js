@@ -1,6 +1,6 @@
-// models/movtoEstoque.js
+// models/MovtoEstoque.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const sequelize = require('../config/db'); // corrigido de ../config/database
 
 const MovtoEstoque = sequelize.define('MovtoEstoque', {
     id: {
@@ -26,7 +26,8 @@ const MovtoEstoque = sequelize.define('MovtoEstoque', {
     },
     ent_sai: {
         type: DataTypes.ENUM('E', 'S'),
-        allowNull: false
+        allowNull: false,
+        comment: 'E=Entrada, S=Saída'
     },
     qtd_anterior: {
         type: DataTypes.DECIMAL(10, 3),

@@ -1,6 +1,6 @@
-// models/lancEstoque.js
+// models/LancEstoque.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const sequelize = require('../config/db'); // corrigido de ../config/database
 
 const LancEstoque = sequelize.define('LancEstoque', {
     id: {
@@ -23,12 +23,14 @@ const LancEstoque = sequelize.define('LancEstoque', {
     },
     tipo: {
         type: DataTypes.ENUM('E', 'S', 'A'),
-        allowNull: false
+        allowNull: false,
+        comment: 'E=Entrada, S=Saída, A=Ajuste'
     },
     status: {
         type: DataTypes.ENUM('A', 'F', 'C'),
         allowNull: false,
-        defaultValue: 'A'
+        defaultValue: 'A',
+        comment: 'A=Aberto, F=Finalizado, C=Cancelado'
     },
     observacao: {
         type: DataTypes.TEXT,

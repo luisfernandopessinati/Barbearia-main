@@ -6,6 +6,7 @@ const authMiddleware = require('../../middlewares/authMiddleware');
 const Agendamento = require('../../models/Agendamento'); 
 
 // 🔥 AGENDAMENTOS (APP)
+/*
 router.get('/agendamentos', authMiddleware, async (req, res) => {
     try {
         const idEmpresa = req.user.empresa_id;
@@ -36,5 +37,6 @@ router.get('/agendamentos', authMiddleware, async (req, res) => {
         res.status(500).json({ erro: 'Erro ao buscar agendamentos' });
     }
 });
+*/
 
 module.exports = router;

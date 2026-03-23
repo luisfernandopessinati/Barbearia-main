@@ -9,39 +9,55 @@ const bcrypt = require('bcryptjs');
 
 const { isAdminAuthenticated } = require('./middlewares/adminMiddleware');
 
-const Admin = require('./models/Admin');
-const Agendamento = require('./models/Agendamento');
-const Bloqueio = require('./models/Bloqueio');
-const Cliente = require('./models/Cliente');
-const Empresa = require('./models/Empresas');
-const Feriado = require('./models/feriado');
+// ─── Models ───────────────────────────────────────────────────────────────────
+const Admin                = require('./models/Admin');
+const Agendamento          = require('./models/Agendamento');
+const Bloqueio             = require('./models/Bloqueio');
+const Cliente              = require('./models/Cliente');
+const Empresa              = require('./models/Empresas');
+const Feriado              = require('./models/feriado');
 const HorarioFuncionamento = require('./models/HorarioFuncionamento');
-const Servico = require('./models/servico');
-const produto = require('./models/produto');
-const Pacote = require('./models/Pacotes');
+const Servico              = require('./models/servico');
+const Produto              = require('./models/produto');
+const Pacote               = require('./models/Pacotes');
+const Venda                = require('./models/Venda');
+const VendaItem            = require('./models/VendaItem');
+const MovtoEstoque         = require('./models/MovtoEstoque');
+
+// ─── Associations ─────────────────────────────────────────────────────────────
+Agendamento.belongsTo(Servico,   { foreignKey: 'servico_id',      as: 'Servico' });
+Agendamento.belongsTo(Admin,     { foreignKey: 'profissional_id', as: 'Profissional' });
+
+Venda.belongsTo(Cliente,         { foreignKey: 'cliente_id',  as: 'Cliente' });
+Venda.hasMany(VendaItem,         { foreignKey: 'venda_id',    as: 'Itens' });
+VendaItem.belongsTo(Venda,       { foreignKey: 'venda_id' });
+VendaItem.belongsTo(Produto,     { foreignKey: 'produto_id',  as: 'Produto' });
+MovtoEstoque.belongsTo(Produto,  { foreignKey: 'produto_id',  as: 'Produto' });
+
+// ─── Services / Helpers ───────────────────────────────────────────────────────
 const { getSlotsDisponiveis, minutesToTime, temColisao, timeToMinutes } = require('./services/slotService');
-
-const passport = require('passport');
-const session = require('express-session');
-require('./config/auth')(passport);
-
 const { verificarConflito } = require('./helpers/conflito');
 
-const { Op } = require('sequelize');
+const passport = require('passport');
+const session  = require('express-session');
+require('./config/auth')(passport);
 
-const app = express();
+const { Op } = require('sequelize');
+const jwt     = require('jsonwebtoken');
+const SECRET  = process.env.JWT_SECRET;
+
+const app  = express();
 const PORT = process.env.PORT || 3333;
 
 const clienteController = require('./controllers/clienteController');
-const uploadAdmins = require('./config/multerAdmins'); 
-
-const upload = require('./config/multer');
+const uploadAdmins      = require('./config/multerAdmins');
+const upload            = require('./config/multer');
 const empresaController = require('./controllers/empresaController');
 
 const path = require('path');
 const fs   = require('fs');
 
-// desconectar automaticamente 
+// ─── Session / Passport ───────────────────────────────────────────────────────
 app.use(session({
     secret: process.env.CHAVE,
     resave: false,
@@ -52,42 +68,8 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// ─── View engine ──────────────────────────────────────────────────────────────
 app.set('view engine', 'handlebars');
-
-//imagens
-
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ limit: '10mb', extended: true }));
-app.use(bodyParser.urlencoded({ extended: false, limit: '10mb' }));
-app.use(bodyParser.json({ limit: '10mb' }));
-app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Rotas  
-
-const agendamentoRoutes = require('./routes/agendamentoRoutes');
-app.use('/api', agendamentoRoutes);
-
-const authRoutes = require('./routes/authRoutes');
-app.use('/api', authRoutes);
-app.use('/', require('./routes/produtoRoutes'));
-app.use('/', require('./routes/empresaRoutes'));
-app.use('/', require('./routes/clienteRoutes')); 
-app.use('/', require('./routes/feriadoRoutes'));
-app.use('/', require('./routes/horarioRoutes'));
-app.use('/', require('./routes/servicoRoutes'));
-app.use('/', require('./routes/adminRoutes'));
-app.use('/', require('./routes/clienteRoutes'));
-app.use('/', require('./routes/slotsRoutes'));
-app.use('/', require('./routes/agendamentoAdminRoutes'));
-
-
-//api
-const jwt = require('jsonwebtoken');
-const SECRET = process.env.JWT_SECRET;
-
-const apiAdminRoutes = require('./routes/api/apiAdmin');
-app.use('/api', apiAdminRoutes);
 
 app.engine('handlebars', engine({
     helpers: {
@@ -95,12 +77,47 @@ app.engine('handlebars', engine({
             if (!str) return '';
             return str.substring(start, start + len).toUpperCase();
         },
-        eq: (a, b) => a === b,
-        lt: (a, b) => a < b,
-        json: (obj) => JSON.stringify(obj),
-        add: (a, b) => a + b
+        eq:   (a, b) => a === b,
+        lt:   (a, b) => a < b,
+        json: (obj)  => JSON.stringify(obj),
+        add:  (a, b) => a + b
     }
 }));
+
+// ─── Body parser / Static ─────────────────────────────────────────────────────
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+app.use(bodyParser.urlencoded({ extended: false, limit: '10mb' }));
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// ─── Rotas web ────────────────────────────────────────────────────────────────
+const agendamentoRoutes = require('./routes/agendamentoRoutes');
+app.use('/api', agendamentoRoutes);
+
+const authRoutes = require('./routes/authRoutes');
+app.use('/api', authRoutes);
+
+app.use('/', require('./routes/produtoRoutes'));
+app.use('/', require('./routes/empresaRoutes'));
+app.use('/', require('./routes/clienteRoutes'));
+app.use('/', require('./routes/feriadoRoutes'));
+app.use('/', require('./routes/horarioRoutes'));
+app.use('/', require('./routes/servicoRoutes'));
+app.use('/', require('./routes/adminRoutes'));
+app.use('/', require('./routes/slotsRoutes'));
+app.use('/', require('./routes/agendamentoAdminRoutes'));
+
+// ─── Rotas API (web admin) ────────────────────────────────────────────────────
+const apiAdminRoutes = require('./routes/api/apiAdmin');
+app.use('/api', apiAdminRoutes);
+
+// ─── Rotas API (app mobile) ───────────────────────────────────────────────────
+app.use('/api/agendamentos', require('./Routes/Api/apiAgendamentos'));
+app.use('/api/produtos',     require('./Routes/Api/apiProdutos'));
+app.use('/api/estoque',      require('./Routes/Api/apiEstoque'));
+app.use('/api/vendas',       require('./Routes/Api/apiVendas'));
 
 
 // tratando erro da imagem 
@@ -140,35 +157,40 @@ app.get('/site/:nome', (req, res) => {
 app.post('/api/loginAdmin', (req, res, next) => {
     passport.authenticate('admin-local', (err, user, info) => {
         if (err) return res.status(500).json({ error: err });
-
+ 
         if (!user) {
             return res.status(401).json({
                 success: false,
                 message: 'Login inválido'
             });
         }
-
+ 
         req.logIn(user, (err) => {
             if (err) return res.status(500).json({ error: err });
-
+ 
             return res.json({
                 success: true,
                 token: jwt.sign(
                     {
-                        id: user.id,
-                        empresa_id: user.empresa_id
+                        id:        user.id,
+                        idEmpresa: user.idEmpresa,  // ← padronizado
+                        nome:      user.nome,        // ← útil no app
+                        role:      user.role         // ← útil para permissões
                     },
                     SECRET,
                     { expiresIn: '7d' }
                 ),
                 user: {
-                    id: user.id,
-                    nome: user.nome
+                    id:        user.id,
+                    nome:      user.nome,
+                    role:      user.role,
+                    idEmpresa: user.idEmpresa
                 }
             });
         });
     })(req, res, next);
 });
+ 
 
 app.get('/loginAdmin', (req, res) => {
     res.render('loginAdmin');

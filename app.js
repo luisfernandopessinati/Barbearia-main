@@ -97,8 +97,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 const agendamentoRoutes = require('./routes/agendamentoRoutes');
 app.use('/api', agendamentoRoutes);
 
-const apiServicos = require('./Routes/Api/apiServicos');
-const apiProfissionais = require('./Routes/Api/apiProfissionais');
+const apiServicos = require('./routes/api/apiServicos');
+const apiProfissionais = require('./routes/api/apiProfissionais');
 app.use('/api/servicos', apiServicos);
 app.use('/api/profissionais', apiProfissionais);
 

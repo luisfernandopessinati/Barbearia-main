@@ -121,10 +121,10 @@ const apiAdminRoutes = require('./routes/api/apiAdmin');
 app.use('/api', apiAdminRoutes);
 
 // ─── Rotas API (app mobile) ───────────────────────────────────────────────────
-app.use('/api/agendamentos', require('./routes/Api/apiAgendamentos'));
-app.use('/api/produtos',     require('./routes/Api/apiProdutos'));
-app.use('/api/estoque',      require('./routes/Api/apiEstoque'));
-app.use('/api/vendas',       require('./routes/Api/apiVendas'));
+app.use('/api/agendamentos', require('./routes/api/apiAgendamentos'));
+app.use('/api/produtos',     require('./routes/api/apiProdutos'));
+app.use('/api/estoque',      require('./routes/api/apiEstoque'));
+app.use('/api/vendas',       require('./routes/api/apiVendas'));
 
 
 // tratando erro da imagem 

@@ -9,6 +9,7 @@ const bcrypt = require('bcryptjs');
 
 const { isAdminAuthenticated } = require('./middlewares/adminMiddleware');
 
+
 // ─── Models ───────────────────────────────────────────────────────────────────
 const Admin                = require('./models/Admin');
 const Agendamento          = require('./models/Agendamento');
@@ -96,6 +97,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 const agendamentoRoutes = require('./routes/agendamentoRoutes');
 app.use('/api', agendamentoRoutes);
 
+const apiServicos = require('./Routes/Api/apiServicos');
+const apiProfissionais = require('./Routes/Api/apiProfissionais');
+app.use('/api/servicos', apiServicos);
+app.use('/api/profissionais', apiProfissionais);
+
 const authRoutes = require('./routes/authRoutes');
 app.use('/api', authRoutes);
 
@@ -108,6 +114,7 @@ app.use('/', require('./routes/servicoRoutes'));
 app.use('/', require('./routes/adminRoutes'));
 app.use('/', require('./routes/slotsRoutes'));
 app.use('/', require('./routes/agendamentoAdminRoutes'));
+
 
 // ─── Rotas API (web admin) ────────────────────────────────────────────────────
 const apiAdminRoutes = require('./routes/api/apiAdmin');

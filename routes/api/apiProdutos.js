@@ -78,6 +78,22 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+// GET /api/produtos/codigo/:codbarras
+router.get('/codigo/:codbarras', async (req, res) => {
+    try {
+        const { idEmpresa } = req.user;
+        const produto = await Produto.findOne({ 
+            where: { codbarras: req.params.codbarras, idEmpresa, ativo: true } 
+        });
+
+        if (!produto) return res.status(404).json({ success: false, message: 'Produto não encontrado' });
+
+        res.json({ success: true, data: produto });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 // ─── CRIAR ──────────────────────────────────────────────────────────────────────
 router.post('/', async (req, res) => {
     try {

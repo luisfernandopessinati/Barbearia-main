@@ -3,7 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../../middlewares/authMiddleware');
-const Empresa = require('../../models/Empresa'); // Certifique-se que o caminho do model está correto
+const Empresa = require('../../models/Empresas'); // Certifique-se que o caminho do model está correto
 
 // GET /api/admin/perfil
 // Traz os dados da empresa para usar na Home e no WhatsApp

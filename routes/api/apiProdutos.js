@@ -66,21 +66,6 @@ router.get('/estoque-minimo', async (req, res) => {
     }
 });
 
-// ─── BUSCAR POR ID ──────────────────────────────────────────────────────────────
-router.get('/:id', async (req, res) => {
-    try {
-        const { idEmpresa } = req.user;
-        const produto = await Produto.findOne({ where: { id: req.params.id, idEmpresa } });
-
-        if (!produto) return res.status(404).json({ success: false, message: 'Produto não encontrado' });
-
-        res.json({ success: true, data: produto });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, message: 'Erro ao buscar produto', error: err.message });
-    }
-});
-
 // GET /api/produtos/codigo/:codbarras
 router.get('/codigo/:codbarras', async (req, res) => {
     try {
@@ -96,6 +81,22 @@ router.get('/codigo/:codbarras', async (req, res) => {
         res.status(500).json({ success: false, error: err.message });
     }
 });
+
+// ─── BUSCAR POR ID ──────────────────────────────────────────────────────────────
+router.get('/:id', async (req, res) => {
+    try {
+        const { idEmpresa } = req.user;
+        const produto = await Produto.findOne({ where: { id: req.params.id, idEmpresa } });
+
+        if (!produto) return res.status(404).json({ success: false, message: 'Produto não encontrado' });
+
+        res.json({ success: true, data: produto });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Erro ao buscar produto', error: err.message });
+    }
+});
+
 
 // ─── CRIAR ──────────────────────────────────────────────────────────────────────
 router.post('/', upload.single('imagem'), async (req, res) => {

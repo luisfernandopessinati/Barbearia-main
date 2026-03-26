@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
 
         const where = { idEmpresa };
 
-        if (!inativos) where.ativo = true; // por padrão só ativos
+       // if (!inativos) where.ativo = true; // por padrão só ativos
 
         if (grupo) where.grupo = grupo;
 

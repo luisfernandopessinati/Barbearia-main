@@ -90,7 +90,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(bodyParser.urlencoded({ extended: false, limit: '10mb' }));
 app.use(bodyParser.json({ limit: '10mb' }));
-app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+app.use('/public/uploads', express.static(path.join(__dirname, 'public/uploads')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ─── Rotas web ────────────────────────────────────────────────────────────────

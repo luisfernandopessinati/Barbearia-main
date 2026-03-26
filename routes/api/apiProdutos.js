@@ -95,14 +95,19 @@ router.get('/codigo/:codbarras', async (req, res) => {
 });
 
 // ─── CRIAR ──────────────────────────────────────────────────────────────────────
-router.post('/', async (req, res) => {
+router.post('/', upload.single('imagem'), async (req, res) => {
     try {
         const { idEmpresa } = req.user;
-        const { descricao, grupo, codbarras, custo, preco, estoque, est_min, imagem } = req.body;
+        const { descricao, grupo, codbarras, custo, preco, estoque, est_min } = req.body;
 
         if (!descricao || preco === undefined) {
             return res.status(400).json({ success: false, message: 'Campos obrigatórios: descricao, preco' });
         }
+
+        // ✅ Pega o caminho do arquivo enviado, ou null se não enviou
+        const imagem = req.file
+            ? '/' + req.file.path.replace(/\\/g, '/')  // normaliza barras no Windows
+            : null;
 
         const novo = await Produto.create({
             idEmpresa,
@@ -122,16 +127,20 @@ router.post('/', async (req, res) => {
 });
 
 // ─── EDITAR ─────────────────────────────────────────────────────────────────────
-router.put('/:id', async (req, res) => {
+router.put('/:id', upload.single('imagem'), async (req, res) => {
     try {
         const { idEmpresa } = req.user;
         const produto = await Produto.findOne({ where: { id: req.params.id, idEmpresa } });
 
         if (!produto) return res.status(404).json({ success: false, message: 'Produto não encontrado' });
 
-        const { descricao, grupo, codbarras, custo, preco, est_min, imagem } = req.body;
+        const { descricao, grupo, codbarras, custo, preco, est_min } = req.body;
 
-        // Nota: estoque NÃO é editável aqui — só via lançamento de estoque
+        // ✅ Só atualiza imagem se enviou uma nova, senão mantém a atual
+        const imagem = req.file
+            ? '/' + req.file.path.replace(/\\/g, '/')
+            : produto.imagem;
+
         await produto.update({ descricao, grupo, codbarras, custo, preco, est_min, imagem });
 
         res.json({ success: true, data: produto });

@@ -8,7 +8,7 @@ router.get('/perfil', authMiddleware, async (req, res) => {
     try {
         const { idEmpresa } = req.user;
         const empresa = await Empresa.findByPk(idEmpresa, {
-            attributes: ['id', 'nome', 'logo', 'observacao', 'telefone', 'endereco']
+            attributes: ['id', 'nome', 'logo', 'observacao', 'celular', 'endereco']
         });
 
         if (!empresa) {

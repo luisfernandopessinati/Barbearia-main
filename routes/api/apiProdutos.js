@@ -18,11 +18,13 @@ router.use(autenticarToken);
 router.get('/', async (req, res) => {
     try {
         const { idEmpresa } = req.user;
-        const { inativos, grupo, busca } = req.query;
+        const { ativo, grupo, busca } = req.query;
 
         const where = { idEmpresa };
 
-       // if (!inativos) where.ativo = true; // por padrão só ativos
+        // ✅ filtra por ativo se passado, senão traz todos
+        if (ativo === 'true') where.ativo = true;
+        if (ativo === 'false') where.ativo = false;
 
         if (grupo) where.grupo = grupo;
 

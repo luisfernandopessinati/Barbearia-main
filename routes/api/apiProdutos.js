@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const { Op } = require('sequelize');
 const autenticarToken = require('../../middlewares/authMiddleware');
+const upload = require('../../config/multer');
 
 const Produto = require('../../models/produto');
 

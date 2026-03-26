@@ -118,7 +118,7 @@ app.use('/', require('./routes/agendamentoAdminRoutes'));
 
 // ─── Rotas API (web admin) ────────────────────────────────────────────────────
 const apiAdminRoutes = require('./routes/api/apiAdmin');
-app.use('/api', apiAdminRoutes);
+app.use('/api/admin', apiAdminRoutes);
 
 // ─── Rotas API (app mobile) ───────────────────────────────────────────────────
 app.use('/api/agendamentos', require('./routes/api/apiAgendamentos'));

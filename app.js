@@ -59,11 +59,18 @@ const path = require('path');
 const fs   = require('fs');
 
 // ─── Session / Passport ───────────────────────────────────────────────────────
+const isProd = process.env.NODE_ENV === 'production';
+
 app.use(session({
     secret: process.env.CHAVE,
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 24 * 60 * 60 * 1000 }
+    cookie: {
+        maxAge: 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        secure: isProd, // só em produção
+        sameSite: isProd ? 'none' : 'lax'
+    }
 }));
 
 app.use(passport.initialize());
@@ -224,6 +231,22 @@ app.get('/logout', (req, res) => {
     req.logout((err) => {
         if (err) { return next(err); }
         res.redirect('/');
+    });
+});
+
+// Rota para abrir a tela de PDV (Vendas)
+app.get('/admin/vendas', isAdminAuthenticated, (req, res) => {
+    res.render('vendas', { 
+        // Aqui passamos o token que o JS da página vai precisar
+        // Se você usa JWT na sessão, pegue de lá
+        token: req.user ? jwt.sign({ id: req.user.id, idEmpresa: req.user.idEmpresa }, SECRET) : null 
+    });
+});
+
+// Rota para abrir a tela de Fechamento
+app.get('/admin/fechamento', isAdminAuthenticated, (req, res) => {
+    res.render('fechamento_caixa', { 
+        token: req.user ? jwt.sign({ id: req.user.id, idEmpresa: req.user.idEmpresa }, SECRET) : null
     });
 });
 

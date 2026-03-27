@@ -1,0 +1,168 @@
+<div class="container-fluid bg-dark text-light p-4" style="min-height: 100vh; background-color: #121212 !important;">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 style="color: #D4AF37; font-weight: bold;">
+            FECHAMENTO <span id="dataDisplay">--/--/----</span>
+        </h2>
+        <div class="d-flex align-items-center">
+            <input type="date" id="filtroData" class="form-control bg-dark text-white border-warning me-2" style="color-scheme: dark;">
+            <button onclick="buscarVendas()" class="btn btn-warning" style="background-color: #D4AF37; color: #000;">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="card mb-4" style="background-color: #1E1E1E; border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 15px;">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-white-50">DINHEIRO</span>
+                <span id="totalDinheiro" class="text-success fw-bold">R$ 0,00</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-white-50">PIX</span>
+                <span id="totalPix" class="text-info fw-bold">R$ 0,00</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-white-50">CARTÕES</span>
+                <span id="totalCartao" class="text-warning fw-bold">R$ 0,00</span>
+            </div>
+            <hr class="border-secondary">
+            <div class="d-flex justify-content-between mt-2">
+                <span class="fw-bold text-white fs-5">TOTAL GERAL</span>
+                <span id="totalGeral" style="color: #D4AF37; font-size: 1.25rem;" class="fw-bold">R$ 0,00</span>
+            </div>
+        </div>
+    </div>
+
+    <h6 class="text-white-50 fw-bold mb-3">VENDAS REALIZADAS</h6>
+
+    <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle">
+            <tbody id="listaVendas">
+                </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDetalhes" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark border-warning">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title" style="color: #D4AF37;">Itens da Venda #<span id="detalheId"></span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="listaItensDetalhe" class="list-group list-group-flush bg-dark text-white">
+                    </ul>
+                <hr class="border-secondary">
+                <div class="d-flex justify-content-between fw-bold">
+                    <span>Total da Venda:</span>
+                    <span id="detalheTotal">R$ 0,00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const token = "{{token}}";
+    // Define a data atual no input ao carregar
+    document.getElementById('filtroData').valueAsDate = new Date();
+
+    async function buscarVendas() {
+        const data = document.getElementById('filtroData').value;
+        const [ano, mes, dia] = data.split('-');
+        document.getElementById('dataDisplay').innerText = `${dia}/${mes}/${ano}`;
+
+        try {
+            const response = await fetch(`https://lpsolutions.online/api/vendas?data_inicio=${data}&data_fim=${data}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const result = await response.json();
+            processarVendas(result.data || []);
+        } catch (err) {
+            console.error("Erro ao buscar vendas:", err);
+        }
+    }
+
+    function processarVendas(vendas) {
+        let d = 0, p = 0, c = 0;
+        const lista = document.getElementById('listaVendas');
+        lista.innerHTML = '';
+
+        vendas.forEach(v => {
+            const isCancelada = v.status_pagamento === 'cancelado';
+            const valor = parseFloat(v.total_final) || 0;
+
+            if (!isCancelada) {
+                const forma = (v.forma_pagamento || "").toLowerCase();
+                if (forma.includes("dinheiro")) d += valor;
+                else if (forma.includes("pix")) p += valor;
+                else c += valor;
+            }
+
+            lista.innerHTML += `
+                <tr onclick='abrirDetalhes(${JSON.stringify(v)})' style="cursor: pointer;">
+                    <td class="${isCancelada ? 'text-white-50 text-decoration-line-through' : ''}">
+                        <i class="bi bi-receipt-cutoff me-2" style="color: ${isCancelada ? '#444' : '#D4AF37'}"></i>
+                        Venda #${v.id}
+                        <br><small class="text-white-50">${v.forma_pagamento?.toUpperCase()} - ${isCancelada ? 'CANCELADA' : 'CONCLUÍDA'}</small>
+                    </td>
+                    <td class="text-end ${isCancelada ? 'text-white-50' : 'fw-bold'}">
+                        R$ ${valor.toFixed(2)}
+                        ${!isCancelada ? `<button onclick="event.stopPropagation(); cancelarVenda(${v.id})" class="btn btn-link text-danger p-0 ms-2"><i class="bi bi-trash"></i></button>` : ''}
+                    </td>
+                </tr>
+            `;
+        });
+
+        document.getElementById('totalDinheiro').innerText = `R$ ${d.toFixed(2)}`;
+        document.getElementById('totalPix').innerText = `R$ ${p.toFixed(2)}`;
+        document.getElementById('totalCartao').innerText = `R$ ${c.toFixed(2)}`;
+        document.getElementById('totalGeral').innerText = `R$ ${(d + p + c).toFixed(2)}`;
+    }
+
+    async function cancelarVenda(id) {
+        if (!confirm(`Deseja realmente cancelar a venda #${id}? O estoque será estornado.`)) return;
+
+        const res = await fetch(`https://lpsolutions.online/api/vendas/${id}/cancelar`, {
+            method: 'PATCH',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (res.ok) {
+            alert("Venda cancelada com sucesso!");
+            buscarVendas();
+        }
+    }
+
+    function abrirDetalhes(venda) {
+        document.getElementById('detalheId').innerText = venda.id;
+        const lista = document.getElementById('listaItensDetalhe');
+        lista.innerHTML = '';
+        
+        let totalModal = 0;
+        venda.Itens?.forEach(item => {
+            const qtd = parseFloat(item.quantidade) || 0;
+            const preco = parseFloat(item.preco_unitario) || 0;
+            const sub = qtd * preco;
+            totalModal += sub;
+
+            lista.innerHTML += `
+                <li class="list-group-item bg-dark text-white border-0 px-0 d-flex justify-content-between">
+                    <div>
+                        ${item.Produto?.descricao || 'Produto #' + item.produto_id}<br>
+                        <small class="text-warning">${qtd}x R$ ${preco.toFixed(2)}</small>
+                    </div>
+                    <span>R$ ${sub.toFixed(2)}</span>
+                </li>
+            `;
+        });
+
+        document.getElementById('detalheTotal').innerText = `R$ ${totalModal.toFixed(2)}`;
+        new bootstrap.Modal(document.getElementById('modalDetalhes')).show();
+    }
+
+    // Inicializa a busca
+    buscarVendas();
+</script>

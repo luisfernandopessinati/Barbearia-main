@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-glow: rgba(212, 175, 55, .18);
+            --bg: #0d0d0d;
+            --surface: #161616;
+            --card: #1a1a1a;
+            --card-border: rgba(212, 175, 55, .15);
+            --text: #e8e8e8;
+            --muted: #666;
+            --danger: #e05454;
+            --success: #4caf7d;
+            --radius: 12px;
+            --font-main: 'Rajdhani', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-main);
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* ── TOPBAR ── */
+        header {
+            background: #000;
+            border-bottom: 1px solid var(--card-border);
+            padding: 0 24px;
+            height: 56px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo { font-weight: 700; font-size: 18px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; }
+
+        /* ── TOAST ── */
+        #toast {
+            position: fixed; top: 16px; right: 16px; z-index: 9999;
+            background: var(--success); color: #fff;
+            padding: 12px 20px; border-radius: 8px;
+            font-size: 15px; font-weight: 600;
+            display: none; align-items: center; gap: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            max-width: 320px;
+        }
+        #toast.error { background: var(--danger); }
+        #toast.show  { display: flex; }
+
+        /* ── APP ── */
+        .app-wrapper { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+        .pdv-container { display: flex; flex: 1; overflow: hidden; }
+
+        /* ── PAINEL ESQUERDO ── */
+        .panel-left {
+            display: flex; flex-direction: column;
+            flex: 1; border-right: 1px solid var(--card-border);
+            background: var(--bg); overflow: hidden; min-width: 0;
+        }
+
+        .search-area {
+            padding: 16px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--card-border);
+            flex-shrink: 0;
+        }
+        .search-row { display: flex; gap: 10px; }
+
+        .input-group { position: relative; flex: 1; }
+        .input-group label {
+            display: block; color: var(--gold);
+            font-size: 11px; text-transform: uppercase;
+            margin-bottom: 5px; font-weight: 600; letter-spacing: 1px;
+        }
+
+        input, select {
+            width: 100%; background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 8px; color: #fff;
+            padding: 10px 12px; font-family: var(--font-main);
+            font-size: 15px; outline: none; transition: border-color 0.2s;
+        }
+        input:focus { border-color: var(--gold); }
+
+        /* ── LISTA DE ITENS ── */
+        .items-list { flex: 1; padding: 16px; overflow-y: auto; }
+
+        .sale-item {
+            background: var(--card);
+            border-left: 4px solid var(--gold);
+            padding: 13px 14px; margin-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+            display: flex; justify-content: space-between;
+            align-items: center; gap: 10px;
+            animation: fadeIn .2s ease;
+        }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
+
+        .sale-item-name { font-weight: bold; font-size: 15px; }
+        .sale-item-qty  { font-size: 12px; color: var(--gold); margin-top: 3px; }
+
+        .sale-item-right {
+            display: flex; align-items: center; gap: 10px;
+            flex-shrink: 0; font-family: var(--font-mono);
+            font-weight: bold; white-space: nowrap;
+        }
+        .btn-remove {
+            background: none; border: none; color: var(--danger);
+            cursor: pointer; font-size: 16px;
+            padding: 2px 6px; border-radius: 4px; transition: background 0.2s;
+        }
+        .btn-remove:hover { background: rgba(224,84,84,.15); }
+
+        /* ── PAINEL DIREITO ── */
+        .panel-right {
+            padding: 20px; background: #050505;
+            display: flex; flex-direction: column; gap: 16px;
+            width: 340px; flex-shrink: 0; overflow-y: auto;
+        }
+
+        .total-box {
+            background: var(--card); padding: 18px 20px;
+            border-radius: var(--radius); text-align: right;
+            border: 1px solid var(--card-border);
+        }
+        .total-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+        .total-value {
+            font-family: var(--font-mono); font-size: 38px;
+            color: var(--gold); font-weight: 600; margin-top: 4px;
+        }
+
+        .btn-finish {
+            background: var(--gold); color: #000;
+            border: none; padding: 18px; border-radius: var(--radius);
+            font-weight: 700; font-size: 17px; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 1px;
+            margin-top: auto; transition: opacity 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-finish:hover    { opacity: 0.88; }
+        .btn-finish:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* ── SUGESTÕES ── */
+        #suggestions {
+            position: absolute; top: 100%; left: 0; right: 0;
+            background: #222; z-index: 200;
+            border-radius: 0 0 8px 8px;
+            max-height: 260px; overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            border: 1px solid var(--card-border); border-top: none;
+        }
+        .sugestao-item {
+            padding: 12px 14px; border-bottom: 1px solid var(--card-border);
+            cursor: pointer; display: flex; justify-content: space-between;
+            align-items: center; gap: 10px; font-size: 14px; transition: background 0.15s;
+        }
+        .sugestao-item:last-child  { border-bottom: none; }
+        .sugestao-item:hover       { background: var(--gold-glow); }
+        .sugestao-item.sem-result  { color: var(--muted); justify-content: center; cursor: default; }
+        .sugestao-item.loading     { color: var(--muted); justify-content: center; cursor: default; font-style: italic; }
+        .sugestao-price     { color: var(--gold); font-family: var(--font-mono); font-weight: 600; white-space: nowrap; }
+        .sugestao-estoque   { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            text-align: center; margin-top: 60px;
+            opacity: 0.25; pointer-events: none;
+        }
+        .empty-state span { font-size: 48px; display: block; margin-bottom: 10px; }
+
+        /* ── SPINNER ── */
+        .spinner {
+            width: 16px; height: 16px;
+            border: 2px solid rgba(0,0,0,.2);
+            border-top-color: #000;
+            border-radius: 50%;
+            animation: spin .6s linear infinite; display: inline-block;
+        }
+        .spinner.light { border-color: rgba(255,255,255,.2); border-top-color: var(--gold); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ══════════════════════════════════════
+           RESPONSIVO — MOBILE (≤ 640px)
+        ══════════════════════════════════════ */
+        @media (max-width: 640px) {
+            html, body { overflow: auto; height: auto; }
+            .app-wrapper { height: auto; overflow: visible; }
+            .pdv-container { flex-direction: column; overflow: visible; }
+            .panel-left { border-right: none; border-bottom: 1px solid var(--card-border); overflow: visible; flex: none; }
+            .items-list { overflow: visible; max-height: none; }
+            .panel-right { width: 100%; padding: 16px; gap: 12px; }
+            .total-value { font-size: 30px; }
+            .btn-finish  { font-size: 16px; padding: 16px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="toast"></div>
+
+<div class="app-wrapper">
+
+    <header>
+        <a href="javascript:history.back()"
+           style="text-decoration:none; color:var(--gold); display:flex; align-items:center; gap:5px; font-weight:600; font-size:14px;">
+            ⬅ VOLTAR
+        </a>
+    </header>
+
+    <div class="pdv-container">
+
+        <!-- ── PAINEL ESQUERDO ── -->
+        <div class="panel-left">
+            <div class="search-area">
+                <div class="search-row">
+                    <div class="input-group">
+                        <label>Buscar Produto</label>
+                        <input type="text" id="buscaInput"
+                               placeholder="Nome ou código de barras..." autocomplete="off">
+                        <div id="suggestions"></div>
+                    </div>
+                    <div class="input-group" style="max-width:72px;">
+                        <label>Qtd</label>
+                        <input type="number" id="qtdInput" value="1" min="1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="items-list" id="listaItens">
+                <div class="empty-state" id="emptyMsg">
+                    <span>🛒</span>
+                    <p>Carrinho vazio</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── PAINEL DIREITO ── -->
+        <div class="panel-right">
+            <div class="input-group">
+                <label>Forma de Pagamento</label>
+                <select id="formaPagamento">
+                    <option value="Dinheiro">Dinheiro</option>
+                    <option value="Pix">Pix</option>
+                    <option value="Cartão Débito">Cartão Débito</option>
+                    <option value="Cartão Crédito">Cartão Crédito</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Desconto (R$)</label>
+                <input type="number" id="descontoInput" value="0" step="0.01" min="0">
+            </div>
+
+            <div class="total-box">
+                <div class="total-label">Total a Pagar</div>
+                <div class="total-value" id="totalGeralDisplay">R$ 0,00</div>
+            </div>
+
+            <button class="btn-finish" id="btnFinalizar" onclick="finalizarVenda()">
+                ✔ Finalizar Venda
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   TOKEN JWT
+   Pega do localStorage — ajuste a chave se necessário.
+   Ex: se você salva como 'authToken', mude abaixo.
+═══════════════════════════════════════════════════════════ */
+const TOKEN = localStorage.getItem('token') || '';
+
+const API_HEADERS = {
+    'Content-Type': 'application/json',
+    ...(TOKEN && { Authorization: `Bearer ${TOKEN}` })
+};
+/* ═══════════════════════════════════════════════
+   ESTADO
+═══════════════════════════════════════════════ */
+let itensVenda   = [];
+let debounceTimer = null;
+
+/* ═══════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════ */
+function toast(msg, tipo) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'show' + (tipo === 'error' ? ' error' : '');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => { el.className = ''; }, 3500);
+}
+
+/* ═══════════════════════════════════════════════
+   BUSCA DE PRODUTOS
+   ─────────────────────────────────────────────
+   Rota texto  → GET /api/produtos?busca=TERMO&ativo=true
+   Rota código → GET /api/produtos/codigo/CODBARRAS
+═══════════════════════════════════════════════ */
+const buscaInput    = document.getElementById('buscaInput');
+const suggestionsEl = document.getElementById('suggestions');
+
+buscaInput.addEventListener('input', (e) => {
+    clearTimeout(debounceTimer);
+    const termo = e.target.value.trim();
+
+    if (!termo) { suggestionsEl.innerHTML = ''; return; }
+
+    // Código de barras: só números com 6+ dígitos
+    if (/^\d{6,}$/.test(termo)) {
+        debounceTimer = setTimeout(() => buscarPorCodigo(termo), 200);
+        return;
+    }
+
+    if (termo.length < 2) return;
+
+    // Debounce 350ms para não sobrecarregar a API
+    debounceTimer = setTimeout(() => buscarPorDescricao(termo), 350);
+});
+
+async function buscarPorDescricao(termo) {
+    suggestionsEl.innerHTML = '<div class="sugestao-item loading"><span class="spinner light"></span>&nbsp;Buscando...</div>';
+    try {
+        const res  = await fetch(`/api/produtos?busca=${encodeURIComponent(termo)}&ativo=true`, { headers: API_HEADERS,credentials: 'include' });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || 'Erro na busca');
+        renderSugestoes(json.data || []);
+    } catch (err) {
+        suggestionsEl.innerHTML = `<div class="sugestao-item sem-result">⚠ ${err.message}</div>`;
+    }
+}
+
+async function buscarPorCodigo(codbarras) {
+    suggestionsEl.innerHTML = '<div class="sugestao-item loading"><span class="spinner light"></span>&nbsp;Buscando...</div>';
+    try {
+        const res  = await fetch(`/api/produtos/codigo/${codbarras}`, { headers: API_HEADERS,credentials: 'include' });
+        const json = await res.json();
+        if (res.status === 404) {
+            suggestionsEl.innerHTML = '<div class="sugestao-item sem-result">Produto não encontrado</div>';
+            return;
+        }
+        if (!res.ok) throw new Error(json.message);
+
+        // Código de barras retorna produto único: adiciona direto
+        adicionarProduto(json.data);
+        suggestionsEl.innerHTML = '';
+        buscaInput.value = '';
+    } catch (err) {
+        suggestionsEl.innerHTML = `<div class="sugestao-item sem-result">⚠ ${err.message}</div>`;
+    }
+}
+
+function renderSugestoes(produtos) {
+    if (!produtos.length) {
+        suggestionsEl.innerHTML = '<div class="sugestao-item sem-result">Nenhum produto encontrado</div>';
+        return;
+    }
+
+    // Guarda dados em memória para recuperar no clique sem eval
+    suggestionsEl._cache = produtos;
+
+    suggestionsEl.innerHTML = produtos.map((p, idx) => `
+        <div class="sugestao-item" data-idx="${idx}">
+            <div>
+                <div>${p.descricao}</div>
+                <div class="sugestao-estoque">Estoque: ${p.estoque ?? '—'}</div>
+            </div>
+            <span class="sugestao-price">R$ ${fmtNum(p.preco)}</span>
+        </div>
+    `).join('');
+
+    // Delegação de evento — sem onclick inline
+    suggestionsEl.querySelectorAll('.sugestao-item[data-idx]').forEach(el => {
+        el.addEventListener('click', () => {
+            const produto = (suggestionsEl._cache || [])[parseInt(el.dataset.idx)];
+            if (produto) {
+                adicionarProduto(produto);
+                suggestionsEl.innerHTML = '';
+                suggestionsEl._cache = null;
+                buscaInput.value = '';
+            }
+        });
+    });
+}
+
+// Fecha sugestões ao clicar fora
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.input-group')) {
+        suggestionsEl.innerHTML = '';
+        suggestionsEl._cache = null;
+    }
+});
+
+/* ═══════════════════════════════════════════════
+   ADICIONAR PRODUTO AO CARRINHO
+   Recebe o objeto produto como vem da sua API
+═══════════════════════════════════════════════ */
+function adicionarProduto(produto) {
+    const qtd = Math.max(1, parseInt(document.getElementById('qtdInput').value) || 1);
+
+    // Se já existe no carrinho, soma a quantidade
+    const existente = itensVenda.find(i => i.produto_id === produto.id);
+    if (existente) {
+        existente.quantidade  += qtd;
+        existente.subtotal     = existente.preco_unitario * existente.quantidade;
+    } else {
+        itensVenda.push({
+            produto_id:     produto.id,
+            descricao:      produto.descricao,
+            preco_unitario: parseFloat(produto.preco),
+            quantidade:     qtd,
+            subtotal:       parseFloat(produto.preco) * qtd
+        });
+    }
+
+    document.getElementById('qtdInput').value = 1;
+    buscaInput.focus();
+    renderItens();
+}
+
+/* ═══════════════════════════════════════════════
+   RENDER DO CARRINHO
+═══════════════════════════════════════════════ */
+function renderItens() {
+    const container = document.getElementById('listaItens');
+    const emptyMsg  = document.getElementById('emptyMsg');
+
+    if (!itensVenda.length) {
+        container.innerHTML = '';
+        container.appendChild(emptyMsg);
+        emptyMsg.style.display = 'block';
+        atualizarTotal();
+        return;
+    }
+
+    emptyMsg.style.display = 'none';
+
+    container.innerHTML = itensVenda.map((item, idx) => `
+        <div class="sale-item">
+            <div>
+                <div class="sale-item-name">${item.descricao}</div>
+                <div class="sale-item-qty">${item.quantidade}x &nbsp;R$ ${fmtNum(item.preco_unitario)}</div>
+            </div>
+            <div class="sale-item-right">
+                R$ ${fmtNum(item.subtotal)}
+                <button class="btn-remove" data-idx="${idx}" title="Remover">✕</button>
+            </div>
+        </div>
+    `).join('');
+
+    // Delegação para os botões de remover
+    container.querySelectorAll('.btn-remove').forEach(btn => {
+        btn.addEventListener('click', () => removerItem(parseInt(btn.dataset.idx)));
+    });
+
+    atualizarTotal();
+}
+
+function removerItem(idx) {
+    itensVenda.splice(idx, 1);
+    renderItens();
+}
+
+/* ═══════════════════════════════════════════════
+   TOTAL
+═══════════════════════════════════════════════ */
+function atualizarTotal() {
+    const subtotal = itensVenda.reduce((acc, i) => acc + i.subtotal, 0);
+    const desconto = parseFloat(document.getElementById('descontoInput').value) || 0;
+    const total    = Math.max(0, subtotal - desconto);
+    document.getElementById('totalGeralDisplay').textContent = 'R$ ' + fmtNum(total);
+}
+
+document.getElementById('descontoInput').addEventListener('input', atualizarTotal);
+
+/* ═══════════════════════════════════════════════
+   FINALIZAR VENDA  →  POST /api/vendas
+   ─────────────────────────────────────────────
+   Payload exatamente como apiVendas.js espera:
+   {
+     forma_pagamento: string,
+     desconto: number,
+     itens: [{ produto_id, quantidade, preco_unitario }]
+   }
+═══════════════════════════════════════════════ */
+async function finalizarVenda() {
+    if (!itensVenda.length) { toast('Adicione pelo menos um item!', 'error'); return; }
+
+    const btn = document.getElementById('btnFinalizar');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>&nbsp;Salvando...';
+
+    const payload = {
+        forma_pagamento: document.getElementById('formaPagamento').value,
+        desconto:        parseFloat(document.getElementById('descontoInput').value) || 0,
+        itens: itensVenda.map(i => ({
+            produto_id:     i.produto_id,
+            quantidade:     i.quantidade,
+            preco_unitario: i.preco_unitario
+        }))
+    };
+
+    try {
+        const res  = await fetch('/api/vendas', {
+            method:  'POST',
+            headers: API_HEADERS,
+            credentials: 'include',
+            body:    JSON.stringify(payload)
+        });
+        const json = await res.json();
+
+        if (!res.ok) throw new Error(json.message || 'Erro ao salvar venda');
+
+        toast(`Venda #${json.data.id} registrada! ✔`);
+        limparCarrinho();
+
+    } catch (err) {
+        toast('Erro: ' + err.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '✔ Finalizar Venda';
+    }
+}
+
+/* ═══════════════════════════════════════════════
+   LIMPAR CARRINHO
+═══════════════════════════════════════════════ */
+function limparCarrinho() {
+    itensVenda = [];
+    document.getElementById('descontoInput').value = 0;
+    renderItens();
+    buscaInput.focus();
+}
+
+/* ═══════════════════════════════════════════════
+   UTILITÁRIO
+═══════════════════════════════════════════════ */
+function fmtNum(n) {
+    return parseFloat(n).toFixed(2).replace('.', ',');
+}
+</script>
+
+</body>
+</html>

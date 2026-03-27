@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 const sequelize  = require('../config/db');
 
 const LancEstoque   = require('../models/LancEstoque');
-const LancEstProduto = require('../models/lancEstProduto');
+const LancEstProduto = require('../models/LancEstProduto');
 const MovtoEstoque  = require('../models/MovtoEstoque');
 const Produto       = require('../models/produto');
 

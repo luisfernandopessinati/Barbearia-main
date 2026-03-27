@@ -5,15 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Produtos</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
       --gold: #c9a84c;
@@ -26,574 +20,204 @@
       --border: #2a2a2a;
       --text: #e0e0e0;
       --text-muted: #666;
+      --danger: #e05252;
     }
 
-    body {
-      background: var(--black);
-      color: var(--text);
-      font-family: 'Barlow', sans-serif;
-      font-size: 13px;
-      min-height: 100vh;
-    }
+    body { background: var(--black); color: var(--text); font-family: 'Barlow', sans-serif; font-size: 13px; min-height: 100vh; }
 
+    /* ── HEADER ── */
     .header {
-      background: var(--dark);
-      border-bottom: 1px solid var(--border);
-      padding: 0 24px;
-      height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      background: var(--dark); border-bottom: 1px solid var(--border);
+      padding: 0 24px; height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
     }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
+    .header-left { display: flex; align-items: center; gap: 14px; }
     .btn-back {
-      width: 34px;
-      height: 34px;
-      background: var(--gold);
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s;
-      text-decoration: none;
-      flex-shrink: 0;
+      width: 34px; height: 34px; background: var(--gold); border: none;
+      border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s; text-decoration: none; flex-shrink: 0;
     }
+    .btn-back:hover { background: var(--gold-light); }
+    .btn-back svg { width: 16px; height: 16px; fill: var(--black); }
+    .header-title { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); }
+    .header-label { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--text-muted); }
 
-    .btn-back:hover {
-      background: var(--gold-light);
-    }
+    /* ── MAIN ── */
+    .main { padding: 20px; max-width: 1200px; margin: 0 auto; }
 
-    .btn-back svg {
-      width: 16px;
-      height: 16px;
-      fill: var(--black);
-    }
-
-    .header-title {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--gold);
-    }
-
-    .header-label {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 12px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
-
-    .main {
-      padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 18px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
+    .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
 
     .search-box {
-      display: flex;
-      align-items: center;
-      background: var(--dark2);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 0 12px;
-      gap: 8px;
-      flex: 1;
-      max-width: 300px;
+      display: flex; align-items: center; background: var(--dark2);
+      border: 1px solid var(--border); border-radius: 4px; padding: 0 12px; gap: 8px; flex: 1; max-width: 300px;
     }
-
-    .search-box svg {
-      width: 13px;
-      height: 13px;
-      fill: var(--text-muted);
-      flex-shrink: 0;
-    }
-
+    .search-box svg { width: 13px; height: 13px; fill: var(--text-muted); flex-shrink: 0; }
     .search-box input {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--text);
-      font-family: 'Barlow', sans-serif;
-      font-size: 13px;
-      padding: 9px 0;
-      width: 100%;
+      background: transparent; border: none; outline: none; color: var(--text);
+      font-family: 'Barlow', sans-serif; font-size: 13px; padding: 9px 0; width: 100%;
     }
-
-    .search-box input::placeholder {
-      color: var(--text-muted);
-    }
+    .search-box input::placeholder { color: var(--text-muted); }
 
     .btn-novo {
-      background: var(--gold);
-      color: var(--black);
-      border: none;
-      padding: 9px 20px;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      cursor: pointer;
-      border-radius: 4px;
-      transition: background 0.2s, transform 0.1s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      background: var(--gold); color: var(--black); border: none;
+      padding: 9px 20px; font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      cursor: pointer; border-radius: 4px; transition: background 0.2s, transform 0.1s;
+      display: flex; align-items: center; gap: 6px;
     }
+    .btn-novo:hover { background: var(--gold-light); transform: translateY(-1px); }
 
-    .btn-novo:hover {
-      background: var(--gold-light);
-      transform: translateY(-1px);
-    }
+    /* ── STATS ── */
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+    .stat-card { background: var(--dark2); border: 1px solid var(--border); border-radius: 4px; padding: 14px; }
+    .stat-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px; }
+    .stat-value { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; color: var(--gold); }
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 18px;
-    }
+    /* ── TABELA ── */
+    .table-wrap { background: var(--dark2); border: 1px solid var(--border); border-radius: 4px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 480px; }
+    thead tr { background: var(--dark3); border-bottom: 1px solid var(--border); }
+    th { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); padding: 11px 12px; text-align: left; font-weight: 600; white-space: nowrap; }
+    td { padding: 11px 12px; font-size: 12px; color: var(--text); border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr { transition: background 0.15s; }
+    tbody tr:hover { background: rgba(201,168,76,0.05); }
 
-    .stat-card {
-      background: var(--dark2);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 14px;
-    }
+    .produto-img { width: 36px; height: 36px; object-fit: cover; border-radius: 3px; border: 1px solid var(--border); }
+    .produto-sem-img { width: 36px; height: 36px; background: var(--dark3); border: 1px solid var(--border); border-radius: 3px; display: flex; align-items: center; justify-content: center; }
+    .produto-sem-img svg { width: 16px; height: 16px; fill: var(--text-muted); }
 
-    .stat-label {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 5px;
-    }
+    .badge-ativo { display: inline-block; padding: 2px 7px; border-radius: 2px; font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .badge-ativo.sim { background: rgba(201,168,76,0.15); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); }
+    .badge-ativo.nao { background: rgba(100,100,100,0.15); color: var(--text-muted); border: 1px solid var(--border); }
 
-    .stat-value {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--gold);
-    }
+    .estoque-low { color: var(--danger); }
+    .estoque-ok  { color: var(--gold); }
 
-    .table-wrap {
-      background: var(--dark2);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 480px;
-    }
-
-    thead tr {
-      background: var(--dark3);
-      border-bottom: 1px solid var(--border);
-    }
-
-    th {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--gold);
-      padding: 11px 12px;
-      text-align: left;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    td {
-      padding: 11px 12px;
-      font-size: 12px;
-      color: var(--text);
-      border-bottom: 1px solid var(--border);
-      vertical-align: middle;
-    }
-
-    tbody tr:last-child td {
-      border-bottom: none;
-    }
-
-    tbody tr {
-      transition: background 0.15s;
-    }
-
-    tbody tr:hover {
-      background: rgba(201, 168, 76, 0.05);
-    }
-
-    .produto-img {
-      width: 36px;
-      height: 36px;
-      object-fit: cover;
-      border-radius: 3px;
-      border: 1px solid var(--border);
-    }
-
-    .produto-sem-img {
-      width: 36px;
-      height: 36px;
-      background: var(--dark3);
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .produto-sem-img svg {
-      width: 16px;
-      height: 16px;
-      fill: var(--text-muted);
-    }
-
-    .badge-ativo {
-      display: inline-block;
-      padding: 2px 7px;
-      border-radius: 2px;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      font-weight: 600;
-    }
-
-    .badge-ativo.sim {
-      background: rgba(201, 168, 76, 0.15);
-      color: var(--gold);
-      border: 1px solid rgba(201, 168, 76, 0.3);
-    }
-
-    .badge-ativo.nao {
-      background: rgba(100, 100, 100, 0.15);
-      color: var(--text-muted);
-      border: 1px solid var(--border);
-    }
-
-    .estoque-low {
-      color: #e05252;
-    }
-
-    .estoque-ok {
-      color: var(--gold);
-    }
-
-    .acoes {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .acoes form {
-      margin: 0;
-    }
+    .acoes { display: flex; gap: 6px; align-items: center; }
+    .acoes form { margin: 0; }
 
     .btn-editar {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--gold);
-      padding: 4px 20px;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 11px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      cursor: pointer;
-      border-radius: 3px;
-      transition: all 0.2s;
-      white-space: nowrap;
-      vertical-align: middle;
+      background: transparent; border: 1px solid var(--border); color: var(--gold);
+      padding: 4px 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
+      letter-spacing: 1px; text-transform: uppercase; cursor: pointer; border-radius: 3px; transition: all 0.2s; white-space: nowrap;
     }
-
-    .btn-editar:hover {
-      background: rgba(201, 168, 76, 0.1);
-      border-color: var(--gold);
-    }
+    .btn-editar:hover { background: rgba(201,168,76,0.1); border-color: var(--gold); }
 
     .btn-excluir {
-      background: transparent;
-      border: 1px solid #3a1a1a;
-      color: #e05252;
-      padding: 4px 30px;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 11px;
-      letter-spacing: 1px;
-      text-align: center;
-      text-transform: uppercase;
-      cursor: pointer;
-      border-radius: 3px;
-      transition: all 0.2s;
-      white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      vertical-align: middle;
+      background: transparent; border: 1px solid #3a1a1a; color: var(--danger);
+      padding: 4px 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
+      letter-spacing: 1px; text-transform: uppercase; cursor: pointer; border-radius: 3px; transition: all 0.2s; white-space: nowrap;
     }
+    .btn-excluir:hover { background: var(--danger); color: white; border-color: var(--danger); }
 
-    .btn-excluir:hover {
-      background: #e05252;
-      color: white;
-      border-color: #e05252;
-    }
+    .empty { text-align: center; padding: 48px 20px; }
+    .empty svg { width: 38px; height: 38px; fill: var(--text-muted); margin-bottom: 10px; }
+    .empty p { color: var(--text-muted); font-size: 12px; letter-spacing: 1px; }
 
-    .empty {
-      text-align: center;
-      padding: 48px 20px;
-    }
-
-    .empty svg {
-      width: 38px;
-      height: 38px;
-      fill: var(--text-muted);
-      margin-bottom: 10px;
-    }
-
-    .empty p {
-      color: var(--text-muted);
-      font-size: 12px;
-      letter-spacing: 1px;
-    }
-
-    /* MODAL */
+    /* ── MODAL ── */
     .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      z-index: 200;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88);
+      z-index: 200; align-items: center; justify-content: center; padding: 16px;
     }
-
-    .modal-overlay.open {
-      display: flex;
-    }
+    .modal-overlay.open { display: flex; }
 
     .modal {
-      background: var(--dark2);
-      border: 1px solid var(--border);
-      border-top: 2px solid var(--gold);
-      border-radius: 4px;
-      width: 100%;
-      max-width: 500px;
-      max-height: 92vh;
-      overflow-y: auto;
+      background: var(--dark2); border: 1px solid var(--border); border-top: 2px solid var(--gold);
+      border-radius: 4px; width: 100%; max-width: 520px; max-height: 94vh; overflow-y: auto;
       animation: slideUp 0.2s ease;
     }
+    @keyframes slideUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
 
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(14px);
-      }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+    .modal-title { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); }
+    .modal-close { background: transparent; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; line-height: 1; transition: color 0.2s; }
+    .modal-close:hover { color: var(--text); }
 
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+    .modal-body { padding: 16px 20px; }
 
-    .modal-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .form-group { margin-bottom: 12px; }
 
-    .modal-title {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--gold);
-    }
-
-    .modal-close {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-size: 20px;
-      cursor: pointer;
-      line-height: 1;
-      transition: color 0.2s;
-    }
-
-    .modal-close:hover {
-      color: var(--text);
-    }
-
-    .modal-body {
-      padding: 16px 20px;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .form-group {
-      margin-bottom: 12px;
-    }
-
-    label {
-      display: block;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 5px;
-    }
+    label { display: block; font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 5px; }
 
     input[type="text"],
     input[type="number"],
     input[type="file"],
     select {
-      width: 100%;
-      background: var(--dark3);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 8px 11px;
-      font-family: 'Barlow', sans-serif;
-      font-size: 13px;
-      border-radius: 3px;
-      outline: none;
-      transition: border-color 0.2s;
+      width: 100%; background: var(--dark3); border: 1px solid var(--border);
+      color: var(--text); padding: 8px 11px; font-family: 'Barlow', sans-serif;
+      font-size: 13px; border-radius: 3px; outline: none; transition: border-color 0.2s;
+    }
+    input:focus, select:focus { border-color: var(--gold); }
+
+    /* ── CAMPO CODBARRAS COM BOTÃO CÂMERA ── */
+    .codbarras-row { display: flex; gap: 6px; align-items: flex-end; }
+    .codbarras-row .input-wrap { flex: 1; }
+    .btn-camera {
+      background: var(--dark3); border: 1px solid var(--border); color: var(--gold);
+      width: 38px; height: 38px; border-radius: 3px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: border-color 0.2s, background 0.2s; font-size: 18px;
+    }
+    .btn-camera:hover { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+
+    /* ── LEITOR DE CÂMERA ── */
+    .scanner-box {
+      display: none; margin-top: 10px; border-radius: 6px; overflow: hidden;
+      border: 1px solid var(--gold); position: relative; background: #000;
+    }
+    .scanner-box.open { display: block; }
+    .scanner-box video { width: 100%; max-height: 220px; object-fit: cover; display: block; }
+    .scanner-line {
+      position: absolute; left: 0; right: 0; top: 50%; height: 2px;
+      background: var(--gold); opacity: 0.7;
+      animation: scan 1.8s ease-in-out infinite;
+    }
+    @keyframes scan {
+      0%   { top: 20%; }
+      50%  { top: 80%; }
+      100% { top: 20%; }
+    }
+    .scanner-msg { position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; font-size: 11px; color: rgba(255,255,255,0.6); letter-spacing: 1px; }
+    .btn-fechar-scanner {
+      position: absolute; top: 6px; right: 8px; background: rgba(0,0,0,0.6);
+      border: none; color: #fff; font-size: 18px; cursor: pointer; line-height: 1;
+      border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
     }
 
-    input:focus,
-    select:focus {
-      border-color: var(--gold);
-    }
+    .form-check { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+    .form-check input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--gold); cursor: pointer; }
+    .form-check span { font-size: 13px; color: var(--text); }
 
-    .form-check {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 4px;
-    }
-
-    .form-check input[type="checkbox"] {
-      width: 15px;
-      height: 15px;
-      accent-color: var(--gold);
-      cursor: pointer;
-    }
-
-    .form-check span {
-      font-size: 13px;
-      color: var(--text);
-    }
-
-    .modal-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      padding: 14px 20px;
-      border-top: 1px solid var(--border);
-    }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 8px; padding: 14px 20px; border-top: 1px solid var(--border); }
 
     .btn-cancelar {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      padding: 8px 18px;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 11px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      cursor: pointer;
-      border-radius: 3px;
-      transition: all 0.2s;
+      background: transparent; border: 1px solid var(--border); color: var(--text-muted);
+      padding: 8px 18px; font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
+      letter-spacing: 2px; text-transform: uppercase; cursor: pointer; border-radius: 3px; transition: all 0.2s;
     }
-
-    .btn-cancelar:hover {
-      border-color: var(--text-muted);
-      color: var(--text);
-    }
+    .btn-cancelar:hover { border-color: var(--text-muted); color: var(--text); }
 
     .btn-salvar {
-      background: var(--gold);
-      border: none;
-      color: var(--black);
-      padding: 8px 22px;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      cursor: pointer;
-      border-radius: 3px;
-      transition: background 0.2s;
+      background: var(--gold); border: none; color: var(--black);
+      padding: 8px 22px; font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
+      font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; border-radius: 3px; transition: background 0.2s;
     }
+    .btn-salvar:hover { background: var(--gold-light); }
 
-    .btn-salvar:hover {
-      background: var(--gold-light);
-    }
-
-    ::-webkit-scrollbar {
-      width: 5px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--dark);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 3px;
-    }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--dark); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
     @media (max-width: 480px) {
-      .main {
-        padding: 10px;
-      }
-
-      .header {
-        padding: 0 10px;
-      }
-
-      .header-title {
-        font-size: 14px;
-      }
-
-      .form-row {
-        grid-template-columns: 1fr;
-      }
-
-      .btn-novo span {
-        display: none;
-      }
+      .main { padding: 10px; }
+      .header { padding: 0 10px; }
+      .header-title { font-size: 14px; }
+      .form-row { grid-template-columns: 1fr; }
+      .btn-novo span { display: none; }
     }
   </style>
 </head>
@@ -603,9 +227,7 @@
   <header class="header">
     <div class="header-left">
       <a href="/admin" class="btn-back">
-        <svg viewBox="0 0 24 24">
-          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-        </svg>
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
       </a>
       <span class="header-title">Barbearia</span>
     </div>
@@ -616,16 +238,11 @@
 
     <div class="top-bar">
       <div class="search-box">
-        <svg viewBox="0 0 24 24">
-          <path
-            d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
-        </svg>
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
         <input type="text" id="busca" placeholder="Buscar produto..." oninput="filtrar()">
       </div>
       <button class="btn-novo" onclick="abrirModal()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-        </svg>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
         <span>Novo Produto</span>
       </button>
     </div>
@@ -641,8 +258,7 @@
       </div>
       <div class="stat-card">
         <div class="stat-label">Est. Baixo</div>
-        <div class="stat-value" style="color:{{#if estoqueBaixo}}#e05252{{else}}var(--gold){{/if}}">{{estoqueBaixo}}
-        </div>
+        <div class="stat-value" style="color:{{#if estoqueBaixo}}#e05252{{else}}var(--gold){{/if}}">{{estoqueBaixo}}</div>
       </div>
     </div>
 
@@ -652,9 +268,10 @@
         <thead>
           <tr>
             <th></th>
-            <th>Descrição</th>
+            <th>Descri&#231;&#227;o</th>
             <th>Grupo</th>
-            <th>Preço</th>
+            <th>Cod. Barras</th>
+            <th>Pre&#231;o</th>
             <th>Estoque</th>
             <th>Ativo</th>
             <th></th>
@@ -668,29 +285,26 @@
               <img src="{{imagem}}" alt="{{descricao}}" class="produto-img">
               {{else}}
               <div class="produto-sem-img">
-                <svg viewBox="0 0 24 24">
-                  <path
-                    d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
-                </svg>
+                <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
               </div>
               {{/if}}
             </td>
             <td><strong>{{descricao}}</strong></td>
-            <td>{{#if grupo}}{{grupo}}{{else}}<span style="color:var(--text-muted)">—</span>{{/if}}</td>
+            <td>{{#if grupo}}{{grupo}}{{else}}<span style="color:var(--text-muted)">&#8212;</span>{{/if}}</td>
+            <td style="font-family:monospace;font-size:11px;color:var(--text-muted)">{{#if codbarras}}{{codbarras}}{{else}}<span style="color:var(--border)">&#8212;</span>{{/if}}</td>
             <td>R$ {{preco}}</td>
             <td class="{{#if (lt estoque 5)}}estoque-low{{else}}estoque-ok{{/if}}">{{estoque}}</td>
             <td>
               {{#if ativo}}
               <span class="badge-ativo sim">Sim</span>
               {{else}}
-              <span class="badge-ativo nao">Não</span>
+              <span class="badge-ativo nao">N&#227;o</span>
               {{/if}}
             </td>
             <td>
               <div class="acoes">
                 <button class="btn-editar" onclick="abrirEditar({{json this}})">Editar</button>
-                <form action="/produtos/excluir/{{id}}" method="POST"
-                  onsubmit="return confirm('Excluir este produto?')">
+                <form action="/produtos/excluir/{{id}}" method="POST" onsubmit="return confirm('Excluir este produto?')">
                   <button type="submit" class="btn-excluir">Excluir</button>
                 </form>
               </div>
@@ -701,10 +315,7 @@
       </table>
       {{else}}
       <div class="empty">
-        <svg viewBox="0 0 24 24">
-          <path
-            d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z" />
-        </svg>
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
         <p>Nenhum produto cadastrado ainda.</p>
       </div>
       {{/if}}
@@ -712,29 +323,34 @@
 
   </main>
 
+  <!-- ── MODAL ── -->
   <div class="modal-overlay" id="modal" onclick="fecharModalFora(event)">
     <div class="modal">
       <div class="modal-header">
         <span class="modal-title" id="modal-titulo">Novo Produto</span>
-        <button class="modal-close" onclick="fecharModal()">×</button>
+        <button class="modal-close" onclick="fecharModal()">&#215;</button>
       </div>
       <form id="form-produto" action="/produtos" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="id" id="campo-id">
         <div class="modal-body">
 
           <div class="form-group">
-            <label>Descrição *</label>
+            <label>Descri&#231;&#227;o *</label>
             <input type="text" name="descricao" id="campo-descricao" required placeholder="Nome do produto">
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label>Grupo</label>
-              <input type="text" name="grupo" id="campo-grupo" placeholder="Ex: Pomada, Óleo...">
+              <input type="text" name="grupo" id="campo-grupo" placeholder="Ex: Pomada, &#211;leo...">
             </div>
             <div class="form-group">
               <label>Estoque</label>
               <input type="number" name="estoque" id="campo-estoque" value="0" min="0">
+            </div>
+            <div class="form-group">
+              <label>Est. M&#237;nimo</label>
+              <input type="number" name="est_min" id="campo-est-min" value="0" min="0">
             </div>
           </div>
 
@@ -744,8 +360,29 @@
               <input type="number" name="custo" id="campo-custo" step="0.01" min="0" placeholder="0,00">
             </div>
             <div class="form-group">
-              <label>Preço de Venda (R$) *</label>
+              <label>Pre&#231;o de Venda (R$) *</label>
               <input type="number" name="preco" id="campo-preco" step="0.01" min="0" required placeholder="0,00">
+            </div>
+          </div>
+
+          <!-- CAMPO CÓDIGO DE BARRAS + CÂMERA -->
+          <div class="form-group">
+            <label>C&#243;d. de Barras</label>
+            <div class="codbarras-row">
+              <div class="input-wrap">
+                <input type="text" name="codbarras" id="campo-codbarras" placeholder="Digite ou escaneie...">
+              </div>
+              <button type="button" class="btn-camera" id="btnCamera" title="Escanear com c&#226;mera">
+                &#128247;
+              </button>
+            </div>
+
+            <!-- Leitor de câmera -->
+            <div class="scanner-box" id="scannerBox">
+              <video id="scannerVideo" playsinline muted></video>
+              <div class="scanner-line"></div>
+              <div class="scanner-msg">Aponte para o c&#243;digo de barras</div>
+              <button type="button" class="btn-fechar-scanner" onclick="fecharScanner()">&#215;</button>
             </div>
           </div>
 
@@ -770,34 +407,45 @@
     </div>
   </div>
 
+  <!-- ZXing para leitura de código de barras via câmera -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/zxing-js/0.20.0/zxing.min.js"></script>
+
   <script>
+    /* ── MODAL ── */
     function abrirModal() {
       document.getElementById('modal-titulo').textContent = 'Novo Produto';
       document.getElementById('form-produto').action = '/produtos';
-      document.getElementById('campo-id').value = '';
+      document.getElementById('campo-id').value        = '';
       document.getElementById('campo-descricao').value = '';
-      document.getElementById('campo-grupo').value = '';
-      document.getElementById('campo-estoque').value = '0';
-      document.getElementById('campo-custo').value = '';
-      document.getElementById('campo-preco').value = '';
-      document.getElementById('campo-ativo').checked = true;
+      document.getElementById('campo-grupo').value     = '';
+      document.getElementById('campo-estoque').value   = '0';
+      document.getElementById('campo-custo').value     = '';
+      document.getElementById('campo-preco').value     = '';
+      document.getElementById('campo-codbarras').value = '';
+      document.getElementById('campo-est-min').value   = '0';
+      document.getElementById('campo-ativo').checked   = true;
+      fecharScanner();
       document.getElementById('modal').classList.add('open');
     }
 
     function abrirEditar(produto) {
-      document.getElementById('modal-titulo').textContent = 'Editar Produto';
-      document.getElementById('form-produto').action = '/produtos/editar/' + produto.id;
-      document.getElementById('campo-id').value = produto.id;
-      document.getElementById('campo-descricao').value = produto.descricao || '';
-      document.getElementById('campo-grupo').value = produto.grupo || '';
-      document.getElementById('campo-estoque').value = produto.estoque || 0;
-      document.getElementById('campo-custo').value = produto.custo || '';
-      document.getElementById('campo-preco').value = produto.preco || '';
-      document.getElementById('campo-ativo').checked = produto.ativo ? true : false;
+      document.getElementById('modal-titulo').textContent    = 'Editar Produto';
+      document.getElementById('form-produto').action         = '/produtos/editar/' + produto.id;
+      document.getElementById('campo-id').value              = produto.id;
+      document.getElementById('campo-descricao').value       = produto.descricao  || '';
+      document.getElementById('campo-grupo').value           = produto.grupo      || '';
+      document.getElementById('campo-estoque').value         = produto.estoque    || 0;
+      document.getElementById('campo-custo').value           = produto.custo      || '';
+      document.getElementById('campo-preco').value           = produto.preco      || '';
+      document.getElementById('campo-codbarras').value       = produto.codbarras  || '';
+      document.getElementById('campo-est-min').value           = produto.est_min    || 0;
+      document.getElementById('campo-ativo').checked         = produto.ativo ? true : false;
+      fecharScanner();
       document.getElementById('modal').classList.add('open');
     }
 
     function fecharModal() {
+      fecharScanner();
       document.getElementById('modal').classList.remove('open');
     }
 
@@ -805,20 +453,130 @@
       if (e.target === document.getElementById('modal')) fecharModal();
     }
 
+    /* ── FILTRO TABELA ── */
     function filtrar() {
-      const termo = document.getElementById('busca').value.toLowerCase();
-      const linhas = document.querySelectorAll('#tabela-produtos tbody tr');
-      linhas.forEach(tr => {
-        const texto = tr.textContent.toLowerCase();
-        tr.style.display = texto.includes(termo) ? '' : 'none';
+      var termo  = document.getElementById('busca').value.toLowerCase();
+      var linhas = document.querySelectorAll('#tabela-produtos tbody tr');
+      linhas.forEach(function(tr) {
+        tr.style.display = tr.textContent.toLowerCase().includes(termo) ? '' : 'none';
       });
     }
 
-    document.addEventListener('keydown', e => {
+    document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') fecharModal();
     });
+
+    /* ══════════════════════════════════════════
+       LEITOR DE CÂMERA — ZXing
+       Usa BarcodeDetector nativo se disponível,
+       cai no ZXing como fallback.
+    ══════════════════════════════════════════ */
+    var streamAtivo   = null;
+    var leituraLoop   = null;
+    var usandoNativo  = false;
+
+    document.getElementById('btnCamera').addEventListener('click', function() {
+      var box = document.getElementById('scannerBox');
+      if (box.classList.contains('open')) {
+        fecharScanner();
+      } else {
+        abrirScanner();
+      }
+    });
+
+    function abrirScanner() {
+      var box   = document.getElementById('scannerBox');
+      var video = document.getElementById('scannerVideo');
+      box.classList.add('open');
+
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+        .then(function(stream) {
+          streamAtivo   = stream;
+          video.srcObject = stream;
+          video.play();
+
+          // Tenta BarcodeDetector nativo (Chrome Android / Safari 17+)
+          if ('BarcodeDetector' in window) {
+            usandoNativo = true;
+            var detector = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'code_128', 'code_39', 'qr_code', 'upc_a', 'upc_e'] });
+            leituraLoop = setInterval(function() {
+              detector.detect(video).then(function(codigos) {
+                if (codigos.length > 0) {
+                  codigoDetectado(codigos[0].rawValue);
+                }
+              }).catch(function() {});
+            }, 400);
+          } else {
+            // Fallback: ZXing
+            usandoNativo = false;
+            iniciarZxing(video);
+          }
+        })
+        .catch(function(err) {
+          alert('Câmera não disponível: ' + err.message);
+          fecharScanner();
+        });
+    }
+
+    function iniciarZxing(video) {
+      // Aguarda ZXing carregar
+      var tentativas = 0;
+      var check = setInterval(function() {
+        tentativas++;
+        if (typeof ZXing !== 'undefined' || tentativas > 30) {
+          clearInterval(check);
+          if (typeof ZXing === 'undefined') return;
+
+          try {
+            var hints = new Map();
+            var formatos = [
+              ZXing.BarcodeFormat.EAN_13, ZXing.BarcodeFormat.EAN_8,
+              ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.CODE_39,
+              ZXing.BarcodeFormat.QR_CODE, ZXing.BarcodeFormat.UPC_A
+            ];
+            hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, formatos);
+
+            var reader = new ZXing.BrowserMultiFormatReader(hints);
+            reader.decodeFromVideoElement(video, function(result, err) {
+              if (result) {
+                codigoDetectado(result.getText());
+                reader.reset();
+              }
+            });
+            // Guarda referência para parar depois
+            streamAtivo._zxingReader = reader;
+          } catch(e) {
+            console.warn('ZXing falhou:', e);
+          }
+        }
+      }, 200);
+    }
+
+    function codigoDetectado(codigo) {
+      document.getElementById('campo-codbarras').value = codigo;
+      fecharScanner();
+      // Vibra no celular para confirmar
+      if (navigator.vibrate) navigator.vibrate(120);
+    }
+
+    function fecharScanner() {
+      var box = document.getElementById('scannerBox');
+      box.classList.remove('open');
+
+      if (leituraLoop) { clearInterval(leituraLoop); leituraLoop = null; }
+
+      if (streamAtivo) {
+        if (streamAtivo._zxingReader) {
+          try { streamAtivo._zxingReader.reset(); } catch(e) {}
+        }
+        streamAtivo.getTracks().forEach(function(t) { t.stop(); });
+        streamAtivo = null;
+      }
+
+      var video = document.getElementById('scannerVideo');
+      video.srcObject = null;
+    }
   </script>
 
 </body>
-
 </html>

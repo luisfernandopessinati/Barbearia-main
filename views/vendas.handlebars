@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,11 +8,11 @@
     <style>
         :root {
             --gold: #D4AF37;
-            --gold-glow: rgba(212, 175, 55, .18);
+            --gold-glow: rgba(212,175,55,.18);
             --bg: #0d0d0d;
             --surface: #161616;
             --card: #1a1a1a;
-            --card-border: rgba(212, 175, 55, .15);
+            --card-border: rgba(212,175,55,.15);
             --text: #e8e8e8;
             --muted: #666;
             --danger: #e05454;
@@ -22,107 +21,93 @@
             --font-main: 'Rajdhani', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { background: var(--bg); color: var(--text); font-family: var(--font-main); height: 100%; overflow: hidden; }
 
-        html, body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: var(--font-main);
-            height: 100%;
-            overflow: hidden;
-        }
-
-        /* ── TOPBAR ── */
         header {
-            background: #000;
-            border-bottom: 1px solid var(--card-border);
-            padding: 0 24px;
-            height: 56px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            background: #000; border-bottom: 1px solid var(--card-border);
+            padding: 0 24px; height: 56px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: space-between;
         }
-        .logo { font-weight: 700; font-size: 18px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; }
 
-        /* ── TOAST ── */
         #toast {
             position: fixed; top: 16px; right: 16px; z-index: 9999;
             background: var(--success); color: #fff;
-            padding: 12px 20px; border-radius: 8px;
-            font-size: 15px; font-weight: 600;
+            padding: 12px 20px; border-radius: 8px; font-size: 15px; font-weight: 600;
             display: none; align-items: center; gap: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-            max-width: 320px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.5); max-width: 320px;
         }
         #toast.error { background: var(--danger); }
         #toast.show  { display: flex; }
 
-        /* ── APP ── */
-        .app-wrapper { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .app-wrapper  { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .pdv-container{ display: flex; flex: 1; overflow: hidden; }
 
-        .pdv-container { display: flex; flex: 1; overflow: hidden; }
-
-        /* ── PAINEL ESQUERDO ── */
         .panel-left {
-            display: flex; flex-direction: column;
-            flex: 1; border-right: 1px solid var(--card-border);
-            background: var(--bg); overflow: hidden; min-width: 0;
+            display: flex; flex-direction: column; flex: 1;
+            border-right: 1px solid var(--card-border); background: var(--bg); overflow: hidden; min-width: 0;
         }
-
         .search-area {
-            padding: 16px;
-            background: var(--surface);
-            border-bottom: 1px solid var(--card-border);
-            flex-shrink: 0;
+            padding: 16px; background: var(--surface);
+            border-bottom: 1px solid var(--card-border); flex-shrink: 0;
         }
         .search-row { display: flex; gap: 10px; }
-
         .input-group { position: relative; flex: 1; }
-        .input-group label {
-            display: block; color: var(--gold);
-            font-size: 11px; text-transform: uppercase;
-            margin-bottom: 5px; font-weight: 600; letter-spacing: 1px;
-        }
-
+        .input-group label { display: block; color: var(--gold); font-size: 11px; text-transform: uppercase; margin-bottom: 5px; font-weight: 600; letter-spacing: 1px; }
         input, select {
-            width: 100%; background: var(--card);
-            border: 1px solid var(--card-border);
-            border-radius: 8px; color: #fff;
-            padding: 10px 12px; font-family: var(--font-main);
-            font-size: 15px; outline: none; transition: border-color 0.2s;
+            width: 100%; background: var(--card); border: 1px solid var(--card-border);
+            border-radius: 8px; color: #fff; padding: 10px 12px;
+            font-family: var(--font-main); font-size: 15px; outline: none; transition: border-color .2s;
         }
         input:focus { border-color: var(--gold); }
 
-        /* ── LISTA DE ITENS ── */
         .items-list { flex: 1; padding: 16px; overflow-y: auto; }
 
+        /* ── ITEM DO CARRINHO ── */
         .sale-item {
-            background: var(--card);
-            border-left: 4px solid var(--gold);
-            padding: 13px 14px; margin-bottom: 10px;
-            border-radius: 0 8px 8px 0;
-            display: flex; justify-content: space-between;
-            align-items: center; gap: 10px;
+            background: var(--card); border-left: 4px solid var(--gold);
+            padding: 12px 14px; margin-bottom: 10px; border-radius: 0 8px 8px 0;
             animation: fadeIn .2s ease;
         }
         @keyframes fadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
 
+        .sale-item-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         .sale-item-name { font-weight: bold; font-size: 15px; }
         .sale-item-qty  { font-size: 12px; color: var(--gold); margin-top: 3px; }
+        .sale-item-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; font-family: var(--font-mono); font-weight: bold; white-space: nowrap; }
 
-        .sale-item-right {
-            display: flex; align-items: center; gap: 10px;
-            flex-shrink: 0; font-family: var(--font-mono);
-            font-weight: bold; white-space: nowrap;
+        .sale-item-edit {
+            background: none; border: none; color: var(--gold);
+            cursor: pointer; font-size: 15px; padding: 2px 5px;
+            border-radius: 4px; transition: background .2s; line-height: 1;
         }
+        .sale-item-edit:hover { background: var(--gold-glow); }
+
         .btn-remove {
             background: none; border: none; color: var(--danger);
-            cursor: pointer; font-size: 16px;
-            padding: 2px 6px; border-radius: 4px; transition: background 0.2s;
+            cursor: pointer; font-size: 15px; padding: 2px 5px; border-radius: 4px; transition: background .2s;
         }
         .btn-remove:hover { background: rgba(224,84,84,.15); }
+
+        /* ── PAINEL EDIÇÃO INLINE ── */
+        .edit-row {
+            display: none; gap: 8px; align-items: center;
+            margin-top: 10px; padding-top: 10px;
+            border-top: 1px solid var(--card-border);
+        }
+        .edit-row.open { display: flex; }
+        .edit-row input {
+            background: var(--surface); border: 1px solid var(--gold);
+            color: #fff; padding: 6px 10px; border-radius: 6px;
+            font-size: 14px; font-family: var(--font-mono);
+        }
+        .edit-row label { font-size: 11px; color: var(--muted); white-space: nowrap; }
+        .edit-field { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+        .btn-confirm {
+            background: var(--gold); color: #000; border: none;
+            padding: 7px 14px; border-radius: 6px; font-weight: 700;
+            font-size: 13px; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+        }
 
         /* ── PAINEL DIREITO ── */
         .panel-right {
@@ -130,133 +115,168 @@
             display: flex; flex-direction: column; gap: 16px;
             width: 340px; flex-shrink: 0; overflow-y: auto;
         }
-
         .total-box {
             background: var(--card); padding: 18px 20px;
-            border-radius: var(--radius); text-align: right;
-            border: 1px solid var(--card-border);
+            border-radius: var(--radius); text-align: right; border: 1px solid var(--card-border);
         }
         .total-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
-        .total-value {
-            font-family: var(--font-mono); font-size: 38px;
-            color: var(--gold); font-weight: 600; margin-top: 4px;
-        }
+        .total-value { font-family: var(--font-mono); font-size: 38px; color: var(--gold); font-weight: 600; margin-top: 4px; }
 
         .btn-finish {
-            background: var(--gold); color: #000;
-            border: none; padding: 18px; border-radius: var(--radius);
+            background: var(--gold); color: #000; border: none;
+            padding: 18px; border-radius: var(--radius);
             font-weight: 700; font-size: 17px; cursor: pointer;
             text-transform: uppercase; letter-spacing: 1px;
-            margin-top: auto; transition: opacity 0.2s;
+            margin-top: auto; transition: opacity .2s;
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .btn-finish:hover    { opacity: 0.88; }
-        .btn-finish:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-finish:hover    { opacity: .88; }
+        .btn-finish:disabled { opacity: .4; cursor: not-allowed; }
+
+        /* ── LINK FECHAMENTO ── */
+        .link-fechamento {
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            color: var(--muted); font-size: 13px; text-decoration: none;
+            padding: 10px; border-radius: 8px; border: 1px solid var(--card-border);
+            transition: color .2s, border-color .2s;
+        }
+        .link-fechamento:hover { color: var(--gold); border-color: var(--gold); }
+
+
+        /* ── SCANNER CÂMERA ── */
+        .btn-camera-pdv {
+            background: var(--card); border: 1px solid var(--card-border); color: var(--gold);
+            width: 44px; height: 44px; border-radius: 8px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            font-size: 20px; transition: border-color .2s, background .2s; align-self: flex-end;
+        }
+        .btn-camera-pdv:hover { border-color: var(--gold); background: var(--gold-glow); }
+
+        .scanner-pdv {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            z-index: 500; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+        }
+        .scanner-pdv.open { display: flex; }
+        .scanner-pdv-box { position: relative; width: 100%; max-width: 380px; border-radius: 12px; overflow: hidden; border: 2px solid var(--gold); background: #000; }
+        .scanner-pdv video { width: 100%; max-height: 280px; object-fit: cover; display: block; }
+        .scanner-pdv-line {
+            position: absolute; left: 0; right: 0; top: 50%; height: 2px;
+            background: var(--gold); opacity: 0.8;
+            animation: scanpdv 1.8s ease-in-out infinite;
+        }
+        @keyframes scanpdv { 0% { top: 15%; } 50% { top: 85%; } 100% { top: 15%; } }
+        .scanner-pdv-msg { color: rgba(255,255,255,0.6); font-size: 13px; letter-spacing: 1px; text-align: center; }
+        .btn-fechar-scanner-pdv {
+            background: var(--card); border: 1px solid var(--card-border); color: var(--text);
+            padding: 12px 32px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer;
+            font-family: var(--font-main); letter-spacing: 1px;
+        }
+        .btn-fechar-scanner-pdv:hover { border-color: var(--danger); color: var(--danger); }
 
         /* ── SUGESTÕES ── */
         #suggestions {
             position: absolute; top: 100%; left: 0; right: 0;
-            background: #222; z-index: 200;
-            border-radius: 0 0 8px 8px;
-            max-height: 260px; overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            background: #222; z-index: 200; border-radius: 0 0 8px 8px;
+            max-height: 300px; overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,.6);
             border: 1px solid var(--card-border); border-top: none;
         }
         .sugestao-item {
             padding: 12px 14px; border-bottom: 1px solid var(--card-border);
             cursor: pointer; display: flex; justify-content: space-between;
-            align-items: center; gap: 10px; font-size: 14px; transition: background 0.15s;
+            align-items: center; gap: 10px; font-size: 14px; transition: background .15s;
         }
-        .sugestao-item:last-child  { border-bottom: none; }
-        .sugestao-item:hover       { background: var(--gold-glow); }
-        .sugestao-item.sem-result  { color: var(--muted); justify-content: center; cursor: default; }
-        .sugestao-item.loading     { color: var(--muted); justify-content: center; cursor: default; font-style: italic; }
-        .sugestao-price     { color: var(--gold); font-family: var(--font-mono); font-weight: 600; white-space: nowrap; }
-        .sugestao-estoque   { font-size: 11px; color: var(--muted); margin-top: 2px; }
+        .sugestao-item:last-child { border-bottom: none; }
+        .sugestao-item:hover      { background: var(--gold-glow); }
+        .sugestao-item.sem-result { color: var(--muted); justify-content: center; cursor: default; }
+        .sugestao-item.loading    { color: var(--muted); justify-content: center; cursor: default; font-style: italic; }
+        .sugestao-price   { color: var(--gold); font-family: var(--font-mono); font-weight: 600; white-space: nowrap; }
+        .sugestao-estoque { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
-        /* ── EMPTY STATE ── */
-        .empty-state {
-            text-align: center; margin-top: 60px;
-            opacity: 0.25; pointer-events: none;
-        }
+        /* ── EMPTY ── */
+        .empty-state { text-align: center; margin-top: 60px; opacity: .25; pointer-events: none; }
         .empty-state span { font-size: 48px; display: block; margin-bottom: 10px; }
 
         /* ── SPINNER ── */
         .spinner {
-            width: 16px; height: 16px;
-            border: 2px solid rgba(0,0,0,.2);
-            border-top-color: #000;
-            border-radius: 50%;
+            width: 16px; height: 16px; border: 2px solid rgba(0,0,0,.2);
+            border-top-color: #000; border-radius: 50%;
             animation: spin .6s linear infinite; display: inline-block;
         }
         .spinner.light { border-color: rgba(255,255,255,.2); border-top-color: var(--gold); }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ══════════════════════════════════════
-           RESPONSIVO — MOBILE (≤ 640px)
-        ══════════════════════════════════════ */
+        /* ── MOBILE ── */
         @media (max-width: 640px) {
             html, body { overflow: auto; height: auto; }
-            .app-wrapper { height: auto; overflow: visible; }
-            .pdv-container { flex-direction: column; overflow: visible; }
-            .panel-left { border-right: none; border-bottom: 1px solid var(--card-border); overflow: visible; flex: none; }
-            .items-list { overflow: visible; max-height: none; }
-            .panel-right { width: 100%; padding: 16px; gap: 12px; }
-            .total-value { font-size: 30px; }
-            .btn-finish  { font-size: 16px; padding: 16px; }
+            .app-wrapper  { height: auto; overflow: visible; }
+            .pdv-container{ flex-direction: column; overflow: visible; }
+            .panel-left   { border-right: none; border-bottom: 1px solid var(--card-border); overflow: visible; flex: none; }
+            .items-list   { overflow: visible; max-height: none; }
+            .panel-right  { width: 100%; padding: 16px; gap: 12px; }
+            .total-value  { font-size: 30px; }
+            .btn-finish   { font-size: 16px; padding: 16px; }
         }
     </style>
 </head>
-
 <body>
 
 <div id="toast"></div>
 
 <div class="app-wrapper">
-
     <header>
-        <a href="javascript:history.back()"
-           style="text-decoration:none; color:var(--gold); display:flex; align-items:center; gap:5px; font-weight:600; font-size:14px;">
-            ⬅ VOLTAR
+        <a href="/admin"
+           style="text-decoration:none;color:var(--gold);display:flex;align-items:center;gap:5px;font-weight:600;font-size:14px;">
+            &#8592; VOLTAR
         </a>
     </header>
 
     <div class="pdv-container">
 
-        <!-- ── PAINEL ESQUERDO ── -->
+        <!-- PAINEL ESQUERDO -->
         <div class="panel-left">
             <div class="search-area">
                 <div class="search-row">
                     <div class="input-group">
                         <label>Buscar Produto</label>
                         <input type="text" id="buscaInput"
-                               placeholder="Nome ou código de barras..." autocomplete="off">
+                               placeholder="Toque para listar ou filtre pelo nome..." autocomplete="off">
                         <div id="suggestions"></div>
                     </div>
                     <div class="input-group" style="max-width:72px;">
                         <label>Qtd</label>
                         <input type="number" id="qtdInput" value="1" min="1">
                     </div>
+                    <button type="button" class="btn-camera-pdv" id="btnCameraPdv" title="Escanear c&#243;digo de barras">&#128247;</button>
                 </div>
             </div>
 
+            <!-- Scanner câmera PDV -->
+            <div class="scanner-pdv" id="scannerPdv">
+                <div class="scanner-pdv-box">
+                    <video id="scannerPdvVideo" playsinline muted></video>
+                    <div class="scanner-pdv-line"></div>
+                </div>
+                <div class="scanner-pdv-msg">Aponte para o c&#243;digo de barras do produto</div>
+                <button type="button" class="btn-fechar-scanner-pdv" onclick="fecharScannerPdv()">&#215; Fechar C&#226;mera</button>
+            </div>
             <div class="items-list" id="listaItens">
                 <div class="empty-state" id="emptyMsg">
-                    <span>🛒</span>
+                    <span>&#128717;</span>
                     <p>Carrinho vazio</p>
                 </div>
             </div>
         </div>
 
-        <!-- ── PAINEL DIREITO ── -->
+        <!-- PAINEL DIREITO -->
         <div class="panel-right">
             <div class="input-group">
                 <label>Forma de Pagamento</label>
                 <select id="formaPagamento">
                     <option value="Dinheiro">Dinheiro</option>
                     <option value="Pix">Pix</option>
-                    <option value="Cartão Débito">Cartão Débito</option>
-                    <option value="Cartão Crédito">Cartão Crédito</option>
+                    <option value="Cartao Debito">Cart&#227;o D&#233;bito</option>
+                    <option value="Cartao Credito">Cart&#227;o Cr&#233;dito</option>
                 </select>
             </div>
 
@@ -271,99 +291,75 @@
             </div>
 
             <button class="btn-finish" id="btnFinalizar" onclick="finalizarVenda()">
-                ✔ Finalizar Venda
+                &#10004; Finalizar Venda
             </button>
+
+            <a href="/admin/fechamento" class="link-fechamento">
+                &#128196; Fechamento de Caixa
+            </a>
         </div>
 
     </div>
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════════════
-   TOKEN JWT
-   Pega do localStorage — ajuste a chave se necessário.
-   Ex: se você salva como 'authToken', mude abaixo.
-═══════════════════════════════════════════════════════════ */
-const TOKEN = localStorage.getItem('token') || '';
+var itensVenda    = [];
+var debounceTimer = null;
+var buscaInput    = document.getElementById('buscaInput');
+var suggestionsEl = document.getElementById('suggestions');
 
-const API_HEADERS = {
-    'Content-Type': 'application/json',
-    ...(TOKEN && { Authorization: `Bearer ${TOKEN}` })
-};
-/* ═══════════════════════════════════════════════
-   ESTADO
-═══════════════════════════════════════════════ */
-let itensVenda   = [];
-let debounceTimer = null;
-
-/* ═══════════════════════════════════════════════
-   TOAST
-═══════════════════════════════════════════════ */
+/* TOAST */
 function toast(msg, tipo) {
-    const el = document.getElementById('toast');
+    var el = document.getElementById('toast');
     el.textContent = msg;
     el.className = 'show' + (tipo === 'error' ? ' error' : '');
     clearTimeout(el._t);
-    el._t = setTimeout(() => { el.className = ''; }, 3500);
+    el._t = setTimeout(function() { el.className = ''; }, 3500);
 }
 
-/* ═══════════════════════════════════════════════
-   BUSCA DE PRODUTOS
-   ─────────────────────────────────────────────
-   Rota texto  → GET /api/produtos?busca=TERMO&ativo=true
-   Rota código → GET /api/produtos/codigo/CODBARRAS
-═══════════════════════════════════════════════ */
-const buscaInput    = document.getElementById('buscaInput');
-const suggestionsEl = document.getElementById('suggestions');
+/* SUGESTOES */
+function fecharSugestoes() {
+    suggestionsEl.innerHTML = '';
+    suggestionsEl._cache = null;
+}
 
-buscaInput.addEventListener('input', (e) => {
-    clearTimeout(debounceTimer);
-    const termo = e.target.value.trim();
-
-    if (!termo) { suggestionsEl.innerHTML = ''; return; }
-
-    // Código de barras: só números com 6+ dígitos
-    if (/^\d{6,}$/.test(termo)) {
-        debounceTimer = setTimeout(() => buscarPorCodigo(termo), 200);
-        return;
-    }
-
-    if (termo.length < 2) return;
-
-    // Debounce 350ms para não sobrecarregar a API
-    debounceTimer = setTimeout(() => buscarPorDescricao(termo), 350);
+buscaInput.addEventListener('focus', function() {
+    if (!suggestionsEl.innerHTML) buscarProdutos(buscaInput.value.trim());
 });
 
-async function buscarPorDescricao(termo) {
-    suggestionsEl.innerHTML = '<div class="sugestao-item loading"><span class="spinner light"></span>&nbsp;Buscando...</div>';
-    try {
-        const res  = await fetch(`/api/produtos?busca=${encodeURIComponent(termo)}&ativo=true`, { headers: API_HEADERS,credentials: 'include' });
-        const json = await res.json();
-        if (!res.ok) throw new Error(json.message || 'Erro na busca');
-        renderSugestoes(json.data || []);
-    } catch (err) {
-        suggestionsEl.innerHTML = `<div class="sugestao-item sem-result">⚠ ${err.message}</div>`;
-    }
-}
+buscaInput.addEventListener('input', function(e) {
+    clearTimeout(debounceTimer);
+    var termo = e.target.value.trim();
+    var delay = /^\d{6,}$/.test(termo) ? 200 : 350;
+    debounceTimer = setTimeout(function() { buscarProdutos(termo); }, delay);
+});
 
-async function buscarPorCodigo(codbarras) {
+function buscarProdutos(termo) {
     suggestionsEl.innerHTML = '<div class="sugestao-item loading"><span class="spinner light"></span>&nbsp;Buscando...</div>';
-    try {
-        const res  = await fetch(`/api/produtos/codigo/${codbarras}`, { headers: API_HEADERS,credentials: 'include' });
-        const json = await res.json();
-        if (res.status === 404) {
-            suggestionsEl.innerHTML = '<div class="sugestao-item sem-result">Produto não encontrado</div>';
-            return;
-        }
-        if (!res.ok) throw new Error(json.message);
-
-        // Código de barras retorna produto único: adiciona direto
-        adicionarProduto(json.data);
-        suggestionsEl.innerHTML = '';
-        buscaInput.value = '';
-    } catch (err) {
-        suggestionsEl.innerHTML = `<div class="sugestao-item sem-result">⚠ ${err.message}</div>`;
-    }
+    var url = '/admin/vendas/produtos' + (termo ? '?busca=' + encodeURIComponent(termo) : '');
+    fetch(url, { credentials: 'include' })
+        .then(function(res) {
+            var ct = res.headers.get('content-type') || '';
+            if (!ct.includes('application/json')) {
+                suggestionsEl.innerHTML = '<div class="sugestao-item sem-result">Sess&#227;o expirada &#8212; recarregue</div>';
+                return;
+            }
+            return res.json().then(function(json) {
+                if (!res.ok) throw new Error(json.message || 'Erro na busca');
+                var lista = json.data || [];
+                if (/^\d{6,}$/.test(termo)) {
+                    var exato = null;
+                    for (var k = 0; k < lista.length; k++) {
+                        if (String(lista[k].codbarras) === termo) { exato = lista[k]; break; }
+                    }
+                    if (exato) { adicionarProduto(exato); fecharSugestoes(); return; }
+                }
+                renderSugestoes(lista);
+            });
+        })
+        .catch(function(err) {
+            suggestionsEl.innerHTML = '<div class="sugestao-item sem-result">&#9888; ' + err.message + '</div>';
+        });
 }
 
 function renderSugestoes(produtos) {
@@ -371,51 +367,39 @@ function renderSugestoes(produtos) {
         suggestionsEl.innerHTML = '<div class="sugestao-item sem-result">Nenhum produto encontrado</div>';
         return;
     }
-
-    // Guarda dados em memória para recuperar no clique sem eval
     suggestionsEl._cache = produtos;
-
-    suggestionsEl.innerHTML = produtos.map((p, idx) => `
-        <div class="sugestao-item" data-idx="${idx}">
-            <div>
-                <div>${p.descricao}</div>
-                <div class="sugestao-estoque">Estoque: ${p.estoque ?? '—'}</div>
-            </div>
-            <span class="sugestao-price">R$ ${fmtNum(p.preco)}</span>
-        </div>
-    `).join('');
-
-    // Delegação de evento — sem onclick inline
-    suggestionsEl.querySelectorAll('.sugestao-item[data-idx]').forEach(el => {
-        el.addEventListener('click', () => {
-            const produto = (suggestionsEl._cache || [])[parseInt(el.dataset.idx)];
-            if (produto) {
-                adicionarProduto(produto);
-                suggestionsEl.innerHTML = '';
-                suggestionsEl._cache = null;
-                buscaInput.value = '';
-            }
-        });
-    });
+    var html = '';
+    for (var i = 0; i < produtos.length; i++) {
+        var p = produtos[i];
+        html += '<div class="sugestao-item" data-idx="' + i + '">'
+             +  '<div><div>' + p.descricao + '</div>'
+             +  '<div class="sugestao-estoque">Estoque: ' + (p.estoque != null ? p.estoque : '&mdash;') + '</div></div>'
+             +  '<span class="sugestao-price">R$ ' + fmtNum(p.preco) + '</span>'
+             +  '</div>';
+    }
+    suggestionsEl.innerHTML = html;
+    var els = suggestionsEl.querySelectorAll('.sugestao-item[data-idx]');
+    for (var j = 0; j < els.length; j++) {
+        els[j].addEventListener('click', (function(idx) {
+            return function() {
+                var prod = (suggestionsEl._cache || [])[idx];
+                if (prod) { adicionarProduto(prod); fecharSugestoes(); }
+            };
+        })(j));
+    }
 }
 
-// Fecha sugestões ao clicar fora
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('.input-group')) {
-        suggestionsEl.innerHTML = '';
-        suggestionsEl._cache = null;
-    }
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.input-group')) fecharSugestoes();
 });
 
-/* ═══════════════════════════════════════════════
-   ADICIONAR PRODUTO AO CARRINHO
-   Recebe o objeto produto como vem da sua API
-═══════════════════════════════════════════════ */
+/* CARRINHO */
 function adicionarProduto(produto) {
-    const qtd = Math.max(1, parseInt(document.getElementById('qtdInput').value) || 1);
-
-    // Se já existe no carrinho, soma a quantidade
-    const existente = itensVenda.find(i => i.produto_id === produto.id);
+    var qtd = Math.max(1, parseInt(document.getElementById('qtdInput').value) || 1);
+    var existente = null;
+    for (var i = 0; i < itensVenda.length; i++) {
+        if (itensVenda[i].produto_id === produto.id) { existente = itensVenda[i]; break; }
+    }
     if (existente) {
         existente.quantidade  += qtd;
         existente.subtotal     = existente.preco_unitario * existente.quantidade;
@@ -428,133 +412,136 @@ function adicionarProduto(produto) {
             subtotal:       parseFloat(produto.preco) * qtd
         });
     }
-
     document.getElementById('qtdInput').value = 1;
-    buscaInput.focus();
+    buscaInput.value = '';
     renderItens();
+    buscaInput.focus();
 }
 
-/* ═══════════════════════════════════════════════
-   RENDER DO CARRINHO
-═══════════════════════════════════════════════ */
 function renderItens() {
-    const container = document.getElementById('listaItens');
-    const emptyMsg  = document.getElementById('emptyMsg');
-
+    var container = document.getElementById('listaItens');
     if (!itensVenda.length) {
-        container.innerHTML = '';
-        container.appendChild(emptyMsg);
-        emptyMsg.style.display = 'block';
+        container.innerHTML = '<div class="empty-state"><span>&#128717;</span><p>Carrinho vazio</p></div>';
         atualizarTotal();
         return;
     }
+    var html = '';
+    for (var i = 0; i < itensVenda.length; i++) {
+        var item = itensVenda[i];
+        html += '<div class="sale-item" data-idx="' + i + '">'
 
-    emptyMsg.style.display = 'none';
+             /* linha principal */
+             + '<div class="sale-item-top">'
+             +   '<div>'
+             +     '<div class="sale-item-name">' + item.descricao + '</div>'
+             +     '<div class="sale-item-qty">' + item.quantidade + 'x &nbsp;R$ ' + fmtNum(item.preco_unitario) + '</div>'
+             +   '</div>'
+             +   '<div class="sale-item-right">'
+             +     'R$ ' + fmtNum(item.subtotal)
+             +     '<button class="sale-item-edit btn-edit" data-idx="' + i + '" title="Editar">&#9998;</button>'
+             +     '<button class="btn-remove" data-idx="' + i + '" title="Remover">&#x2715;</button>'
+             +   '</div>'
+             + '</div>'
 
-    container.innerHTML = itensVenda.map((item, idx) => `
-        <div class="sale-item">
-            <div>
-                <div class="sale-item-name">${item.descricao}</div>
-                <div class="sale-item-qty">${item.quantidade}x &nbsp;R$ ${fmtNum(item.preco_unitario)}</div>
-            </div>
-            <div class="sale-item-right">
-                R$ ${fmtNum(item.subtotal)}
-                <button class="btn-remove" data-idx="${idx}" title="Remover">✕</button>
-            </div>
-        </div>
-    `).join('');
+             /* painel edição inline */
+             + '<div class="edit-row" id="editRow' + i + '">'
+             +   '<div class="edit-field">'
+             +     '<label>Qtd</label>'
+             +     '<input type="number" class="edit-qtd" value="' + item.quantidade + '" min="1" style="width:80px;">'
+             +   '</div>'
+             +   '<div class="edit-field">'
+             +     '<label>Pre&#231;o unit. R$</label>'
+             +     '<input type="number" class="edit-preco" value="' + item.preco_unitario.toFixed(2) + '" step="0.01" min="0" style="width:110px;">'
+             +   '</div>'
+             +   '<button class="btn-confirm btn-salvar" data-idx="' + i + '">OK</button>'
+             + '</div>'
 
-    // Delegação para os botões de remover
-    container.querySelectorAll('.btn-remove').forEach(btn => {
-        btn.addEventListener('click', () => removerItem(parseInt(btn.dataset.idx)));
-    });
+             + '</div>';
+    }
+    container.innerHTML = html;
+
+    /* eventos dos botões */
+    var btnsEdit   = container.querySelectorAll('.btn-edit');
+    var btnsRemove = container.querySelectorAll('.btn-remove');
+    var btnsSalvar = container.querySelectorAll('.btn-salvar');
+
+    for (var j = 0; j < btnsEdit.length; j++) {
+        btnsEdit[j].addEventListener('click', (function(idx) {
+            return function() {
+                var row = document.getElementById('editRow' + idx);
+                row.classList.toggle('open');
+            };
+        })(j));
+    }
+
+    for (var k = 0; k < btnsRemove.length; k++) {
+        btnsRemove[k].addEventListener('click', (function(idx) {
+            return function() { itensVenda.splice(idx, 1); renderItens(); };
+        })(k));
+    }
+
+    for (var m = 0; m < btnsSalvar.length; m++) {
+        btnsSalvar[m].addEventListener('click', (function(idx) {
+            return function() {
+                var row   = document.getElementById('editRow' + idx);
+                var novaQtd   = Math.max(1, parseFloat(row.querySelector('.edit-qtd').value)   || 1);
+                var novoPreco = Math.max(0, parseFloat(row.querySelector('.edit-preco').value)  || 0);
+                itensVenda[idx].quantidade     = novaQtd;
+                itensVenda[idx].preco_unitario = novoPreco;
+                itensVenda[idx].subtotal       = novaQtd * novoPreco;
+                renderItens();
+            };
+        })(m));
+    }
 
     atualizarTotal();
 }
 
-function removerItem(idx) {
-    itensVenda.splice(idx, 1);
-    renderItens();
-}
-
-/* ═══════════════════════════════════════════════
-   TOTAL
-═══════════════════════════════════════════════ */
 function atualizarTotal() {
-    const subtotal = itensVenda.reduce((acc, i) => acc + i.subtotal, 0);
-    const desconto = parseFloat(document.getElementById('descontoInput').value) || 0;
-    const total    = Math.max(0, subtotal - desconto);
-    document.getElementById('totalGeralDisplay').textContent = 'R$ ' + fmtNum(total);
+    var subtotal = 0;
+    for (var i = 0; i < itensVenda.length; i++) subtotal += itensVenda[i].subtotal;
+    var desconto = parseFloat(document.getElementById('descontoInput').value) || 0;
+    document.getElementById('totalGeralDisplay').textContent = 'R$ ' + fmtNum(Math.max(0, subtotal - desconto));
 }
-
 document.getElementById('descontoInput').addEventListener('input', atualizarTotal);
 
-/* ═══════════════════════════════════════════════
-   FINALIZAR VENDA  →  POST /api/vendas
-   ─────────────────────────────────────────────
-   Payload exatamente como apiVendas.js espera:
-   {
-     forma_pagamento: string,
-     desconto: number,
-     itens: [{ produto_id, quantidade, preco_unitario }]
-   }
-═══════════════════════════════════════════════ */
-async function finalizarVenda() {
+/* FINALIZAR */
+function finalizarVenda() {
     if (!itensVenda.length) { toast('Adicione pelo menos um item!', 'error'); return; }
-
-    const btn = document.getElementById('btnFinalizar');
+    var btn = document.getElementById('btnFinalizar');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>&nbsp;Salvando...';
 
-    const payload = {
+    var payload = {
         forma_pagamento: document.getElementById('formaPagamento').value,
         desconto:        parseFloat(document.getElementById('descontoInput').value) || 0,
-        itens: itensVenda.map(i => ({
-            produto_id:     i.produto_id,
-            quantidade:     i.quantidade,
-            preco_unitario: i.preco_unitario
-        }))
+        itens: itensVenda.map(function(i) {
+            return { produto_id: i.produto_id, quantidade: i.quantidade, preco_unitario: i.preco_unitario };
+        })
     };
 
-    try {
-        const res  = await fetch('/api/vendas', {
-            method:  'POST',
-            headers: API_HEADERS,
-            credentials: 'include',
-            body:    JSON.stringify(payload)
+    fetch('/admin/vendas', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(function(res) {
+        var ct = res.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) throw new Error('Sess\u00e3o expirada \u2014 recarregue');
+        return res.json().then(function(json) {
+            if (!res.ok) throw new Error(json.message || 'Erro ao salvar venda');
+            toast('Venda #' + json.data.id + ' registrada! \u2714');
+            itensVenda = [];
+            document.getElementById('descontoInput').value = 0;
+            renderItens();
+            buscaInput.focus();
         });
-        const json = await res.json();
-
-        if (!res.ok) throw new Error(json.message || 'Erro ao salvar venda');
-
-        toast(`Venda #${json.data.id} registrada! ✔`);
-        limparCarrinho();
-
-    } catch (err) {
-        toast('Erro: ' + err.message, 'error');
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = '✔ Finalizar Venda';
-    }
+    })
+    .catch(function(err) { toast('Erro: ' + err.message, 'error'); })
+    .finally(function() { btn.disabled = false; btn.innerHTML = '&#10004; Finalizar Venda'; });
 }
 
-/* ═══════════════════════════════════════════════
-   LIMPAR CARRINHO
-═══════════════════════════════════════════════ */
-function limparCarrinho() {
-    itensVenda = [];
-    document.getElementById('descontoInput').value = 0;
-    renderItens();
-    buscaInput.focus();
-}
-
-/* ═══════════════════════════════════════════════
-   UTILITÁRIO
-═══════════════════════════════════════════════ */
-function fmtNum(n) {
-    return parseFloat(n).toFixed(2).replace('.', ',');
-}
+function fmtNum(n) { return parseFloat(n).toFixed(2).replace('.', ','); }
 </script>
-
 </body>
 </html>

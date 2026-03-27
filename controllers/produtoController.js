@@ -1,36 +1,46 @@
+const { Op } = require('sequelize');
 const Produto = require('../models/produto');
 
 const produtoController = {
 
-    // 📌 Listar produtos (enviar para tela)
+    // Listar produtos
     async listar(req, res) {
         try {
+            const { busca, formato } = req.query;
             const idEmpresa = req.user.idEmpresa;
 
-            const produtos = await Produto.findAll({
-                where: { idEmpresa },
-                order: [['createdAt', 'DESC']]
-            });
+            const where = { idEmpresa };
 
-            const lista = produtos.map(p => p.toJSON());
+            if (busca && busca.trim()) {
+                where[Op.or] = [
+                    { descricao: { [Op.like]: `%${busca.trim()}%` } },
+                    { codbarras: { [Op.like]: `%${busca.trim()}%` } },
+                ];
+            }
 
-            res.render('produtos', {
-                produtos: lista,
-                totalProdutos: lista.length,
-                totalAtivos: lista.filter(p => p.ativo).length,
-                estoqueBaixo: lista.filter(p => p.estoque < 5).length
-            });
+            const raw = await Produto.findAll({ where, order: [['descricao', 'ASC']], raw: true });
+            const produtos = raw;
 
+            // Calcula stats para a view
+            const totalProdutos  = produtos.length;
+            const totalAtivos    = produtos.filter(p => p.ativo).length;
+            const estoqueBaixo   = produtos.filter(p => p.estoque < 5).length;
+
+            if (formato === 'json') {
+                return res.json({ data: produtos });
+            }
+
+            return res.render('produtos', { produtos, totalProdutos, totalAtivos, estoqueBaixo });
         } catch (error) {
             console.error('Erro ao listar produtos:', error);
-            res.status(500).send('Erro interno');
+            res.status(500).send('Erro ao listar produtos');
         }
     },
 
-    // 📌 Criar produto
+    // Criar produto
     async criar(req, res) {
         try {
-            const { descricao, grupo, custo, preco, estoque, ativo } = req.body;
+            const { descricao, grupo, custo, preco, estoque, est_min, ativo, codbarras } = req.body;
             const idEmpresa = req.user.idEmpresa;
 
             let imagem = null;
@@ -42,60 +52,64 @@ const produtoController = {
                 idEmpresa,
                 descricao,
                 grupo,
-                custo,
+                custo:     custo    || null,
                 preco,
-                estoque,
-                ativo: ativo ? true : false,
+                estoque:   estoque  || 0,
+                codbarras: codbarras || null,
+                est_min:   est_min   || 0,
+                ativo:     ativo ? true : false,
                 imagem
             });
 
             res.redirect('/admin/produtos');
-
         } catch (error) {
             console.error('Erro ao criar produto:', error);
             res.status(500).send('Erro ao salvar produto');
         }
     },
 
-    // 📌 Excluir produto
+    // Excluir produto
     async excluir(req, res) {
         try {
-            const { id } = req.params;
+            const { id }    = req.params;
             const idEmpresa = req.user.idEmpresa;
-
-            await Produto.destroy({
-                where: { id, idEmpresa }
-            });
-
+            await Produto.destroy({ where: { id, idEmpresa } });
             res.redirect('/admin/produtos');
-
         } catch (error) {
             console.error('Erro ao excluir:', error);
             res.status(500).send('Erro ao excluir');
         }
     },
-    // editar
+
+    // Editar produto
     async editar(req, res) {
-    try {
-        const { id } = req.params;
-        const { descricao, grupo, custo, preco, estoque, ativo } = req.body;
-        const idEmpresa = req.user.idEmpresa;
+        try {
+            const { id }     = req.params;
+            const { descricao, grupo, custo, preco, estoque, est_min, ativo, codbarras } = req.body;
+            const idEmpresa  = req.user.idEmpresa;
 
-        const dados = { descricao, grupo, custo, preco, estoque, ativo: ativo ? true : false };
+            const dados = {
+                descricao,
+                grupo,
+                custo:     custo    || null,
+                preco,
+                estoque:   estoque  || 0,
+                codbarras: codbarras || null,
+                est_min:   est_min   || 0,
+                ativo:     ativo ? true : false,
+            };
 
-        if (req.file) {
-            dados.imagem = '/uploads/' + req.file.filename;
+            if (req.file) {
+                dados.imagem = '/uploads/' + req.file.filename;
+            }
+
+            await Produto.update(dados, { where: { id, idEmpresa } });
+            res.redirect('/admin/produtos');
+        } catch (error) {
+            console.error('Erro ao editar produto:', error);
+            res.status(500).send('Erro ao editar produto');
         }
-
-        await Produto.update(dados, { where: { id, idEmpresa } });
-
-        res.redirect('/admin/produtos');
-    } catch (error) {
-        console.error('Erro ao editar produto:', error);
-        res.status(500).send('Erro ao editar produto');
     }
-}
-
 };
 
 module.exports = produtoController;

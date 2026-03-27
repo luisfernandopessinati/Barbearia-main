@@ -46,8 +46,13 @@
                 <button class="config-dropdown-item" id="menu-vendas">
                     <span class="item-icon">🛍️</span>
                     <span class="item-label"><span>Vendas</span><small>Área de vendas</small></span>
-                    <span class="item-badgeBlock">Bloc</span>
+                    <span class="item-badge">Novo</span>
                 </button>
+               <button class="config-dropdown-item" id="menu-estoque">
+                    <span class="item-icon">📦</span>
+                    <span class="item-label"><span>Estoque</span><small>Lançamentos e movimentações</small></span>
+                    <span class="item-badge">Novo</span>
+                </button> 
                 <div class="config-dropdown-sep"></div>
                 <div class="config-dropdown-label">Cadastros</div>
                 <button class="config-dropdown-item" id="menu-empresa">
@@ -71,7 +76,7 @@
                 <button class="config-dropdown-item" id="menu-produtos">
                     <span class="item-icon">📦</span>
                     <span class="item-label"><span>Produtos</span><small>Produtos</small></span>
-                    <span class="item-badgeBlock">Block</span>
+                    <span class="item-badge">Novo</span>
                 </button>
                 <div class="config-dropdown-sep"></div>
                 <div class="config-dropdown-label">Agenda</div>
@@ -984,6 +989,7 @@
     document.getElementById('btn-hoje').addEventListener('click', () => { weekOffset = 0; renderCalendar(); renderCounts(); });
     document.getElementById('btn-sair').addEventListener('click', () => { window.location.href = '/logout'; });
     document.getElementById('menu-clientes').addEventListener('click', () => { window.location.href = '/clientes'; });
+    document.getElementById('menu-estoque').addEventListener('click', () => { toggleDropdown(false); window.location.href = '/admin/estoque'; });
     let _lastWidth = window.innerWidth;
     window.addEventListener('resize', () => {
         if (window.innerWidth !== _lastWidth) {

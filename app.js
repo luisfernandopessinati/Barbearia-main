@@ -25,7 +25,7 @@ const Venda                = require('./models/Venda');
 const VendaItem            = require('./models/VendaItem');
 const MovtoEstoque         = require('./models/MovtoEstoque');
 const LancEstoque    = require('./models/LancEstoque');
-const LancEstProduto = require('./models/lancEstProduto');
+const LancEstProduto = require('./models/LancEstProduto');
 
 // ─── Associations ─────────────────────────────────────────────────────────────
 Agendamento.belongsTo(Servico,   { foreignKey: 'servico_id',      as: 'Servico' });

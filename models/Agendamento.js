@@ -74,7 +74,7 @@ const Agendamento = sequelize.define('Agendamentos', {
     },        
     observacao: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     }
 });
 

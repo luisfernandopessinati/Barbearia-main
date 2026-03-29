@@ -293,8 +293,18 @@
             gap: 16px;
             width: 340px;
             flex-shrink: 0;
+            height: 100%;
+            overflow: hidden;
+            /* 👈 não scrolla o painel todo */
+        }
+
+        /* lista de itens scrolla sozinha */
+        .items-list {
+            flex: 1;
+            padding: 16px;
             overflow-y: auto;
-            height: 100%; 
+            min-height: 0;
+            /* 👈 essencial para o flex+scroll funcionar */
         }
 
         .total-box {
@@ -331,7 +341,8 @@
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-top: 0;        /* 👈 era auto */
+            margin-top: 0;
+            /* 👈 era auto */
             transition: opacity .2s;
             display: flex;
             align-items: center;
@@ -677,6 +688,13 @@
 
             <!-- PAINEL DIREITO -->
             <div class="panel-right">
+                <!-- Lista de itens aqui dentro -->
+                <div class="items-list" id="listaItens">
+                    <div class="empty-state" id="emptyMsg">
+                        <span>&#128717;</span>
+                        <p>Carrinho vazio</p>
+                    </div>
+                </div> 
                 <div class="input-group">
                     <label>Forma de Pagamento</label>
                     <select id="formaPagamento">

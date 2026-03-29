@@ -1002,12 +1002,19 @@
             if (navigator.vibrate) navigator.vibrate(120);
             buscarProdutos(codigo);
         }
-
         function fecharScannerPdv() {
             document.getElementById('scannerPdv').classList.remove('open');
             if (pdvLoop) { clearInterval(pdvLoop); pdvLoop = null; }
             if (pdvStream) {
-                if (pdvStream._zxing) { try { pdvStream._zxing.reset();
+                if (pdvStream._zxing) {
+                    try { pdvStream._zxing.reset(); } catch (e) { }
+                }
+                pdvStream.getTracks().forEach(function (t) { t.stop(); });
+                pdvStream = null;
+            }
+            var video = document.getElementById('scannerPdvVideo');
+            if (video) { video.srcObject = null; }
+        }
     </script>
 </body>
 

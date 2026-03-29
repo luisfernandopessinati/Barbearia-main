@@ -1,4 +1,3 @@
-{{!-- agendar.handlebars --}}
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap');
 
@@ -7,9 +6,31 @@
     padding: 0;
     box-sizing: border-box;
   }
-
+:root {
+      {{#if empresa.feminino}}
+    --accent:       #c0395a;
+    --accent-light: #d4547a;
+    --accent-dim:   #d4547a22;
+    --bg-main:      #fafafa;
+    --bg-panel:     #ffffff;
+    --bg-card:      #f5f5f5;
+    --border-color: #e8e0e3;
+    --text-main:    #1a1a1a;
+    --text-muted:   #999999;
+    {{else}}
+    --accent:       #b8860b;
+    --accent-light: #d4a012;
+    --accent-dim:   #b8860b33;
+    --bg-main:      #0a0a0a;
+    --bg-panel:     #111111;
+    --bg-card:      #1a1a1a;
+    --border-color: #222222;
+    --text-main:    #eeeeee;
+    --text-muted:   #555555;
+    {{/if}}
+  }
   body {
-    background: #0a0a0a;
+    background: var(--bg-main);
     font-family: 'DM Sans', sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
@@ -18,13 +39,12 @@
   .page-agendar {
     min-height: 100vh;
     display: flex;
-    background: #0a0a0a;
+    background: var(--bg-main);
   }
 
-  /* ── Painel Esquerdo ── */
   .panel-left {
     width: 38%;
-    background: #111;
+    background: var(--bg-panel);
     position: relative;
     overflow: hidden;
     display: flex;
@@ -37,7 +57,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(160deg, #b8860b22 0%, transparent 60%);
+    background: linear-gradient(160deg, var(--accent-dim) 0%, transparent 60%);
     pointer-events: none;
   }
 
@@ -57,7 +77,7 @@
     font-family: 'Bebas Neue', sans-serif;
     font-size: 11px;
     letter-spacing: 4px;
-    color: #b8860b;
+    color: var(--accent);
     margin-bottom: 32px;
     text-transform: uppercase;
   }
@@ -74,8 +94,8 @@
     gap: 14px;
     padding: 14px 18px;
     border-radius: 10px;
-    background: #1a1a1a;
-    border: 1px solid #222;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
     cursor: pointer;
     transition: all 0.25s ease;
     position: relative;
@@ -83,15 +103,15 @@
 
   .barber-card:hover,
   .barber-card.active {
-    border-color: #b8860b;
-    background: #1c1a14;
+    border-color: var(--accent);
+    background: var(--bg-panel);
   }
 
   .barber-card.active::after {
     content: '✓';
     position: absolute;
     right: 16px;
-    color: #b8860b;
+    color: var(--accent);
     font-size: 14px;
     font-weight: 600;
   }
@@ -100,7 +120,7 @@
     width: 46px;
     height: 46px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #b8860b, #8b6508);
+    background: linear-gradient(135deg, var(--accent), var(--accent-light));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -113,11 +133,10 @@
   .barber-info h4 {
     font-size: 14px;
     font-weight: 500;
-    color: #eee;
+    color: var(--text-main);
     margin-bottom: 2px;
   }
 
-  /* ── Painel Direito ── */
   .panel-right {
     flex: 1;
     padding: 48px 52px;
@@ -136,13 +155,13 @@
   .logo-text {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 22px;
-    color: #b8860b;
+    color: var(--accent);
     letter-spacing: 3px;
   }
 
   .sair-link {
     font-size: 12px;
-    color: #555;
+    color: var(--text-muted);
     text-decoration: none;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -150,20 +169,20 @@
   }
 
   .sair-link:hover {
-    color: #b8860b;
+    color: var(--accent);
   }
 
   .form-title {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 52px;
-    color: #fff;
+    color: var(--text-main);
     line-height: 1;
     margin-bottom: 6px;
   }
 
   .form-subtitle {
     font-size: 13px;
-    color: #555;
+    color: var(--text-muted);
     margin-bottom: 40px;
   }
 
@@ -171,15 +190,14 @@
     font-size: 10px;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: #b8860b;
+    color: var(--accent);
     margin-bottom: 14px;
     margin-top: 28px;
   }
 
-  /* ── Calendário ── */
   .calendar-wrapper {
-    background: #111;
-    border: 1px solid #222;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 20px;
   }
@@ -194,7 +212,7 @@
   .cal-nav {
     background: none;
     border: none;
-    color: #b8860b;
+    color: var(--accent);
     font-size: 18px;
     cursor: pointer;
     padding: 4px 10px;
@@ -203,13 +221,13 @@
   }
 
   .cal-nav:hover {
-    background: #1c1a14;
+    background: var(--accent-dim);
   }
 
   .cal-month {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 20px;
-    color: #fff;
+    color: var(--text-main);
     letter-spacing: 2px;
   }
 
@@ -222,7 +240,7 @@
   .cal-day-name {
     text-align: center;
     font-size: 10px;
-    color: #444;
+    color: var(--text-muted);
     letter-spacing: 1px;
     padding-bottom: 8px;
     text-transform: uppercase;
@@ -235,31 +253,31 @@
     justify-content: center;
     border-radius: 8px;
     font-size: 13px;
-    color: #888;
+    color: var(--text-muted);
     cursor: pointer;
     transition: all 0.2s;
     border: 1px solid transparent;
   }
 
   .cal-day:hover:not(.disabled):not(.empty) {
-    background: #1c1a14;
-    border-color: #b8860b55;
-    color: #fff;
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--text-main);
   }
 
   .cal-day.today {
-    border-color: #b8860b44;
-    color: #b8860b;
+    border-color: var(--accent-dim);
+    color: var(--accent);
   }
 
   .cal-day.selected {
-    background: #b8860b;
-    color: #000;
+    background: var(--accent);
+    color: #fff;
     font-weight: 600;
   }
 
   .cal-day.disabled {
-    color: #2a2a2a;
+    color: var(--border-color);
     cursor: not-allowed;
   }
 
@@ -267,7 +285,6 @@
     cursor: default;
   }
 
-  /* ── Slots de Horário ── */
   .horarios-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -278,14 +295,14 @@
     grid-column: 1 / -1;
     text-align: center;
     font-size: 12px;
-    color: #555;
+    color: var(--text-muted);
     padding: 16px;
     letter-spacing: 1px;
   }
 
   .horario-btn {
-    background: #111;
-    border: 1px solid #222;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 10px 4px;
     text-align: center;
@@ -300,69 +317,64 @@
 
   .horario-btn .slot-hora {
     font-size: 13px;
-    color: #888;
+    color: var(--text-muted);
   }
 
   .horario-btn .slot-fim {
     font-size: 10px;
-    color: #3a3a3a;
+    color: var(--border-color);
   }
 
   .horario-btn:hover:not(.indisponivel) {
-    border-color: #b8860b;
-    background: #1c1a14;
+    border-color: var(--accent);
+    background: var(--accent-dim);
   }
 
   .horario-btn:hover:not(.indisponivel) .slot-hora {
-    color: #fff;
+    color: var(--text-main);
   }
 
   .horario-btn:hover:not(.indisponivel) .slot-fim {
-    color: #b8860b88;
+    color: var(--accent);
   }
 
   .horario-btn.selected {
-    background: #b8860b;
-    border-color: #b8860b;
+    background: var(--accent);
+    border-color: var(--accent);
   }
 
   .horario-btn.selected .slot-hora {
-    color: #000;
+    color: #fff;
     font-weight: 600;
   }
 
   .horario-btn.selected .slot-fim {
-    color: #00000077;
+    color: #ffffff77;
   }
 
   .horario-btn.indisponivel {
-    background: #140808;
-    border-color: #2a1010;
+    background: var(--bg-main);
+    border-color: var(--border-color);
     cursor: not-allowed;
-    opacity: 0.5;
+    opacity: 0.4;
   }
 
   .horario-btn.indisponivel .slot-hora {
-    color: #3a1a1a;
+    color: var(--text-muted);
     text-decoration: line-through;
-  }
-
-  .horario-btn.indisponivel .slot-fim {
-    color: #2a1010;
   }
 
   .slots-aviso {
     grid-column: 1 / -1;
     text-align: center;
     font-size: 12px;
-    color: #444;
+    color: var(--text-muted);
     padding: 20px;
     letter-spacing: 1px;
-    border: 1px dashed #222;
+    border: 1px dashed var(--border-color);
     border-radius: 8px;
   }
 
-  /* ── Serviços ── */
   .servicos-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -370,8 +382,8 @@
   }
 
   .servico-card {
-    background: #111;
-    border: 1px solid #222;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
     border-radius: 10px;
     padding: 14px 16px;
     cursor: pointer;
@@ -380,32 +392,31 @@
 
   .servico-card:hover,
   .servico-card.selected {
-    border-color: #b8860b;
-    background: #1c1a14;
+    border-color: var(--accent);
+    background: var(--accent-dim);
   }
 
   .servico-card.selected .servico-nome {
-    color: #b8860b;
+    color: var(--accent);
   }
 
   .servico-nome {
     font-size: 13px;
     font-weight: 500;
-    color: #ccc;
+    color: var(--text-main);
     margin-bottom: 4px;
   }
 
   .servico-preco {
     font-size: 12px;
-    color: #555;
+    color: var(--text-muted);
   }
 
-  /* ── Resumo ── */
   .resumo-bar {
     margin-top: 36px;
     padding: 20px 24px;
-    background: #111;
-    border: 1px solid #222;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -421,20 +432,20 @@
 
   .resumo-info span {
     font-size: 11px;
-    color: #555;
+    color: var(--text-muted);
     letter-spacing: 1px;
     text-transform: uppercase;
   }
 
   .resumo-info p {
     font-size: 14px;
-    color: #ccc;
+    color: var(--text-main);
     min-height: 20px;
   }
 
   .btn-agendar {
-    background: #b8860b;
-    color: #000;
+    background: var(--accent);
+    color: #fff;
     border: none;
     padding: 14px 36px;
     border-radius: 8px;
@@ -448,13 +459,13 @@
   }
 
   .btn-agendar:hover {
-    background: #d4a012;
+    background: var(--accent-light);
     transform: translateY(-1px);
   }
 
   .btn-agendar:disabled {
-    background: #2a2a2a;
-    color: #555;
+    background: var(--border-color);
+    color: var(--text-muted);
     cursor: not-allowed;
     transform: none;
   }
@@ -537,7 +548,7 @@
   <!-- ── Painel Direito: Formulário ── -->
   <div class="panel-right">
     <div class="top-bar">
-      <span class="logo-text">Barbearia</span>
+      <!--  <span class="logo-text">Barbearia</span>-->
       <a href="/" class="sair-link">← Sair</a>
     </div>
 
@@ -551,17 +562,17 @@
     <div class="msg-sucesso">
       ✓ {{Sucesso}}
       <script>
-         window.onload = function() {
-            const link = "{{{whatsappLink}}}"; 
+        window.onload = function () {
+          const link = "{{{whatsappLink}}}";
 
-            if (link && link !== "null" && link !== "") {
-                setTimeout(function() {
-                    // Redireciona a aba atual para o WhatsApp
-                    window.location.href = link;
-                }, 500); // 1 segundo para o usuário ler a mensagem de sucesso
-            }
-          };
-        </script>    
+          if (link && link !== "null" && link !== "") {
+            setTimeout(function () {
+              // Redireciona a aba atual para o WhatsApp
+              window.location.href = link;
+            }, 500); // 1 segundo para o usuário ler a mensagem de sucesso
+          }
+        };
+      </script>
       <a href="{{{whatsappLink}}}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;margin-top:12px;
             background:#25d366;color:#fff;padding:12px 20px;border-radius:8px;
             text-decoration:none;font-size:13px;font-weight:500;">
@@ -589,19 +600,19 @@
       <p class="section-label">Serviço</p>
       <div class="servicos-grid">
         {{#each servicos}}
-         <div class="servico-card" 
-          data-id="{{id}}" 
-          data-nome="{{nome}}" 
-          data-duracao="{{duracao_minutos}}"
-          data-preco="R$ {{valor}}"
-          data-sessoes="{{qtd_sessoes}}">  {{!-- 👈 adiciona isso --}}
+        <div class="servico-card" data-id="{{id}}" data-nome="{{nome}}" data-duracao="{{duracao_minutos}}"
+          data-preco="R$ {{valor}}" data-sessoes="{{qtd_sessoes}}"> {{!-- 👈 adiciona isso --}}
           <div class="servico-nome">{{nome}}</div>
-          <div class="servico-preco">R$ {{valor}}</div>
-          {{#if qtd_sessoes}}
-          <div style="font-size:10px;color:#b8860b;margin-top:4px;letter-spacing:1px;">📦 PACOTE · {{qtd_sessoes}} SESSÕES</div>
+          {{#if descricao}}
+          <div style="font-size:11px;color:#666;margin-top:3px;">{{descricao}}</div>
           {{/if}}
-      </div>
-      {{/each}}
+          <div class="servico-preco" style="margin-top:6px;">R$ {{valor}}</div>
+          {{#if qtd_sessoes}}
+          <div style="font-size:10px;color:#b8860b;margin-top:4px;letter-spacing:1px;">📦 PACOTE · {{qtd_sessoes}}
+            SESSÕES</div>
+          {{/if}}
+        </div>
+        {{/each}}
       </div>
 
       <!-- CALENDÁRIO -->
@@ -616,15 +627,15 @@
       </div>
 
       <!-- SLOTS -->
-      <p class="section-label"  id="secao-horario">Horário</p>
+      <p class="section-label" id="secao-horario">Horário</p>
       <div class="horarios-grid" id="horarios-grid">
         <div class="horarios-loading">Selecione um serviço e uma data</div>
       </div>
 
       <!-- PACOTE - adiciona após os slots -->
       <div id="secao-pacote" style="display:none;">
-          <p class="section-label">Sessões do Pacote</p>
-          <div id="lista-sessoes-cliente" style="display:flex;flex-direction:column;gap:12px;"></div>
+        <p class="section-label">Sessões do Pacote</p>
+        <div id="lista-sessoes-cliente" style="display:flex;flex-direction:column;gap:12px;"></div>
       </div>
 
       <!-- RESUMO -->
@@ -649,8 +660,8 @@
     servicoId: null,
     servicoNome: null,
     servicoPreco: null,
-    qtdSessoes: null,    
-    sessoes: [], 
+    qtdSessoes: null,
+    sessoes: [],
     data: null,
     horaInicio: null,
     horaFim: null,
@@ -835,48 +846,48 @@
   // ── Serviços ─────────────────────────────────────────────
   document.querySelectorAll('.servico-card').forEach(card => {
     card.addEventListener('click', async () => {
-        document.querySelectorAll('.servico-card').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        state.servicoId = card.dataset.id;
-        state.servicoNome = card.dataset.nome;
-        state.servicoPreco = card.dataset.preco;
-        state.qtdSessoes = card.dataset.sessoes && card.dataset.sessoes !== 'null' ? parseInt(card.dataset.sessoes) : null;
-        
-        document.getElementById('input-servico-id').value = state.servicoId;
-        document.getElementById('input-servico').value = state.servicoNome;
-        resetHorario();
+      document.querySelectorAll('.servico-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      state.servicoId = card.dataset.id;
+      state.servicoNome = card.dataset.nome;
+      state.servicoPreco = card.dataset.preco;
+      state.qtdSessoes = card.dataset.sessoes && card.dataset.sessoes !== 'null' ? parseInt(card.dataset.sessoes) : null;
 
-        if (state.qtdSessoes) {
-            // É pacote — esconde calendário e slots normais
-            document.getElementById('secao-data').style.display = 'none';
-            document.querySelector('.calendar-wrapper').style.display = 'none'; // 👈
-            document.getElementById('secao-horario').style.display = 'none';
-            document.getElementById('horarios-grid').style.display = 'none';   // 👈
-            document.getElementById('secao-pacote').style.display = '';
-            gerarSessoesPacote(state.qtdSessoes);
-        } else {
-            // Serviço normal — mostra calendário e slots
-            document.getElementById('secao-data').style.display = '';
-            document.querySelector('.calendar-wrapper').style.display = ''; // 👈
-            document.getElementById('secao-horario').style.display = '';
-            document.getElementById('horarios-grid').style.display = '';   // 👈
-            document.getElementById('secao-pacote').style.display = 'none';
-            await buscarSlots();
-        }
+      document.getElementById('input-servico-id').value = state.servicoId;
+      document.getElementById('input-servico').value = state.servicoNome;
+      resetHorario();
 
-        updateResumo();
+      if (state.qtdSessoes) {
+        // É pacote — esconde calendário e slots normais
+        document.getElementById('secao-data').style.display = 'none';
+        document.querySelector('.calendar-wrapper').style.display = 'none'; // 👈
+        document.getElementById('secao-horario').style.display = 'none';
+        document.getElementById('horarios-grid').style.display = 'none';   // 👈
+        document.getElementById('secao-pacote').style.display = '';
+        gerarSessoesPacote(state.qtdSessoes);
+      } else {
+        // Serviço normal — mostra calendário e slots
+        document.getElementById('secao-data').style.display = '';
+        document.querySelector('.calendar-wrapper').style.display = ''; // 👈
+        document.getElementById('secao-horario').style.display = '';
+        document.getElementById('horarios-grid').style.display = '';   // 👈
+        document.getElementById('secao-pacote').style.display = 'none';
+        await buscarSlots();
+      }
+
+      updateResumo();
     });
-  }); 
+  });
   // cadastrar combo
   async function gerarSessoesPacote(qtd) {
-      state.sessoes = Array(qtd).fill(null).map(() => ({ data: null, horaInicio: null, horaFim: null }));
-      const lista = document.getElementById('lista-sessoes-cliente');
-      lista.innerHTML = '';
+    state.sessoes = Array(qtd).fill(null).map(() => ({ data: null, horaInicio: null, horaFim: null }));
+    const lista = document.getElementById('lista-sessoes-cliente');
+    lista.innerHTML = '';
 
-      for (let i = 0; i < qtd; i++) {
-          const bloco = document.createElement('div');
-          bloco.style.cssText = 'background:#111;border:1px solid #222;border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;';
-          bloco.innerHTML = `
+    for (let i = 0; i < qtd; i++) {
+      const bloco = document.createElement('div');
+      bloco.style.cssText = 'background:#111;border:1px solid #222;border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;';
+      bloco.innerHTML = `
               <span style="font-size:10px;letter-spacing:3px;color:#b8860b;text-transform:uppercase;">Sessão ${i + 1}</span>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                   <div>
@@ -896,136 +907,136 @@
                   </div>
               </div>
           `;
-          lista.appendChild(bloco);
+      lista.appendChild(bloco);
 
-          // Busca slots ao selecionar data
-          bloco.querySelector('.sessao-data-cliente').addEventListener('change', async function() {
-              const data = this.value;
-              const select = bloco.querySelector('.sessao-horario-cliente');
-              select.innerHTML = '<option value="">Carregando...</option>';
+      // Busca slots ao selecionar data
+      bloco.querySelector('.sessao-data-cliente').addEventListener('change', async function () {
+        const data = this.value;
+        const select = bloco.querySelector('.sessao-horario-cliente');
+        select.innerHTML = '<option value="">Carregando...</option>';
 
-              try {
-                  const url = `/slots?profissional_id=${state.profissionalId}&servico_id=${state.servicoId}&data=${data}&token=${TOKEN}`;
-                  const res = await fetch(url);
-                  const json = await res.json();
-                  const slots = (json.slots || []).filter(s => s.status === 'disponivel');
+        try {
+          const url = `/slots?profissional_id=${state.profissionalId}&servico_id=${state.servicoId}&data=${data}&token=${TOKEN}`;
+          const res = await fetch(url);
+          const json = await res.json();
+          const slots = (json.slots || []).filter(s => s.status === 'disponivel');
 
-                  select.innerHTML = slots.length 
-                      ? '<option value="">Selecione</option>' 
-                      : '<option value="">Nenhum horário disponível</option>';
+          select.innerHTML = slots.length
+            ? '<option value="">Selecione</option>'
+            : '<option value="">Nenhum horário disponível</option>';
 
-                  slots.forEach(s => {
-                      const opt = document.createElement('option');
-                      opt.value = s.hora_inicio;
-                      opt.dataset.horaFim = s.hora_fim;
-                      opt.textContent = `${s.hora_inicio.substring(0, 5)} – ${s.hora_fim.substring(0, 5)}`;
-                      select.appendChild(opt);
-                  });
-              } catch {
-                  select.innerHTML = '<option value="">Erro ao carregar</option>';
-              }
-
-              // Atualiza data no state
-              state.sessoes[i].data = data;
-              state.sessoes[i].horaInicio = null;
-              state.sessoes[i].horaFim = null;
-              updateResumo();
+          slots.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.hora_inicio;
+            opt.dataset.horaFim = s.hora_fim;
+            opt.textContent = `${s.hora_inicio.substring(0, 5)} – ${s.hora_fim.substring(0, 5)}`;
+            select.appendChild(opt);
           });
+        } catch {
+          select.innerHTML = '<option value="">Erro ao carregar</option>';
+        }
 
-          // Salva horário selecionado
-          bloco.querySelector('.sessao-horario-cliente').addEventListener('change', function() {
-              const opt = this.selectedOptions[0];
-              state.sessoes[i].horaInicio = opt?.value || null;
-              state.sessoes[i].horaFim = opt?.dataset.horaFim || null;
-              updateResumo();
-          });
-      }
+        // Atualiza data no state
+        state.sessoes[i].data = data;
+        state.sessoes[i].horaInicio = null;
+        state.sessoes[i].horaFim = null;
+        updateResumo();
+      });
+
+      // Salva horário selecionado
+      bloco.querySelector('.sessao-horario-cliente').addEventListener('change', function () {
+        const opt = this.selectedOptions[0];
+        state.sessoes[i].horaInicio = opt?.value || null;
+        state.sessoes[i].horaFim = opt?.dataset.horaFim || null;
+        updateResumo();
+      });
+    }
   }
   // ── Resumo ───────────────────────────────────────────────
   function updateResumo() {
-      const partes = [];
-      if (state.profissionalNome) partes.push(state.profissionalNome);
-      if (state.servicoNome) partes.push(state.servicoNome);
+    const partes = [];
+    if (state.profissionalNome) partes.push(state.profissionalNome);
+    if (state.servicoNome) partes.push(state.servicoNome);
 
-      let tudo = false;
+    let tudo = false;
 
-      if (state.qtdSessoes) {
-          // Pacote — verifica se todas as sessões estão preenchidas
-          const sessoesCompletas = state.sessoes.filter(s => s.data && s.horaInicio).length;
-          partes.push(`${sessoesCompletas}/${state.qtdSessoes} sessões selecionadas`);
-          tudo = state.profissionalId && state.servicoId && sessoesCompletas === state.qtdSessoes;
-      } else {
-          // Normal
-          if (state.data) partes.push(state.data.toLocaleDateString('pt-BR'));
-          if (state.horaInicio) partes.push(`${state.horaInicio.substring(0, 5)} – ${state.horaFim.substring(0, 5)}`);
-          tudo = state.profissionalId && state.servicoId && state.data && state.horaInicio;
-      }
+    if (state.qtdSessoes) {
+      // Pacote — verifica se todas as sessões estão preenchidas
+      const sessoesCompletas = state.sessoes.filter(s => s.data && s.horaInicio).length;
+      partes.push(`${sessoesCompletas}/${state.qtdSessoes} sessões selecionadas`);
+      tudo = state.profissionalId && state.servicoId && sessoesCompletas === state.qtdSessoes;
+    } else {
+      // Normal
+      if (state.data) partes.push(state.data.toLocaleDateString('pt-BR'));
+      if (state.horaInicio) partes.push(`${state.horaInicio.substring(0, 5)} – ${state.horaFim.substring(0, 5)}`);
+      tudo = state.profissionalId && state.servicoId && state.data && state.horaInicio;
+    }
 
-      const p = document.getElementById('resumo-texto');
-      const btn = document.getElementById('btn-submit');
-      p.textContent = partes.length ? partes.join(' · ') : 'Selecione profissional, serviço, data e horário';
-      p.style.color = tudo ? '#ccc' : '#555';
-      btn.disabled = !tudo;
+    const p = document.getElementById('resumo-texto');
+    const btn = document.getElementById('btn-submit');
+    p.textContent = partes.length ? partes.join(' · ') : 'Selecione profissional, serviço, data e horário';
+    p.style.color = tudo ? '#ccc' : '#555';
+    btn.disabled = !tudo;
   }
 
   // ── Submit ───────────────────────────────────────────────
-  document.getElementById('form-agendar').addEventListener('submit', async function(e) {
-      e.preventDefault();
+  document.getElementById('form-agendar').addEventListener('submit', async function (e) {
+    e.preventDefault();
 
-      if (state.qtdSessoes) {
-          // Pacote
-          const ok = confirm(
-              `Confirmar pacote?\n\n` +
-              `👤 ${state.profissionalNome}\n` +
-              `✂️ ${state.servicoNome} (${state.servicoPreco})\n` +
-              `📦 ${state.qtdSessoes} sessões agendadas`
-          );
-          if (!ok) return;
+    if (state.qtdSessoes) {
+      // Pacote
+      const ok = confirm(
+        `Confirmar pacote?\n\n` +
+        `👤 ${state.profissionalNome}\n` +
+        `✂️ ${state.servicoNome} (${state.servicoPreco})\n` +
+        `📦 ${state.qtdSessoes} sessões agendadas`
+      );
+      if (!ok) return;
 
-          const body = new URLSearchParams({
-              barbeiro: state.profissionalNome,
-              profissional_id: state.profissionalId,
-              servico: state.servicoNome,
-              servico_id: state.servicoId,
-              nome: '{{clienteNome}}',
-              telefone: '{{clienteTelefone}}',
-              sessoes: JSON.stringify(state.sessoes.map(s => ({
-                  data: s.data,
-                  hora_inicio: s.horaInicio,
-                  hora_fim: s.horaFim
-              })))
-          });
+      const body = new URLSearchParams({
+        barbeiro: state.profissionalNome,
+        profissional_id: state.profissionalId,
+        servico: state.servicoNome,
+        servico_id: state.servicoId,
+        nome: '{{clienteNome}}',
+        telefone: '{{clienteTelefone}}',
+        sessoes: JSON.stringify(state.sessoes.map(s => ({
+          data: s.data,
+          hora_inicio: s.horaInicio,
+          hora_fim: s.horaFim
+        })))
+      });
 
-          const res = await fetch(`/pacote/${TOKEN}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: body.toString()
-            });
-            const json = await res.json();
-            if (json.sucesso) {
-                if (json.whatsappLink) {
-                    window.location.href = json.whatsappLink;
-                } else {
-                    window.location.reload();
-                }
-            } else {
-                alert('⚠ ' + (json.erro || 'Erro ao salvar pacote.'));
-            }
-
+      const res = await fetch(`/pacote/${TOKEN}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString()
+      });
+      const json = await res.json();
+      if (json.sucesso) {
+        if (json.whatsappLink) {
+          window.location.href = json.whatsappLink;
+        } else {
+          window.location.reload();
+        }
       } else {
-          // Normal
-          const hora = state.horaInicio
-              ? `${state.horaInicio.substring(0, 5)} – ${state.horaFim.substring(0, 5)}`
-              : '';
-          const ok = confirm(
-              `Confirmar agendamento?\n\n` +
-              `👤 ${state.profissionalNome}\n` +
-              `✂️ ${state.servicoNome} (${state.servicoPreco})\n` +
-              `📅 ${state.data?.toLocaleDateString('pt-BR')} às ${hora}`
-          );
-          if (!ok) return;
-          this.submit();
+        alert('⚠ ' + (json.erro || 'Erro ao salvar pacote.'));
       }
+
+    } else {
+      // Normal
+      const hora = state.horaInicio
+        ? `${state.horaInicio.substring(0, 5)} – ${state.horaFim.substring(0, 5)}`
+        : '';
+      const ok = confirm(
+        `Confirmar agendamento?\n\n` +
+        `👤 ${state.profissionalNome}\n` +
+        `✂️ ${state.servicoNome} (${state.servicoPreco})\n` +
+        `📅 ${state.data?.toLocaleDateString('pt-BR')} às ${hora}`
+      );
+      if (!ok) return;
+      this.submit();
+    }
   });
 
   // ── Init ─────────────────────────────────────────────────

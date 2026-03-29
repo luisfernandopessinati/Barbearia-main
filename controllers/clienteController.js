@@ -99,6 +99,8 @@ module.exports = {
                     id: c.id,
                     nome: c.nome,
                     telefone: c.telefone,
+                    observacao: c.observacao || '',
+                    nascimento: c.nascimento || '',
                     total,
                     valorTotal: valorTotal.toFixed(2).replace('.', ','),
                     ultimoAgendamento,

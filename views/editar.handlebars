@@ -353,6 +353,16 @@
                     </select>
                 </div>
 
+                <!-- Observação -->            
+                <div class="edit-field full">
+                    <label for="observacao">Observação</label>
+                    <textarea id="observacao" name="observacao" rows="3"
+                        style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);outline:none;transition:border-color .2s, box-shadow .2s;width:100%;resize:vertical;"
+                        onfocus="this.style.borderColor='var(--gold)';this.style.boxShadow='0 0 0 3px var(--gold-dim)'"
+                        onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'"
+                        placeholder="Anotações sobre este agendamento...">{{agendamento.observacao}}</textarea>
+                </div>
+
             </div>
 
             <div class="edit-actions">
@@ -365,7 +375,7 @@
 </div>
 
 <script>
-    document.getElementById('barbeiro').addEventListener('change', function() {
+    document.getElementById('barbeiro').addEventListener('change', function () {
         const selected = this.options[this.selectedIndex];
         document.getElementById('profissional_id').value = selected.getAttribute('data-id');
     });

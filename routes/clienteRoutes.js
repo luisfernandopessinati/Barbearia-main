@@ -15,8 +15,8 @@ const sequelize = require('../config/db');
 function normalizarTelefone(tel) {
     const numeros = tel.replace(/\D/g, '');
     const semDDI = numeros.startsWith('55') && numeros.length >= 12 ? numeros.slice(2) : numeros;
-    if (semDDI.length === 11) return `(${semDDI.slice(0,2)}) ${semDDI.slice(2,7)}-${semDDI.slice(7)}`;
-    if (semDDI.length === 10) return `(${semDDI.slice(0,2)}) ${semDDI.slice(2,6)}-${semDDI.slice(6)}`;
+    if (semDDI.length === 11) return `(${semDDI.slice(0, 2)}) ${semDDI.slice(2, 7)}-${semDDI.slice(7)}`;
+    if (semDDI.length === 10) return `(${semDDI.slice(0, 2)}) ${semDDI.slice(2, 6)}-${semDDI.slice(6)}`;
     return semDDI;
 }
 
@@ -26,7 +26,7 @@ router.get('/clientes', isAdminAuthenticated, clienteController.listar);
 // ── Edita cliente ──
 router.patch('/clientes/:id', isAdminAuthenticated, async (req, res) => {
     try {
-        const { nome, telefone } = req.body;
+        const { nome, telefone, observacao, nascimento } = req.body;
         const telefoneNormalizado = normalizarTelefone(telefone);
         const cliente = await Cliente.findOne({ where: { id: req.params.id, idEmpresa: req.user.idEmpresa } });
         if (!cliente) return res.status(404).json({ erro: 'Cliente não encontrado.' });
@@ -34,7 +34,12 @@ router.patch('/clientes/:id', isAdminAuthenticated, async (req, res) => {
             { telefone: telefoneNormalizado },
             { where: { telefone: cliente.telefone, idEmpresa: req.user.idEmpresa } }
         );
-        await cliente.update({ nome: nome.trim(), telefone: telefoneNormalizado });
+        await cliente.update({
+            nome: nome.trim(),
+            telefone: telefoneNormalizado,
+            observacao: observacao?.trim() || null,
+            nascimento: nascimento || null
+        });
         res.json({ sucesso: true });
     } catch (error) {
         res.status(500).json({ erro: 'Erro ao atualizar: ' + error.message });
@@ -83,6 +88,7 @@ router.get('/agendar/:token', async (req, res) => {
         const horariosOcupados = agendamentos.map(a => ({ data: a.data, horario: a.horario }));
         const servicosFormatados = servicos.map(s => ({
             id: s.id, nome: s.nome,
+            descricao: s.descricao || null,
             valor: parseFloat(s.valor).toFixed(2).replace('.', ','),
             duracao_minutos: s.duracao_minutos,
             qtd_sessoes: s.qtd_sessoes || null
@@ -96,7 +102,11 @@ router.get('/agendar/:token', async (req, res) => {
             horariosOcupados, servicos: servicosFormatados, barbeiros,
             Sucesso: agendamentoSucesso?.mensagem || null,
             whatsappLink: agendamentoSucesso?.whatsappLink || null,
-            token
+            token,
+            empresa: {
+                estilo: empresa.estilo || 1,
+                feminino: empresa.estilo == 2
+            }
         });
     } catch (error) {
         return res.render('agendar', { erro: 'Erro ao carregar.' });
@@ -200,7 +210,7 @@ router.post('/pacote/:token', async (req, res) => {
             const adminProf = await Admin.findOne({ where: { id: profissional_id, idEmpresa }, attributes: ['telefone'] });
             const telefoneLimpo = adminProf?.telefone?.replace(/\D/g, '');
             if (telefoneLimpo) {
-                const datasTexto = sessoesArray.map((s, i) => `📅 Sessão ${i+1}: ${s.data} às ${s.hora_inicio}`).join('\n');
+                const datasTexto = sessoesArray.map((s, i) => `📅 Sessão ${i + 1}: ${s.data} às ${s.hora_inicio}`).join('\n');
                 const mensagem = encodeURIComponent(`Olá! Acabei de agendar um pacote:\n✂️ Serviço: ${servico}\n👤 Profissional: ${barbeiro}\n${datasTexto}`);
                 whatsappLink = `https://wa.me/55${telefoneLimpo}?text=${mensagem}`;
             }
@@ -209,6 +219,45 @@ router.post('/pacote/:token', async (req, res) => {
         return res.json({ sucesso: true, pacote_id: pacote.id, whatsappLink });
     } catch (e) {
         return res.status(500).json({ erro: e.message });
+    }
+});
+
+router.get('/clientes/:id/agendamentos', isAdminAuthenticated, async (req, res) => {
+    try {
+        const cliente = await Cliente.findOne({
+            where: { id: req.params.id, idEmpresa: req.user.idEmpresa }
+        });
+        if (!cliente) return res.status(404).json({ erro: 'Cliente não encontrado.' });
+
+        const agendamentos = await Agendamento.findAll({
+            where: { telefone: cliente.telefone, idEmpresa: req.user.idEmpresa },
+            attributes: ['id', 'data', 'horario', 'servico', 'barbeiro', 'valor', 'pago', 'status', 'observacao'],
+            order: [['data', 'DESC'], ['horario', 'DESC']]
+        });
+
+        res.json({
+            sucesso: true,
+            cliente: {
+                id: cliente.id,
+                nome: cliente.nome,
+                telefone: cliente.telefone,
+                observacao: cliente.observacao || null,
+                nascimento: cliente.nascimento || null
+            },
+            agendamentos: agendamentos.map(a => ({
+                id: a.id,
+                data: a.data,
+                horario: a.horario ? a.horario.substring(0, 5) : '',
+                servico: a.servico,
+                barbeiro: a.barbeiro,
+                valor: a.valor ? parseFloat(a.valor).toFixed(2).replace('.', ',') : '0,00',
+                pago: !!a.pago,
+                status: a.status,
+                observacao: a.observacao || null
+            }))
+        });
+    } catch (error) {
+        res.status(500).json({ erro: error.message });
     }
 });
 

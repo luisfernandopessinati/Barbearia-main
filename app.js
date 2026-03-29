@@ -226,7 +226,11 @@ app.get('/loginUsuario/:token', async (req, res) => {
     const empresa = await Empresa.findOne({ where: { token_agendamento: token } });
     if (!empresa) return res.status(404).send('Empresa não encontrada');
 
-    res.render('loginUsuario', { token,logo: empresa.logo }); 
+    res.render('loginUsuario', { 
+        token, 
+        logo: empresa.logo,
+        empresa: { feminino: empresa.estilo == 2 }  // 👈
+    });
 });
 
 app.get('/loginUsuarioNovo/:token', async (req, res) => {

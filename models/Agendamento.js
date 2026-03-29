@@ -71,6 +71,10 @@ const Agendamento = sequelize.define('Agendamentos', {
         type: DataTypes.INTEGER,
         allowNull: true,
         defaultValue: null
+    },        
+    observacao: {
+        type: DataTypes.STRING,
+        allowNull: false
     }
 });
 

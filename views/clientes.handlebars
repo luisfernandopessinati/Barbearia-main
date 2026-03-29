@@ -69,7 +69,9 @@
     }
 
     /* ══ RANKING BARBEIROS ══ */
-    .ranking-wrap { margin-bottom: 40px; }
+    .ranking-wrap {
+        margin-bottom: 40px;
+    }
 
     .ranking-grid-barbeiros {
         display: grid;
@@ -88,8 +90,15 @@
         user-select: none;
     }
 
-    .ranking-barb-card:hover { border-color: var(--gold); background: var(--bg3); }
-    .ranking-barb-card.active { border-color: var(--gold); background: var(--gold-dim); }
+    .ranking-barb-card:hover {
+        border-color: var(--gold);
+        background: var(--bg3);
+    }
+
+    .ranking-barb-card.active {
+        border-color: var(--gold);
+        background: var(--gold-dim);
+    }
 
     .ranking-barb-top {
         display: flex;
@@ -106,7 +115,9 @@
         line-height: 1;
     }
 
-    .ranking-barb-card.pos1 .ranking-barb-pos { color: var(--gold); }
+    .ranking-barb-card.pos1 .ranking-barb-pos {
+        color: var(--gold);
+    }
 
     .ranking-barb-avatar {
         width: 36px;
@@ -162,7 +173,9 @@
         line-height: 1.2;
     }
 
-    .ranking-barb-card.pos1 .ranking-barb-stat span { color: var(--gold-light); }
+    .ranking-barb-card.pos1 .ranking-barb-stat span {
+        color: var(--gold-light);
+    }
 
     .ranking-barb-expand-hint {
         font-size: 9px;
@@ -175,7 +188,9 @@
     }
 
     .ranking-barb-card:hover .ranking-barb-expand-hint,
-    .ranking-barb-card.active .ranking-barb-expand-hint { color: var(--gold); }
+    .ranking-barb-card.active .ranking-barb-expand-hint {
+        color: var(--gold);
+    }
 
     .barb-expand-panel {
         display: none;
@@ -188,11 +203,20 @@
         animation: fadeIn 0.2s ease;
     }
 
-    .barb-expand-panel.open { display: block; }
+    .barb-expand-panel.open {
+        display: block;
+    }
 
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-6px); }
-        to   { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(-6px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .barb-expand-title {
@@ -249,8 +273,15 @@
         margin-bottom: 4px;
     }
 
-    .barb-top-cli-stat { font-size: 10px; color: var(--muted); }
-    .barb-top-cli-stat span { color: var(--gold); font-weight: 600; }
+    .barb-top-cli-stat {
+        font-size: 10px;
+        color: var(--muted);
+    }
+
+    .barb-top-cli-stat span {
+        color: var(--gold);
+        font-weight: 600;
+    }
 
     .barb-expand-empty {
         font-size: 12px;
@@ -276,8 +307,14 @@
         transition: border-color 0.2s;
     }
 
-    .top-cliente-card:hover { border-color: var(--gold); }
-    .top-cliente-card.primeiro { background: var(--gold-dim); border-color: var(--gold); }
+    .top-cliente-card:hover {
+        border-color: var(--gold);
+    }
+
+    .top-cliente-card.primeiro {
+        background: var(--gold-dim);
+        border-color: var(--gold);
+    }
 
     .top-cliente-pos {
         font-family: 'Bebas Neue', sans-serif;
@@ -287,7 +324,9 @@
         margin-bottom: 8px;
     }
 
-    .top-cliente-card.primeiro .top-cliente-pos { color: var(--gold); }
+    .top-cliente-card.primeiro .top-cliente-pos {
+        color: var(--gold);
+    }
 
     .top-cliente-avatar {
         width: 38px;
@@ -320,8 +359,16 @@
         text-overflow: ellipsis;
     }
 
-    .top-cliente-stat { font-size: 10px; color: var(--muted); margin-bottom: 2px; }
-    .top-cliente-stat span { color: var(--gold); font-weight: 600; }
+    .top-cliente-stat {
+        font-size: 10px;
+        color: var(--muted);
+        margin-bottom: 2px;
+    }
+
+    .top-cliente-stat span {
+        color: var(--gold);
+        font-weight: 600;
+    }
 
     /* ══ TABELA CLIENTES ══ */
     .clientes-header {
@@ -345,7 +392,9 @@
         min-width: 220px;
     }
 
-    .clientes-search-wrap:focus-within { border-color: var(--gold); }
+    .clientes-search-wrap:focus-within {
+        border-color: var(--gold);
+    }
 
     .clientes-search-wrap svg {
         width: 14px;
@@ -364,7 +413,9 @@
         width: 100%;
     }
 
-    .clientes-search::placeholder { color: var(--muted); }
+    .clientes-search::placeholder {
+        color: var(--muted);
+    }
 
     .clientes-count {
         font-size: 11px;
@@ -381,7 +432,10 @@
         overflow: hidden;
     }
 
-    .clientes-table { width: 100%; border-collapse: collapse; }
+    .clientes-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
 
     .clientes-table th {
         background: var(--bg3);
@@ -404,12 +458,27 @@
         vertical-align: middle;
     }
 
-    .clientes-table tr:last-child td { border-bottom: none; }
-    .clientes-table tbody tr { transition: background 0.15s; }
-    .clientes-table tbody tr:hover td { background: var(--bg3); }
-    .clientes-table tbody tr.hidden { display: none; }
+    .clientes-table tr:last-child td {
+        border-bottom: none;
+    }
 
-    .td-nome-wrap { display: flex; align-items: center; gap: 10px; }
+    .clientes-table tbody tr {
+        transition: background 0.15s;
+    }
+
+    .clientes-table tbody tr:hover td {
+        background: var(--bg3);
+    }
+
+    .clientes-table tbody tr.hidden {
+        display: none;
+    }
+
+    .td-nome-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 
     .td-avatar {
         width: 32px;
@@ -432,8 +501,15 @@
         line-height: 1;
     }
 
-    .td-valor { font-size: 13px; font-weight: 500; }
-    .td-muted { color: var(--muted); font-size: 12px; }
+    .td-valor {
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .td-muted {
+        color: var(--muted);
+        font-size: 12px;
+    }
 
     .td-badge {
         font-size: 10px;
@@ -471,9 +547,21 @@
         display: none;
     }
 
-    .clientes-empty { text-align: center; padding: 80px 20px; color: var(--muted); }
-    .clientes-empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.3; }
-    .clientes-empty p { font-size: 13px; }
+    .clientes-empty {
+        text-align: center;
+        padding: 80px 20px;
+        color: var(--muted);
+    }
+
+    .clientes-empty-icon {
+        font-size: 40px;
+        margin-bottom: 12px;
+        opacity: 0.3;
+    }
+
+    .clientes-empty p {
+        font-size: 13px;
+    }
 
     /* ══ MODAL EDIÇÃO CLIENTE ══ */
     .modal-cli-overlay {
@@ -487,7 +575,9 @@
         justify-content: center;
     }
 
-    .modal-cli-overlay.open { display: flex; }
+    .modal-cli-overlay.open {
+        display: flex;
+    }
 
     .modal-cli {
         background: var(--bg2);
@@ -501,7 +591,9 @@
         transition: transform 0.25s;
     }
 
-    .modal-cli-overlay.open .modal-cli { transform: translateY(0); }
+    .modal-cli-overlay.open .modal-cli {
+        transform: translateY(0);
+    }
 
     .modal-cli-close {
         position: absolute;
@@ -515,7 +607,9 @@
         transition: color 0.2s;
     }
 
-    .modal-cli-close:hover { color: var(--text); }
+    .modal-cli-close:hover {
+        color: var(--text);
+    }
 
     .modal-cli-title {
         font-family: 'Bebas Neue', sans-serif;
@@ -558,7 +652,9 @@
         transition: border-color 0.2s;
     }
 
-    .modal-cli-field input:focus { border-color: var(--gold); }
+    .modal-cli-field input:focus {
+        border-color: var(--gold);
+    }
 
     .modal-cli-erro {
         font-size: 12px;
@@ -586,7 +682,10 @@
         transition: all 0.2s;
     }
 
-    .btn-cli-cancelar:hover { border-color: var(--danger); color: var(--danger); }
+    .btn-cli-cancelar:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+    }
 
     .btn-cli-salvar {
         flex: 2;
@@ -602,27 +701,74 @@
         transition: background 0.2s;
     }
 
-    .btn-cli-salvar:hover { background: var(--gold-light); }
-    .btn-cli-salvar:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-cli-salvar:hover {
+        background: var(--gold-light);
+    }
+
+    .btn-cli-salvar:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
 
     /* ══ MOBILE ══ */
     @media (max-width: 900px) {
-        .clientes-wrap { padding: 16px; }
-        .ranking-grid-barbeiros { grid-template-columns: repeat(2, 1fr); }
-        .barb-top-clientes { grid-template-columns: repeat(2, 1fr); }
-        .top-clientes-grid { grid-template-columns: repeat(2, 1fr); }
+        .clientes-wrap {
+            padding: 16px;
+        }
+
+        .ranking-grid-barbeiros {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .barb-top-clientes {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .top-clientes-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
         .clientes-table th:nth-child(5),
         .clientes-table td:nth-child(5),
         .clientes-table th:nth-child(6),
-        .clientes-table td:nth-child(6) { display: none; }
+        .clientes-table td:nth-child(6) {
+            display: none;
+        }
     }
 
     @media (max-width: 600px) {
-        .ranking-grid-barbeiros { grid-template-columns: 1fr 1fr; }
+        .ranking-grid-barbeiros {
+            grid-template-columns: 1fr 1fr;
+        }
+
         .clientes-table th:nth-child(4),
-        .clientes-table td:nth-child(4) { display: none; }
-        .top-clientes-grid { grid-template-columns: repeat(2, 1fr); }
-        .barb-top-clientes { grid-template-columns: repeat(2, 1fr); }
+        .clientes-table td:nth-child(4) {
+            display: none;
+        }
+
+        .top-clientes-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .barb-top-clientes {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .btn-cli-historico {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-cli-historico:hover {
+        border-color: var(--gold);
+        color: var(--gold);
     }
 </style>
 
@@ -641,10 +787,8 @@
         <div class="ranking-grid-barbeiros" id="ranking-barbeiros-grid">
 
             {{#each rankingBarbeiros}}
-            <div class="ranking-barb-card {{#if (eq @index 0)}}pos1{{/if}}"
-                 data-id="{{id}}"
-                 data-clientes='{{json topClientes}}'
-                 onclick="toggleBarbeiro(this)">
+            <div class="ranking-barb-card {{#if (eq @index 0)}}pos1{{/if}}" data-id="{{id}}"
+                data-clientes='{{json topClientes}}' onclick="toggleBarbeiro(this)">
                 <div class="ranking-barb-top">
                     <div class="ranking-barb-pos">#{{add @index 1}}</div>
                     <div class="ranking-barb-avatar">{{substr nome 0 2}}</div>
@@ -665,7 +809,8 @@
             <div class="barb-expand-panel" id="barb-expand-panel">
                 <div class="barb-expand-title" id="barb-expand-title">Top Clientes</div>
                 <div class="barb-top-clientes" id="barb-top-clientes"></div>
-                <div class="barb-expand-empty" id="barb-expand-empty" style="display:none">Nenhum cliente encontrado.</div>
+                <div class="barb-expand-empty" id="barb-expand-empty" style="display:none">Nenhum cliente encontrado.
+                </div>
             </div>
 
         </div>
@@ -696,18 +841,18 @@
 
     {{!-- LISTA COMPLETA --}}
     <div class="clientes-header">
-        <div class="section-titulo" style="margin-bottom:0">👥 Todos os Clientes</div>
-        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-            {{#if clientes.length}}
-            <span class="clientes-count" id="clientes-count">{{clientes.length}} cadastrados</span>
-            {{/if}}
-            <div class="clientes-search-wrap">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
-                </svg>
-                <input class="clientes-search" id="clientes-search" type="text" placeholder="Buscar cliente ou telefone..." />
-            </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+            <div class="section-titulo" style="margin-bottom:0">👥 Todos os Clientes</div>
+            <button id="btn-aniversarios" style="
+            background:none;border:1px solid var(--border);color:var(--muted);
+            padding:6px 14px;border-radius:6px;font-size:11px;letter-spacing:1px;
+            text-transform:uppercase;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;"
+                onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'"
+                onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+                🎂 Aniversários
+            </button>
         </div>
+        <div class="section-titulo" style="margin-bottom:0">👥 Todos os Clientes</div>
     </div>
 
     {{#if clientes.length}}
@@ -718,15 +863,15 @@
                     <th>Cliente</th>
                     <th>Telefone</th>
                     <th>Agendamentos</th>
-                    <th>Valor Total</th>
+                    <th>Nascimento</th>
                     <th>Último Agendamento</th>
-                    <th>Serviço Favorito</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody id="clientes-tbody">
                 {{#each clientes}}
-                <tr data-id="{{id}}" data-nome="{{nome}}" data-telefone="{{telefone}}">
+                <tr data-id="{{id}}" data-nome="{{nome}}" data-telefone="{{telefone}}" data-obs="{{observacao}}"
+                    data-nascimento="{{nascimento}}">
                     <td>
                         <div class="td-nome-wrap">
                             <div class="td-avatar">{{substr nome 0 2}}</div>
@@ -735,14 +880,13 @@
                     </td>
                     <td class="td-muted" id="cli-tel-{{id}}">{{telefone}}</td>
                     <td><span class="td-total">{{total}}</span></td>
-                    <td><span class="td-valor">R$ {{valorTotal}}</span></td>
+                    <td class="td-muted">{{#if nascimento}}{{nascimento}}{{else}}—{{/if}}</td>
                     <td class="td-muted">{{ultimoAgendamento}}</td>
-                    <td><span class="td-badge">{{servicoFavorito}}</span></td>
-                    <td>
-                        <button class="btn-cli-edit"
-                            data-id="{{id}}"
-                            data-nome="{{nome}}"
-                            data-tel="{{telefone}}">✎</button>
+                    <td style="display:flex;gap:6px;">
+                        <button class="btn-cli-edit" data-id="{{id}}" data-nome="{{nome}}" data-tel="{{telefone}}"
+                            data-obs="{{observacao}}" data-nascimento="{{nascimento}}" title="Editar">✎</button>
+                        <button class="btn-cli-historico" data-id="{{id}}" data-nome="{{nome}}" data-tel="{{telefone}}"
+                            title="Histórico">📋</button>
                     </td>
                 </tr>
                 {{/each}}
@@ -760,6 +904,7 @@
 </div>
 
 {{!-- MODAL EDIÇÃO CLIENTE --}}
+{{!-- MODAL EDIÇÃO CLIENTE --}}
 <div class="modal-cli-overlay" id="modal-cli-overlay">
     <div class="modal-cli">
         <button class="modal-cli-close" id="modal-cli-close">✕</button>
@@ -774,11 +919,68 @@
             <label>Telefone</label>
             <input id="cli-edit-tel" type="text" placeholder="(00) 00000-0000">
         </div>
+        <div class="modal-cli-field">
+            <label>Data de Nascimento</label>
+            <input id="cli-edit-nascimento" type="date">
+        </div>
+        <div class="modal-cli-field">
+            <label>Observação</label>
+            <textarea id="cli-edit-obs" rows="3"
+                style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;resize:vertical;transition:border-color .2s;"
+                onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"
+                placeholder="Alergias, preferências, observações..."></textarea>
+        </div>
         <div class="modal-cli-erro" id="cli-edit-erro"></div>
         <div class="modal-cli-actions">
             <button class="btn-cli-cancelar" id="btn-cli-cancelar">Cancelar</button>
             <button class="btn-cli-salvar" id="btn-cli-salvar">Salvar</button>
         </div>
+    </div>
+</div> {{!-- 👈 modal fecha aqui --}}
+
+{{!-- DRAWER HISTÓRICO CLIENTE — fora do modal --}}
+<div id="drawer-overlay"
+    style="display:none;position:fixed;inset:0;background:#000000bb;z-index:400;backdrop-filter:blur(3px);"
+    onclick="fecharDrawer()"></div>
+<div id="drawer-cliente" style="
+    position:fixed;top:0;right:0;height:100vh;width:480px;max-width:100vw;
+    background:var(--bg2);border-left:1px solid var(--border);
+    z-index:401;display:flex;flex-direction:column;
+    transform:translateX(100%);transition:transform .3s ease;overflow:hidden;">
+
+    <div style="padding:24px 24px 0;flex-shrink:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div>
+                <div id="drawer-nome"
+                    style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:var(--text);">
+                </div>
+                <div id="drawer-tel" style="font-size:12px;color:var(--muted);margin-top:2px;"></div>
+            </div>
+            <button onclick="fecharDrawer()"
+                style="background:none;border:1px solid var(--border);color:var(--muted);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;transition:all .2s;"
+                onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'"
+                onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">✕</button>
+        </div>
+
+        <div id="drawer-obs-wrap"
+            style="display:none;background:var(--bg3);border:1px solid var(--gold-dim);border-radius:8px;padding:10px 14px;margin-bottom:16px;">
+            <div style="font-size:9px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:4px;">
+                📌 Observação do cliente</div>
+            <div id="drawer-obs" style="font-size:13px;color:var(--text);"></div>
+        </div>
+
+        <div id="drawer-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;">
+        </div>
+
+        <div
+            style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;padding-bottom:12px;border-bottom:1px solid var(--border);">
+            Histórico de Agendamentos
+        </div>
+    </div>
+
+    <div id="drawer-lista"
+        style="flex:1;overflow-y:auto;padding:16px 24px;display:flex;flex-direction:column;gap:10px;">
+        <div style="text-align:center;color:var(--muted);font-size:13px;padding:40px;">Carregando...</div>
     </div>
 </div>
 
@@ -787,10 +989,10 @@
     let activeBarbCard = null;
 
     function toggleBarbeiro(card) {
-        const panel     = document.getElementById('barb-expand-panel');
-        const title     = document.getElementById('barb-expand-title');
+        const panel = document.getElementById('barb-expand-panel');
+        const title = document.getElementById('barb-expand-title');
         const container = document.getElementById('barb-top-clientes');
-        const empty     = document.getElementById('barb-expand-empty');
+        const empty = document.getElementById('barb-expand-empty');
 
         if (activeBarbCard === card) {
             card.classList.remove('active');
@@ -803,17 +1005,17 @@
         card.classList.add('active');
         activeBarbCard = card;
 
-        const nome     = card.querySelector('.ranking-barb-nome').textContent;
+        const nome = card.querySelector('.ranking-barb-nome').textContent;
         const clientes = JSON.parse(card.dataset.clientes || '[]');
 
-        title.textContent  = `Top Clientes de ${nome}`;
+        title.textContent = `Top Clientes de ${nome}`;
         container.innerHTML = '';
 
         if (!clientes.length) {
-            empty.style.display     = 'block';
+            empty.style.display = 'block';
             container.style.display = 'none';
         } else {
-            empty.style.display     = 'none';
+            empty.style.display = 'none';
             container.style.display = 'grid';
             clientes.forEach((c, i) => {
                 const initials = c.nome.substring(0, 2).toUpperCase();
@@ -834,20 +1036,20 @@
 
     // ── Pesquisa clientes ──
     const searchInput = document.getElementById('clientes-search');
-    const tbody       = document.getElementById('clientes-tbody');
-    const countEl     = document.getElementById('clientes-count');
-    const noResults   = document.getElementById('no-results');
-    const searchTerm  = document.getElementById('search-term');
+    const tbody = document.getElementById('clientes-tbody');
+    const countEl = document.getElementById('clientes-count');
+    const noResults = document.getElementById('no-results');
+    const searchTerm = document.getElementById('search-term');
 
     if (searchInput && tbody) {
         searchInput.addEventListener('input', function () {
             const termo = this.value.toLowerCase().trim();
-            const rows  = tbody.querySelectorAll('tr');
+            const rows = tbody.querySelectorAll('tr');
             let visiveis = 0;
 
             rows.forEach(row => {
-                const nome  = (row.dataset.nome     || '').toLowerCase();
-                const tel   = (row.dataset.telefone || '').toLowerCase();
+                const nome = (row.dataset.nome || '').toLowerCase();
+                const tel = (row.dataset.telefone || '').toLowerCase();
                 const match = !termo || nome.includes(termo) || tel.includes(termo);
                 row.classList.toggle('hidden', !match);
                 if (match) visiveis++;
@@ -860,18 +1062,28 @@
             }
         });
     }
+    if (tbody) {
+        tbody.addEventListener('click', e => {
+            if (e.target.closest('.btn-cli-edit')) return; // clique no lápis → modal, não drawer
+            const row = e.target.closest('tr');
+            if (!row || !row.dataset.id) return;
+            abrirDrawer(row.dataset.id, row.dataset.nome, row.dataset.telefone);
+        });
+    }
 
     // ── Modal edição cliente ──
-    const modalOverlay  = document.getElementById('modal-cli-overlay');
+    const modalOverlay = document.getElementById('modal-cli-overlay');
     const btnCliCancelar = document.getElementById('btn-cli-cancelar');
-    const btnCliClose   = document.getElementById('modal-cli-close');
-    const btnCliSalvar  = document.getElementById('btn-cli-salvar');
-    const cliErro       = document.getElementById('cli-edit-erro');
+    const btnCliClose = document.getElementById('modal-cli-close');
+    const btnCliSalvar = document.getElementById('btn-cli-salvar');
+    const cliErro = document.getElementById('cli-edit-erro');
 
-    function abrirModalCli(id, nome, tel) {
-        document.getElementById('cli-edit-id').value   = id;
+    function abrirModalCli(id, nome, tel, obs, nascimento) {
+        document.getElementById('cli-edit-id').value = id;
         document.getElementById('cli-edit-nome').value = nome;
-        document.getElementById('cli-edit-tel').value  = tel;
+        document.getElementById('cli-edit-tel').value = tel;
+        document.getElementById('cli-edit-obs').value = obs || '';
+        document.getElementById('cli-edit-nascimento').value = nascimento || '';
         cliErro.textContent = '';
         modalOverlay.classList.add('open');
     }
@@ -887,36 +1099,46 @@
     });
 
     // Abre modal ao clicar no botão ✎
+    // ── Botão editar ──
     document.addEventListener('click', e => {
         const btn = e.target.closest('.btn-cli-edit');
         if (!btn) return;
-        abrirModalCli(btn.dataset.id, btn.dataset.nome, btn.dataset.tel);
+        abrirModalCli(btn.dataset.id, btn.dataset.nome, btn.dataset.tel, btn.dataset.obs, btn.dataset.nascimento);
+    });
+
+    // ── Botão histórico ──
+    document.addEventListener('click', e => {
+        const btn = e.target.closest('.btn-cli-historico');
+        if (!btn) return;
+        abrirDrawer(btn.dataset.id, btn.dataset.nome, btn.dataset.tel);
     });
 
     // Salvar edição
     btnCliSalvar.addEventListener('click', async () => {
-        const id    = document.getElementById('cli-edit-id').value;
-        const nome  = document.getElementById('cli-edit-nome').value.trim();
-        const tel   = document.getElementById('cli-edit-tel').value.trim();
+        const id = document.getElementById('cli-edit-id').value;
+        const nome = document.getElementById('cli-edit-nome').value.trim();
+        const tel = document.getElementById('cli-edit-tel').value.trim();
+        const obs = document.getElementById('cli-edit-obs').value.trim();
+        const nascimento = document.getElementById('cli-edit-nascimento').value;
 
         if (!nome || !tel) { cliErro.textContent = '⚠ Preencha todos os campos.'; return; }
 
         btnCliSalvar.textContent = 'Salvando...';
-        btnCliSalvar.disabled    = true;
-        cliErro.textContent      = '';
+        btnCliSalvar.disabled = true;
+        cliErro.textContent = '';
 
         try {
-            const res  = await fetch(`/clientes/${id}`, {
-                method:  'PATCH',
+            const res = await fetch(`/clientes/${id}`, {
+                method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body:    JSON.stringify({ nome, telefone: tel })
+                body: JSON.stringify({ nome, telefone: tel, observacao: obs, nascimento: nascimento || null })
             });
             const json = await res.json();
 
             if (json.sucesso) {
                 // Atualiza tabela sem recarregar
                 document.getElementById(`cli-nome-${id}`).textContent = nome;
-                document.getElementById(`cli-tel-${id}`).textContent  = tel;
+                document.getElementById(`cli-tel-${id}`).textContent = tel;
 
                 // Atualiza data-attributes da linha e do botão
                 const row = tbody.querySelector(`tr[data-id="${id}"]`);
@@ -932,7 +1154,162 @@
             cliErro.textContent = '⚠ Erro de conexão.';
         } finally {
             btnCliSalvar.textContent = 'Salvar';
-            btnCliSalvar.disabled    = false;
+            btnCliSalvar.disabled = false;
         }
+    });
+    // ── Drawer histórico ──
+    async function abrirDrawer(id, nome, tel) {
+        const drawer = document.getElementById('drawer-cliente');
+        const overlay = document.getElementById('drawer-overlay');
+        const lista = document.getElementById('drawer-lista');
+
+        document.getElementById('drawer-nome').textContent = nome;
+        document.getElementById('drawer-tel').textContent = tel;
+        document.getElementById('drawer-stats').innerHTML = '';
+        document.getElementById('drawer-obs-wrap').style.display = 'none';
+        lista.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:40px;">Carregando...</div>';
+
+        overlay.style.display = 'block';
+        drawer.style.transform = 'translateX(0)';
+
+        try {
+            const res = await fetch(`/clientes/${id}/agendamentos`);
+            const json = await res.json();
+            if (!json.sucesso) throw new Error(json.erro);
+
+            // Observação fixa
+            if (json.cliente.observacao) {
+                document.getElementById('drawer-obs').textContent = json.cliente.observacao;
+                document.getElementById('drawer-obs-wrap').style.display = 'block';
+            }
+
+            // Nascimento
+            if (json.cliente.nascimento) {
+                const [y, m, d] = json.cliente.nascimento.split('-');
+                document.getElementById('drawer-tel').textContent = `${tel}  ·  🎂 ${d}/${m}/${y}`;
+            }
+
+            // Stats
+            const total = json.agendamentos.length;
+            const pagos = json.agendamentos.filter(a => a.pago).length;
+            const gasto = json.agendamentos.reduce((acc, a) => acc + parseFloat(a.valor.replace(',', '.')), 0);
+            document.getElementById('drawer-stats').innerHTML = `
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);">${total}</div>
+                <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Agendamentos</div>
+            </div>
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);">${pagos}</div>
+                <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Pagos</div>
+            </div>
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);">R$${gasto.toFixed(2).replace('.', ',')}</div>
+                <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Total gasto</div>
+            </div>`;
+
+            // Lista
+            if (!json.agendamentos.length) {
+                lista.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:40px;">Nenhum agendamento encontrado.</div>';
+                return;
+            }
+
+            lista.innerHTML = '';
+            json.agendamentos.forEach(a => {
+                const [y, m, d] = a.data.split('-');
+                const dataFmt = `${d}/${m}/${y}`;
+                const corStatus = a.pago ? '#27ae60' : (a.status === 'cancelado' ? 'var(--danger)' : 'var(--muted)');
+                const labelStatus = a.pago ? 'Pago' : (a.status === 'cancelado' ? 'Cancelado' : 'Pendente');
+
+                const card = document.createElement('div');
+                card.style.cssText = 'background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;transition:border-color .2s;';
+                card.onmouseover = () => card.style.borderColor = 'var(--gold-dim)';
+                card.onmouseout = () => card.style.borderColor = 'var(--border)';
+                card.innerHTML = `
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--gold);letter-spacing:1px;">${dataFmt}</span>
+                        <span style="font-size:12px;color:var(--muted);">${a.horario}</span>
+                    </div>
+                    <span style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:${corStatus};border:1px solid ${corStatus}33;padding:2px 8px;border-radius:10px;">${labelStatus}</span>
+                </div>
+                <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;">✂️ ${a.servico}</div>
+                <div style="font-size:11px;color:var(--muted);margin-bottom:${a.observacao ? '8px' : '0'};">
+                    👤 ${a.barbeiro} &nbsp;·&nbsp; R$ ${a.valor}
+                </div>
+                ${a.observacao ? `
+                <div style="background:var(--bg2);border-left:2px solid var(--gold-dim);padding:6px 10px;border-radius:0 6px 6px 0;font-size:12px;color:#888;">
+                    📝 ${a.observacao}
+                </div>` : ''}`;
+                lista.appendChild(card);
+            });
+
+        } catch (e) {
+            lista.innerHTML = `<div style="text-align:center;color:var(--danger);font-size:13px;padding:40px;">Erro ao carregar: ${e.message}</div>`;
+        }
+    }
+
+    function fecharDrawer() {
+        document.getElementById('drawer-cliente').style.transform = 'translateX(100%)';
+        document.getElementById('drawer-overlay').style.display = 'none';
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharDrawer(); });
+
+    // ── Aniversários próximos ──
+    document.getElementById('btn-aniversarios')?.addEventListener('click', () => {
+        const hoje = new Date();
+        const em7dias = new Date(); em7dias.setDate(hoje.getDate() + 7);
+
+        const rows = document.querySelectorAll('#clientes-tbody tr');
+        const aniversariantes = [];
+
+        rows.forEach(row => {
+            const nasc = row.dataset.nascimento;
+            if (!nasc) return;
+            const [y, m, d] = nasc.split('-');
+            // Compara só dia e mês, ignora ano
+            const aniv = new Date(hoje.getFullYear(), parseInt(m) - 1, parseInt(d));
+            // Se já passou este ano, testa o próximo
+            if (aniv < hoje) aniv.setFullYear(hoje.getFullYear() + 1);
+            if (aniv <= em7dias) {
+                aniversariantes.push({
+                    nome: row.dataset.nome,
+                    tel: row.dataset.telefone,
+                    data: `${d}/${m}`,
+                    diff: Math.ceil((aniv - hoje) / (1000 * 60 * 60 * 24))
+                });
+            }
+        });
+
+        // Monta popup simples
+        let existing = document.getElementById('modal-aniv');
+        if (existing) existing.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'modal-aniv';
+        modal.style.cssText = 'position:fixed;inset:0;background:#000000cc;z-index:500;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
+        modal.innerHTML = `
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px;width:100%;max-width:400px;position:relative;">
+            <button onclick="document.getElementById('modal-aniv').remove()" 
+                style="position:absolute;top:14px;right:14px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;">✕</button>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--text);margin-bottom:4px;">🎂 Aniversários</div>
+            <p style="font-size:12px;color:var(--muted);margin-bottom:20px;">Próximos 7 dias</p>
+            ${aniversariantes.length === 0
+                ? '<p style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">Nenhum aniversário nos próximos 7 dias.</p>'
+                : aniversariantes.sort((a, b) => a.diff - b.diff).map(a => `
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;">
+                        <div>
+                            <div style="font-size:13px;font-weight:600;color:var(--text);">${a.nome}</div>
+                            <div style="font-size:11px;color:var(--muted);margin-top:2px;">📅 ${a.data} · ${a.tel}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);">${a.diff === 0 ? '🎉' : a.diff + 'd'}</div>
+                            <div style="font-size:10px;color:var(--muted);">${a.diff === 0 ? 'Hoje!' : 'restantes'}</div>
+                        </div>
+                    </div>`).join('')
+            }
+        </div>`;
+        modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+        document.body.appendChild(modal);
     });
 </script>

@@ -35,12 +35,19 @@ router.get('/editar/:id', isAdminAuthenticated, async (req, res) => {
 
 router.post('/editar/:id', isAdminAuthenticated, (req, res) => {
     Agendamento.update(
-        { nome: req.body.nome, telefone: req.body.telefone, data: req.body.data,
-          horario: req.body.horario, servico: req.body.servico, barbeiro: req.body.barbeiro,
-          profissional_id: req.body.profissional_id },
+        {
+            nome: req.body.nome,
+            telefone: req.body.telefone,
+            data: req.body.data,
+            horario: req.body.horario,
+            servico: req.body.servico,
+            barbeiro: req.body.barbeiro,
+            profissional_id: req.body.profissional_id,
+            observacao: req.body.observacao || null  // 👈
+        },
         { where: { id: req.params.id, idEmpresa: req.user.idEmpresa } }
     ).then(() => res.redirect('/admin'))
-     .catch(error => res.status(500).send('Erro ao atualizar: ' + error.message));
+        .catch(error => res.status(500).send('Erro ao atualizar: ' + error.message));
 });
 
 // ── Deletar agendamento ──
@@ -99,9 +106,11 @@ router.get('/admin/dashboard/dados', isAdminAuthenticated, async (req, res) => {
 
         res.json({
             periodo: { inicio: inicio.toISOString().split('T')[0], fim: fim.toISOString().split('T')[0] },
-            kpis: { totalAgendamentos: lista.length, faturamentoTotal: faturamentoTotal.toFixed(2),
+            kpis: {
+                totalAgendamentos: lista.length, faturamentoTotal: faturamentoTotal.toFixed(2),
                 topBarbeiro: topBarbeiro ? { nome: topBarbeiro[0], count: topBarbeiro[1] } : null,
-                topServico: topServico ? { nome: topServico[0], count: topServico[1] } : null },
+                topServico: topServico ? { nome: topServico[0], count: topServico[1] } : null
+            },
             evolucao, servicosPorBarbeiro, faturamentoPorBarbeiro, porBarbeiro
         });
     } catch (error) {

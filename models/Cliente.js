@@ -29,8 +29,16 @@ const Cliente = sequelize.define('Clientes', {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true
+    },
+    observacao: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    nascimento: {
+        type: DataTypes.DATEONLY,
+        allowNull: true
     }
 });
 
- // Cliente.sync({ force: true });
+// Cliente.sync({ force: true });
 module.exports = Cliente;

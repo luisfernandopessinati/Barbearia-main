@@ -18,10 +18,10 @@ const Empresa = sequelize.define('Empresa', {
     ativo: {
         type: DataTypes.STRING,
         allowNull: false
-    }, 
+    },
     cnpj: {
         type: DataTypes.STRING,
-        allowNull: false        
+        allowNull: false
     },
     celular: {
         type: DataTypes.STRING,
@@ -68,6 +68,11 @@ const Empresa = sequelize.define('Empresa', {
     observacao: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    estilo: {
+        type: DataTypes.TINYINT,
+        allowNull: true,
+        defaultValue: 1
     }
 }, {
     tableName: 'empresas',

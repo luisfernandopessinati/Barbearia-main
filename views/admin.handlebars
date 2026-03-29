@@ -48,11 +48,11 @@
                     <span class="item-label"><span>Vendas</span><small>Área de vendas</small></span>
                     <span class="item-badge">Novo</span>
                 </button>
-               <button class="config-dropdown-item" id="menu-estoque">
+                <button class="config-dropdown-item" id="menu-estoque">
                     <span class="item-icon">📦</span>
                     <span class="item-label"><span>Estoque</span><small>Lançamentos e movimentações</small></span>
                     <span class="item-badge">Novo</span>
-                </button> 
+                </button>
                 <div class="config-dropdown-sep"></div>
                 <div class="config-dropdown-label">Cadastros</div>
                 <button class="config-dropdown-item" id="menu-empresa">
@@ -176,10 +176,10 @@
                         <input type="time" name="compromisso_fim" id="compromisso-fim">
                     </div>
                 </div>
-                <div id="campoNome" class="modal-field full"><label>Nome do cliente</label><input type="text" name="nome"
-                        placeholder="Nome completo"></div>
-                <div id="campoTelefone" class="modal-field full"><label>Telefone</label><input type="tel" name="telefone"
-                        placeholder="(00) 00000-0000"></div>                
+                <div id="campoNome" class="modal-field full"><label>Nome do cliente</label><input type="text"
+                        name="nome" placeholder="Nome completo"></div>
+                <div id="campoTelefone" class="modal-field full"><label>Telefone</label><input type="tel"
+                        name="telefone" placeholder="(00) 00000-0000"></div>
                 <div class="modal-field full">
                     <label>Funcionário</label>
                     <select name="barbeiro" id="modal-barbeiro" required>
@@ -191,12 +191,15 @@
                     <label>Serviço</label>
                     <select name="servico" id="modal-servico">
                         <option value="">Selecione</option>
-                        {{#each servicos}}<option value="{{nome}}" data-id="{{id}}" data-sessoes="{{qtd_sessoes}}" >{{nome}} — R$ {{valor}}</option>
+                        {{#each servicos}}<option value="{{nome}}" data-id="{{id}}" data-sessoes="{{qtd_sessoes}}">
+                            {{nome}} — R$ {{valor}}</option>
                         {{/each}}
                     </select>
                 </div>
                 <div id="campoPacote" style="display:none;" class="modal-field full">
-                    <label style="font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:8px;display:block;">Sessões do Pacote</label>
+                    <label
+                        style="font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:8px;display:block;">Sessões
+                        do Pacote</label>
                     <div id="lista-sessoes" style="display:flex;flex-direction:column;gap:10px;"></div>
                 </div>
                 <div class="modal-field"><label>Data</label><input type="date" name="data" id="modal-data" required>
@@ -253,12 +256,21 @@
         <div class="modal-grid">
             <div class="modal-field full"><label>Nome do serviço</label><input type="text" id="servico-nome-input"
                     placeholder="Ex: Corte + Barba"></div>
-            <!-- <div class="modal-field full"><label>Descrição</label><input type="text" id="servico-descricao-input" placeholder="Ex: Corte social com acabamento"></div> -->
+            <div class="modal-field full"><label>Descrição</label><input type="text" id="servico-descricao-input"
+                    placeholder="Ex: Corte social com acabamento"></div>
             <div class="modal-field"><label>Valor (R$)</label><input type="number" id="servico-valor-input"
                     placeholder="0,00" step="0.01" min="0"></div>
             <div class="modal-field"><label>Duração (min)</label><input type="number" id="servico-duracao-input"
                     placeholder="Ex: 30" min="1"></div>
-            <div class="modal-field"><label>Sessões (pacote)</label><input type="number" id="servico-sessoes-input" placeholder="Ex: 4 (deixe vazio se não for pacote)" min="2"></div>                    
+            <div class="modal-field"><label>Sessões (pacote)</label><input type="number" id="servico-sessoes-input"
+                    placeholder="Ex: 4 (deixe vazio se não for pacote)" min="2"></div>
+            <div class="form-group">
+                <label>Observação</label>
+                <textarea name="observacao" rows="3"
+                    style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;resize:vertical;"
+                    onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"
+                    placeholder="Anotações sobre este agendamento...">{{agendamento.observacao}}</textarea>
+            </div>
             <div class="modal-field" style="justify-content:flex-end;"><label>&nbsp;</label><button
                     class="btn-confirmar" id="btn-add-servico" style="padding:10px 16px;font-size:15px;">+
                     Adicionar</button></div>
@@ -295,13 +307,13 @@
                         <span style="font-size:10px;color:var(--muted);">PNG, JPG ou SVG · máx. 2MB</span>
                     </div>
                     <div id="campoObservacao" class="modal-field full">
-                    <label>Observação / Aviso para clientes</label>
-                    <textarea id="empresa-observacao-input"
-                        placeholder="Ex: Cancelamentos com menos de 2 dias terão cobrança de 50% no próximo atendimento."
-                        style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .2s;width:100%;resize:vertical;min-height:80px;"
-                        onfocus="this.style.borderColor='var(--gold)'"
-                        onblur="this.style.borderColor='var(--border)'"></textarea>
-                    </div>  
+                        <label>Observação / Aviso para clientes</label>
+                        <textarea id="empresa-observacao-input"
+                            placeholder="Ex: Cancelamentos com menos de 2 dias terão cobrança de 50% no próximo atendimento."
+                            style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .2s;width:100%;resize:vertical;min-height:80px;"
+                            onfocus="this.style.borderColor='var(--gold)'"
+                            onblur="this.style.borderColor='var(--border)'"></textarea>
+                    </div>
                     <input type="file" id="empresa-logo-input" accept="image/*" style="display:none" onchange="
                         const f=this.files[0]; if(!f) return;
                         const r=new FileReader(); r.onload=e=>{
@@ -338,6 +350,14 @@
                     placeholder="Centro"></div>
             <div class="modal-field"><label>Cidade</label><input type="text" id="empresa-cidade-input"
                     placeholder="São Paulo"></div>
+            <div class="modal-field full">
+                <label>Estilo / Tema</label>
+                <select id="empresa-estilo-input"
+                    style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;">
+                    <option value="1">🟡 Clássico (dourado)</option>
+                    <option value="2">🌸 Claro (rosa e branco)</option>
+                </select>
+            </div>
         </div>
         <div style="margin-top:16px;">
             <button class="btn-confirmar" id="btn-salvar-empresa" style="width:100%;font-size:15px;padding:10px;">Salvar
@@ -546,8 +566,8 @@
     // ── Dados do backend ──────────────────────────────────
     const todosAgendamentos = [
         {{#each agendamentos}}
-        { id: {{id}}, nome: "{{nome}}", telefone: "{{telefone}}", data: "{{data}}", horario: "{{horario}}", hora_fim: "{{hora_fim}}", servico: "{{servico}}", barbeiro: "{{barbeiro}}", pago: {{#if pago}}1{{else}}0{{/if}}, pacote_id: "{{pacote_id}}" },
-        {{/each}}
+    {id: {{id}}, nome: "{{nome}}", telefone: "{{telefone}}", data: "{{data}}", horario: "{{horario}}", hora_fim: "{{hora_fim}}", servico: "{{servico}}", barbeiro: "{{barbeiro}}", pago: {{#if pago }} 1{{else }} 0{{/if }}, pacote_id: "{{pacote_id}}" },
+    {{/each }}
     ];
 
     const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -618,7 +638,7 @@
     document.body.appendChild(popup);
 
     document.addEventListener('click', e => {
-        if (e.target.closest('#popup-pago')) return; 
+        if (e.target.closest('#popup-pago')) return;
         if (!popup.contains(e.target) && !e.target.closest('.cal-event') && !e.target.closest('.cal-mobile-event')) {
             popup.classList.remove('open');
         }
@@ -642,7 +662,7 @@
 
         // 👇 Botão pago
         const btnPago = document.getElementById('popup-pago');
-        btnPago.dataset.id = a.id;  
+        btnPago.dataset.id = a.id;
         btnPago.className = `btn-pago-mini ${a.pago ? 'pago' : 'nao-pago'}`;
         btnPago.title = a.pago ? 'Pago ✅' : 'Não pago — clique para marcar';
 
@@ -678,7 +698,7 @@
         const json = await res.json();
         if (json.sucesso) {
             const ag = todosAgendamentos.find(a => a.id == id);
-            
+
             if (ag?.pacote_id) {
                 // Atualiza todos do mesmo pacote no array
                 todosAgendamentos
@@ -687,7 +707,7 @@
             } else {
                 if (ag) ag.pago = json.pago;
             }
-            
+
             btn.className = `btn-pago-mini ${json.pago ? 'pago' : 'nao-pago'}`;
             btn.title = json.pago ? 'Pago ✅' : 'Não pago — clique para marcar';
             popup.classList.remove('open');
@@ -699,20 +719,20 @@
         const isCompromisso = tipo === 'compromisso';
         document.getElementById('inputTipo').value = tipo;
 
-        document.getElementById('campoNome').style.display       = isCompromisso ? 'none' : '';
-        document.getElementById('campoTelefone').style.display   = isCompromisso ? 'none' : '';
-        document.getElementById('campoServico').style.display    = isCompromisso ? 'none' : '';
+        document.getElementById('campoNome').style.display = isCompromisso ? 'none' : '';
+        document.getElementById('campoTelefone').style.display = isCompromisso ? 'none' : '';
+        document.getElementById('campoServico').style.display = isCompromisso ? 'none' : '';
         document.getElementById('campoObservacao').style.display = isCompromisso ? 'none' : '';
-        document.getElementById('campoMotivo').style.display     = isCompromisso ? '' : 'none';
+        document.getElementById('campoMotivo').style.display = isCompromisso ? '' : 'none';
 
         document.querySelector('[name="horario"]').closest('.modal-field').style.display = isCompromisso ? 'none' : '';
 
-        document.querySelector('[name="horario"]').required    = !isCompromisso;
-        document.querySelector('[name="nome"]').required       = !isCompromisso;
-        document.querySelector('[name="telefone"]').required   = !isCompromisso;
-        document.querySelector('[name="servico"]').required    = !isCompromisso;
+        document.querySelector('[name="horario"]').required = !isCompromisso;
+        document.querySelector('[name="nome"]').required = !isCompromisso;
+        document.querySelector('[name="telefone"]').required = !isCompromisso;
+        document.querySelector('[name="servico"]').required = !isCompromisso;
         document.getElementById('compromisso-inicio').required = isCompromisso;
-        document.getElementById('compromisso-fim').required    = isCompromisso;
+        document.getElementById('compromisso-fim').required = isCompromisso;
 
         document.getElementById('btnTipoAgendamento').classList.toggle('ativo', !isCompromisso);
         document.getElementById('btnTipoCompromisso').classList.toggle('ativo', isCompromisso);
@@ -720,14 +740,14 @@
     }
 
     // 👇 Listener do barbeiro fora da função, registrado uma única vez
-    document.getElementById('modal-barbeiro').addEventListener('change', function() {
+    document.getElementById('modal-barbeiro').addEventListener('change', function () {
         const opt = this.selectedOptions[0];
         document.getElementById('modal-profissional-id').value = opt?.dataset.id || '';
         if (document.getElementById('inputTipo').value !== 'compromisso') {
             buscarSlotsAdmin();
         }
     });
-        
+
     // ── Calendário ────────────────────────────────────────
     function getWeekDates() {
         const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -792,23 +812,23 @@
                 );
 
                 if (eventos.length > 0) {
-                eventos.forEach(a => {
-                    const ev = document.createElement('div');
-                    const isPacote = a.pacote_id && a.pacote_id !== 'undefined' && a.pacote_id !== '';
-                    const cor = isPacote ? (a.pago ? '#27ae60' : '#e74c3c') : 'var(--gold)';
+                    eventos.forEach(a => {
+                        const ev = document.createElement('div');
+                        const isPacote = a.pacote_id && a.pacote_id !== 'undefined' && a.pacote_id !== '';
+                        const cor = isPacote ? (a.pago ? '#27ae60' : '#e74c3c') : 'var(--gold)';
 
-                    ev.className = 'cal-event' + (isPacote ? (a.pago ? ' pacote-pago' : ' pacote') : '');
-                    ev.innerHTML = `
+                        ev.className = 'cal-event' + (isPacote ? (a.pago ? ' pacote-pago' : ' pacote') : '');
+                        ev.innerHTML = `
                         <div style="border-left: 3px solid ${cor}; padding-left: 5px; display: flex; flex-direction: column; position: relative;">
                             ${isPacote && !a.pago ? `<span style="position:absolute;top:-4px;right:-4px;width:8px;height:8px;background:#e74c3c;border-radius:50%;"></span>` : ''}
                             <span style="font-weight:bold;color:${cor};font-size:11px;text-transform:uppercase;">${a.barbeiro}</span>
                             <span style="color:#fff;font-size:13px;">${a.nome}</span>
                             <span style="font-size:10px;opacity:0.6;">${a.servico}${isPacote ? ' 📦' : ''}</span>
                         </div>`;
-                    ev.addEventListener('click', e => abrirPopup(e, a));
-                    cell.appendChild(ev);
+                        ev.addEventListener('click', e => abrirPopup(e, a));
+                        cell.appendChild(ev);
                     });
-                    } else {
+                } else {
                     const vazio = document.createElement('div');
                     vazio.className = 'cal-slot-vazio';
                     vazio.textContent = '+';
@@ -885,7 +905,8 @@
             leftInfo.appendChild(badge);
 
             const arrow = document.createElement('span');
-            arrow.style.cssText = 'font-size:13px;color:var(--muted);transition:transform 0.25s;display:inline-block;';
+            //arrow.style.cssText = 'font-size:13px;color:var(--muted);transition:transform 0.25s;display:inline-block;';
+            row.style.cssText = 'display:flex;flex-direction:column;gap:8px;width:100%;padding-top:10px;border-top:1px solid var(--border);';
             arrow.textContent = '▼';
 
             header.appendChild(leftInfo);
@@ -1172,8 +1193,9 @@
     const servicoLista = document.getElementById('servico-lista');
     const servicoErro = document.getElementById('servico-erro');
     const servicoNomeInput = document.getElementById('servico-nome-input');
+    const servicoDescricaoInput = document.getElementById('servico-descricao-input');
     const servicoValorInput = document.getElementById('servico-valor-input');
-    const servicoDuracaoInput = document.getElementById('servico-duracao-input'); 
+    const servicoDuracaoInput = document.getElementById('servico-duracao-input');
     const servicoSessoesInput = document.getElementById('servico-sessoes-input');
     const btnAddServico = document.getElementById('btn-add-servico');
 
@@ -1192,7 +1214,7 @@
                     <span class="servico-item-valor">R$ ${parseFloat(s.valor).toFixed(2).replace('.', ',')}</span>
                     <span class="servico-item-duracao" style="font-size:12px;color:var(--muted);">${s.duracao_minutos ? s.duracao_minutos + ' min' : '—'}</span>
                     <div class="servico-item-actions">
-                        <button class="btn-servico-edit" data-id="${s.id}" data-nome="${s.nome}" data-valor="${s.valor}" data-duracao="${s.duracao_minutos || ''}">✏️</button>
+                        <button class="btn-servico-edit" data-id="${s.id}" data-nome="${s.nome}" data-valor="${s.valor}" data-duracao="${s.duracao_minutos || ''}" data-descricao="${s.descricao || ''}">✏️</button>
                         <button class="btn-servico-toggle ${s.ativo ? '' : 'inativo'}" data-id="${s.id}">${s.ativo ? 'Ativo' : 'Inativo'}</button>
                     </div>`;
                 servicoLista.appendChild(item);
@@ -1206,12 +1228,13 @@
                     const row = document.createElement('div');
                     row.className = 'servico-edit-row';
                     row.innerHTML = `
+                        <input type="text" value="${btn.dataset.descricao}" placeholder="Descrição">
                         <input type="number" value="${btn.dataset.valor}" step="0.01" min="0" placeholder="Valor (R$)">
                         <input type="number" value="${btn.dataset.duracao}" min="1" placeholder="Duração (min)" style="width:100px;">
                         <button style="background:var(--gold);border:none;color:#000;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;">Salvar</button>
                         <button style="background:none;border:1px solid var(--border);color:var(--muted);padding:5px 10px;border-radius:6px;cursor:pointer;font-size:12px;">✕</button>`;
                     item.appendChild(row);
-                    const [inputVal, inputDur, btnSalvar, btnCancelar] = row.querySelectorAll('input, button');
+                    const [inputDesc, inputVal, inputDur, btnSalvar, btnCancelar] = row.querySelectorAll('input, button');
                     btnCancelar.addEventListener('click', () => row.remove());
                     btnSalvar.addEventListener('click', async () => {
                         const novoValor = parseFloat(inputVal.value);
@@ -1222,7 +1245,7 @@
                             const res = await fetch(`/servicos/${btn.dataset.id}`, {
                                 method: 'PUT',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ valor: novoValor, nome: btn.dataset.nome, duracao_minutos: novaDuracao }) // 👈
+                                body: JSON.stringify({ valor: novoValor, nome: btn.dataset.nome, duracao_minutos: novaDuracao, descricao: inputDesc.value.trim() })
                             });
                             const json = await res.json();
                             if (json.sucesso) carregarServicos();
@@ -1247,8 +1270,9 @@
         servicoErro.textContent = '';
         const nome = servicoNomeInput.value.trim();
         const valor = parseFloat(servicoValorInput.value);
-        const duracao_minutos = parseInt(servicoDuracaoInput.value); 
+        const duracao_minutos = parseInt(servicoDuracaoInput.value);
         const qtd_sessoes = parseInt(servicoSessoesInput.value) || null;
+        const descricao = servicoDescricaoInput.value.trim();
         if (!nome || isNaN(valor) || valor < 0) { servicoErro.textContent = '⚠ Preencha nome e valor.'; return; }
         if (isNaN(duracao_minutos) || duracao_minutos < 1) { servicoErro.textContent = '⚠ Informe a duração em minutos.'; return; } // 👈
         btnAddServico.textContent = 'Salvando...'; btnAddServico.disabled = true;
@@ -1256,10 +1280,10 @@
             const res = await fetch('/servicos', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nome, valor, duracao_minutos, qtd_sessoes }) // 👈
+                body: JSON.stringify({ nome, descricao, valor, duracao_minutos, qtd_sessoes }) // 👈
             });
             const json = await res.json();
-            if (json.sucesso) { servicoNomeInput.value = ''; servicoValorInput.value = ''; servicoDuracaoInput.value = '';servicoSessoesInput.value = ''; carregarServicos(); }
+            if (json.sucesso) { servicoNomeInput.value = ''; servicoValorInput.value = ''; servicoDuracaoInput.value = ''; servicoSessoesInput.value = ''; carregarServicos(); }
             else servicoErro.textContent = '⚠ ' + (json.erro || 'Erro ao salvar.');
         } catch (e) { servicoErro.textContent = '⚠ Erro de conexão.'; }
         finally { btnAddServico.textContent = '+ Adicionar'; btnAddServico.disabled = false; }
@@ -1298,6 +1322,7 @@
         bairro: document.getElementById('empresa-bairro-input'),
         cidade: document.getElementById('empresa-cidade-input'),
         observacao: document.getElementById('empresa-observacao-input'),
+        estilo: document.getElementById('empresa-estilo-input'),
     };
 
     async function carregarDadosEmpresa() {
@@ -1317,6 +1342,7 @@
             camposEmpresa.bairro.value = data.bairro || '';
             camposEmpresa.cidade.value = data.cidade || '';
             camposEmpresa.observacao.value = data.observacao || '';
+            camposEmpresa.estilo.value = data.estilo || '1';
 
             const preview = document.getElementById('empresa-logo-preview');
             preview.innerHTML = data.logo
@@ -1664,7 +1690,7 @@
             `;
             lista.appendChild(sessao);
 
-            sessao.querySelector('.sessao-data').addEventListener('change', async function() {
+            sessao.querySelector('.sessao-data').addEventListener('change', async function () {
                 const data = this.value;
                 const selectHorario = sessao.querySelector('.sessao-horario');
                 const profId = document.getElementById('modal-barbeiro').selectedOptions[0]?.dataset.id;
@@ -1677,8 +1703,8 @@
                     const res = await fetch(`/admin/slots?profissional_id=${profId}&servico_id=${servicoId}&data=${data}`);
                     const json = await res.json();
                     const slots = (json.slots || []).filter(s => s.status === 'disponivel');
-                    selectHorario.innerHTML = slots.length 
-                        ? '<option value="">Selecione</option>' 
+                    selectHorario.innerHTML = slots.length
+                        ? '<option value="">Selecione</option>'
                         : '<option value="">Nenhum horário disponível</option>';
                     slots.forEach(s => {
                         const opt = document.createElement('option');
@@ -1688,20 +1714,20 @@
                         opt.textContent = `${s.hora_inicio.substring(0, 5)} – ${s.hora_fim.substring(0, 5)}`;
                         selectHorario.appendChild(opt);
                     });
-                } catch { 
-                    selectHorario.innerHTML = '<option value="">Erro ao carregar</option>'; 
+                } catch {
+                    selectHorario.innerHTML = '<option value="">Erro ao carregar</option>';
                 }
             });
 
-            sessao.querySelector('.sessao-horario').addEventListener('change', function() {
+            sessao.querySelector('.sessao-horario').addEventListener('change', function () {
                 const opt = this.selectedOptions[0];
                 sessao.querySelector('.sessao-hora-inicio').value = opt?.dataset.horaInicio || '';
                 sessao.querySelector('.sessao-hora-fim').value = opt?.dataset.horaFim || '';
             });
         }
-    }   
+    }
 
-    document.getElementById('modal-servico').addEventListener('change', function() {
+    document.getElementById('modal-servico').addEventListener('change', function () {
         const opt = this.selectedOptions[0];
         const qtdSessoes = opt?.dataset.sessoes;
         const campoPacote = document.getElementById('campoPacote');

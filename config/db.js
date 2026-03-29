@@ -15,6 +15,7 @@ sequelize.authenticate().then(function () {
 module.exports = sequelize;
 
 //web para baixo
+
 */
 const Sequelize = require('sequelize')
 const sequelize = new Sequelize(
@@ -36,4 +37,3 @@ sequelize.authenticate().then(function () {
 }) 
 
 module.exports = sequelize;
-

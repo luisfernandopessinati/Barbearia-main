@@ -1,3 +1,34 @@
+<style>
+  :root {
+    {{#if empresa.feminino}}
+    --secundario:   #c0395a;
+    --secundario-1: #d4547a;
+    --secundario1:  #c0395a;
+    --background:   #fafafa;
+    --background1:  #f0f0f0;
+    --light:        #1a1a1a;
+    {{else}}
+    --secundario:   #eb9c2d;
+    --secundario-1: #e7ab57;
+    --secundario1:  #e6891200;
+    --background:   #1e1e20;
+    --background1:  rgb(19, 19, 19);
+    --light:        #fff;
+    {{/if}}
+  }
+
+  {{#if empresa.feminino}}
+  body { background-color: #fafafa; }
+  .titulo { color: #1a1a1a; }
+  .form-login { border-color: var(--secundario); background: #fff; box-shadow: 0 4px 24px #c0395a18; }
+  .form-login label { color: #1a1a1a; }
+  .form-login a { color: #555; }
+  .form-login a:hover { color: var(--secundario); }
+  .btn-login { background-color: var(--secundario); color: #fff; }
+  .btn-login:hover { background-color: var(--secundario-1); }
+  {{/if}}
+</style>
+
 <div class="login login2">
   <h1 class="titulo">Agende seu horário!</h1>
   <form action="/loginUsuario/{{token}}" method="post" class="form-login">

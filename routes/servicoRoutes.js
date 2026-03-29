@@ -6,14 +6,14 @@ const Servico = require('../models/servico');
 // GET - lista todos (admin)
 router.get('/servicos/admin', isAdminAuthenticated, async (req, res) => {
     const servicos = await Servico.findAll({ where: { idEmpresa: req.user.idEmpresa }, order: [['nome', 'ASC']] });
-    res.json({ servicos: servicos.map(s => ({ id: s.id, nome: s.nome, valor: s.valor, ativo: s.ativo, duracao_minutos: s.duracao_minutos })) });
+    res.json({ servicos: servicos.map(s => ({ id: s.id, nome: s.nome, descricao: s.descricao, valor: s.valor, ativo: s.ativo, duracao_minutos: s.duracao_minutos })) });
 });
 
 // POST - adiciona novo serviço
 router.post('/servicos', isAdminAuthenticated, async (req, res) => {
-    const { nome, valor, duracao_minutos, qtd_sessoes } = req.body;
+    const { nome, descricao, valor, duracao_minutos, qtd_sessoes } = req.body;
     try {
-        await Servico.create({ nome, valor, duracao_minutos, qtd_sessoes: qtd_sessoes || null, idEmpresa: req.user.idEmpresa });
+        await Servico.create({ nome, descricao, valor, duracao_minutos, qtd_sessoes: qtd_sessoes || null, idEmpresa: req.user.idEmpresa });
         res.json({ sucesso: true });
     } catch (e) {
         res.status(500).json({ erro: e.message });
@@ -22,9 +22,9 @@ router.post('/servicos', isAdminAuthenticated, async (req, res) => {
 
 // PUT - edita serviço
 router.put('/servicos/:id', isAdminAuthenticated, async (req, res) => {
-    const { nome, valor, duracao_minutos } = req.body;
+    const { nome, descricao, valor, duracao_minutos } = req.body;
     try {
-        await Servico.update({ nome, valor, duracao_minutos }, { where: { id: req.params.id } });
+        await Servico.update({ nome, descricao, valor, duracao_minutos }, { where: { id: req.params.id } });
         res.json({ sucesso: true });
     } catch (e) {
         res.status(500).json({ erro: e.message });

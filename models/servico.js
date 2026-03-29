@@ -10,6 +10,10 @@ const Servico = sequelize.define('Servico', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    descricao: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },    
     valor: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false

@@ -1,11 +1,11 @@
 // controllers/estoqueController.js
 const { Op } = require('sequelize');
-const sequelize  = require('../config/db');
+const sequelize = require('../config/db');
 
-const LancEstoque   = require('../models/LancEstoque');
+const LancEstoque = require('../models/LancEstoque');
 const LancEstProduto = require('../models/LancEstProduto');
-const MovtoEstoque  = require('../models/MovtoEstoque');
-const Produto       = require('../models/produto');
+const MovtoEstoque = require('../models/MovtoEstoque');
+const Produto = require('../models/produto');
 
 /* ─────────────────────────────────────────────
    Associações locais (caso não estejam no app.js)
@@ -13,7 +13,7 @@ const Produto       = require('../models/produto');
 if (!LancEstoque.associations.Itens) {
     LancEstoque.hasMany(LancEstProduto, { foreignKey: 'lancamento_id', as: 'Itens' });
     LancEstProduto.belongsTo(LancEstoque, { foreignKey: 'lancamento_id' });
-    LancEstProduto.belongsTo(Produto,     { foreignKey: 'produto_id', as: 'Produto' });
+    LancEstProduto.belongsTo(Produto, { foreignKey: 'produto_id', as: 'Produto' });
 }
 
 /* ─────────────────────────────────────────────
@@ -67,7 +67,7 @@ exports.criar = async (req, res) => {
     const t = await sequelize.transaction();
     try {
         const { tipo, observacao, itens } = req.body;
-        const idEmpresa  = req.user.idEmpresa;
+        const idEmpresa = req.user.idEmpresa;
         const usuario_id = req.user.id;
 
         if (!itens || !itens.length) {
@@ -100,29 +100,38 @@ exports.criar = async (req, res) => {
             if (!produto) continue;
 
             const qtdAnterior = parseFloat(produto.estoque) || 0;
-            const quantidade  = parseFloat(item.quantidade);
-            const entSai      = tipo === 'S' ? 'S' : 'E'; // Ajuste conta como Entrada
-            const qtdFinal    = entSai === 'E'
-                ? qtdAnterior + quantidade
-                : Math.max(0, qtdAnterior - quantidade);
+            const quantidade = parseFloat(item.quantidade);
+            let entSai, qtdFinal;
+
+            if (tipo === 'E') {
+                entSai = 'E';
+                qtdFinal = qtdAnterior + quantidade;
+            } else if (tipo === 'S') {
+                entSai = 'S';
+                qtdFinal = Math.max(0, qtdAnterior - quantidade);
+            } else {
+                // Ajuste: substitui o estoque pelo valor informado
+                entSai = quantidade >= qtdAnterior ? 'E' : 'S';
+                qtdFinal = quantidade; // 👈 define o estoque, não soma/subtrai
+            }
 
             // Item do lançamento
             await LancEstProduto.create({
                 lancamento_id: lanc.id,
-                produto_id:    item.produto_id,
+                produto_id: item.produto_id,
                 quantidade,
             }, { transaction: t });
 
             // Movimentação rastreável
             await MovtoEstoque.create({
-                empresa_id:    idEmpresa,
-                produto_id:    item.produto_id,
-                documento_id:  lanc.id,
-                tipo_documento: tipo === 'E' ? 'ENTRADA_MANUAL' : tipo === 'S' ? 'AJUSTE' : 'AJUSTE',
-                ent_sai:       entSai,
-                qtd_anterior:  qtdAnterior,
+                empresa_id: idEmpresa,
+                produto_id: item.produto_id,
+                documento_id: lanc.id,
+                tipo_documento: tipo === 'E' ? 'ENTRADA_MANUAL' : tipo === 'S' ? 'SAIDA_MANUAL' : 'AJUSTE',
+                ent_sai: entSai,
+                qtd_anterior: qtdAnterior,
                 quantidade,
-                qtd_final:     qtdFinal,
+                qtd_final: qtdFinal,
                 usuario_id,
             }, { transaction: t });
 
@@ -147,10 +156,10 @@ exports.criar = async (req, res) => {
 exports.consultaDados = async (req, res) => {
     try {
         const idEmpresa = req.user.idEmpresa;
-        const data      = req.query.data || new Date().toISOString().slice(0, 10);
+        const data = req.query.data || new Date().toISOString().slice(0, 10);
 
         const inicio = new Date(data + 'T00:00:00');
-        const fim    = new Date(data + 'T23:59:59');
+        const fim = new Date(data + 'T23:59:59');
 
         const lancamentos = await LancEstoque.findAll({
             where: {
@@ -159,7 +168,7 @@ exports.consultaDados = async (req, res) => {
             },
             include: [{
                 model: LancEstProduto,
-                as:    'Itens',
+                as: 'Itens',
                 include: [{ model: Produto, as: 'Produto', attributes: ['descricao'] }],
             }],
             order: [['data', 'DESC']],
@@ -180,10 +189,10 @@ exports.cancelar = async (req, res) => {
     const t = await sequelize.transaction();
     try {
         const idEmpresa = req.user.idEmpresa;
-        const { id }    = req.params;
+        const { id } = req.params;
 
         const lanc = await LancEstoque.findOne({
-            where:   { id, empresa_id: idEmpresa },
+            where: { id, empresa_id: idEmpresa },
             include: [{ model: LancEstProduto, as: 'Itens' }],
         });
 
@@ -207,7 +216,7 @@ exports.cancelar = async (req, res) => {
             if (!produto) continue;
 
             const qtdAnterior = parseFloat(produto.estoque) || 0;
-            const quantidade  = parseFloat(item.quantidade);
+            const quantidade = parseFloat(item.quantidade);
 
             // Inverte: se foi Entrada, estorna subtraindo; se Saída, estorna somando
             const entSaiEstorno = lanc.tipo === 'S' ? 'E' : 'S';
@@ -216,15 +225,15 @@ exports.cancelar = async (req, res) => {
                 : Math.max(0, qtdAnterior - quantidade);
 
             await MovtoEstoque.create({
-                empresa_id:    idEmpresa,
-                produto_id:    item.produto_id,
-                documento_id:  lanc.id,
+                empresa_id: idEmpresa,
+                produto_id: item.produto_id,
+                documento_id: lanc.id,
                 tipo_documento: 'AJUSTE',
-                ent_sai:       entSaiEstorno,
-                qtd_anterior:  qtdAnterior,
+                ent_sai: entSaiEstorno,
+                qtd_anterior: qtdAnterior,
                 quantidade,
-                qtd_final:     qtdFinal,
-                usuario_id:    req.user.id,
+                qtd_final: qtdFinal,
+                usuario_id: req.user.id,
             }, { transaction: t });
 
             await produto.update({ estoque: qtdFinal }, { transaction: t });

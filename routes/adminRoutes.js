@@ -6,6 +6,7 @@ const Agendamento = require('../models/Agendamento');
 const Servico = require('../models/servico');
 const Empresa = require('../models/Empresas');
 const Pacote = require('../models/Pacotes');
+const Cliente = require('../models/Cliente');
 const bcrypt = require('bcryptjs');
 const path = require('path');
 const fs = require('fs');
@@ -14,6 +15,14 @@ const { Op, QueryTypes } = require('sequelize');
 const sequelize = require('../config/db');
 const { verificarConflito } = require('../helpers/conflito');
 const { minutesToTime, temColisao } = require('../services/slotService');
+
+function normalizarTelefone(tel) {
+    const numeros = tel.replace(/\D/g, '');
+    const semDDI = numeros.startsWith('55') && numeros.length >= 12 ? numeros.slice(2) : numeros;
+    if (semDDI.length === 11) return `(${semDDI.slice(0, 2)}) ${semDDI.slice(2, 7)}-${semDDI.slice(7)}`;
+    if (semDDI.length === 10) return `(${semDDI.slice(0, 2)}) ${semDDI.slice(2, 6)}-${semDDI.slice(6)}`;
+    return semDDI;
+}
 
 // ── Lista admins ──
 router.get('/admins', isAdminAuthenticated, async (req, res) => {
@@ -193,7 +202,6 @@ router.get('/admin/slots', isAdminAuthenticated, async (req, res) => {
         res.status(500).json({ erro: e.message });
     }
 });
-
 // ── Admin agenda ──
 router.post('/admin/agendar', isAdminAuthenticated, async (req, res) => {
     const { barbeiro, nome, telefone, data, horario, servico, profissional_id, hora_inicio, hora_fim, servico_id } = req.body;
@@ -236,6 +244,18 @@ router.post('/admin/agendar', isAdminAuthenticated, async (req, res) => {
             servico_id: isCompromisso ? null : (servico_id || null),
             status: isCompromisso ? 'compromisso' : 'pendente'
         });
+
+        // ✅ nome e telefone já estão disponíveis do topo — só usar direto
+        if (!isCompromisso && nome && telefone) {
+            const telNormalizado = normalizarTelefone(telefone);
+            const [cliente] = await Cliente.findOrCreate({
+                where: { telefone: telNormalizado, idEmpresa },
+                defaults: { nome: nome.trim(), telefone: telNormalizado, idEmpresa }
+            });
+            if (cliente.nome !== nome.trim()) {
+                await cliente.update({ nome: nome.trim() });
+            }
+        }
 
         return res.status(200).json({ sucesso: true });
     } catch (error) {

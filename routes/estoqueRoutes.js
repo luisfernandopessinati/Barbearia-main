@@ -19,4 +19,4 @@ router.get('/admin/estoque/consulta/dados',   isAdminAuthenticated, estoqueContr
 // Cancela lançamento + estorna estoque
 router.patch('/admin/estoque/:id/cancelar',   isAdminAuthenticated, estoqueController.cancelar);
 
-module.exports = router;
+module.exports = router; 

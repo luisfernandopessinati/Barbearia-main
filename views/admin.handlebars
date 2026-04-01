@@ -176,10 +176,27 @@
                         <input type="time" name="compromisso_fim" id="compromisso-fim">
                     </div>
                 </div>
-                <div id="campoNome" class="modal-field full"><label>Nome do cliente</label><input type="text"
-                        name="nome" placeholder="Nome completo"></div>
-                <div id="campoTelefone" class="modal-field full"><label>Telefone</label><input type="tel"
-                        name="telefone" placeholder="(00) 00000-0000"></div>
+                <div id="campoNome" class="modal-field full" style="position:relative;">
+                    <label>Nome do cliente</label>
+                    <div style="display:flex;gap:6px;">
+                        <input type="text" name="nome" id="modal-nome" placeholder="Nome completo" autocomplete="off"
+                            style="flex:1;" oninput="onNomeInput(this.value)">
+                        <button type="button" title="Buscar cliente cadastrado" onclick="toggleBuscaCliente()" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+           width:36px;height:36px;cursor:pointer;font-size:13px;color:var(--gold);
+           flex-shrink:0;display:flex;align-items:center;justify-content:center;
+           transition:border-color .2s;" onmouseover="this.style.borderColor='var(--gold)'"
+                            onmouseout="this.style.borderColor='var(--border)'">🔍</button>
+                    </div>
+                    <!-- dropdown de sugestões -->
+                    <div id="cliente-suggestions" style="display:none;position:absolute;top:100%;left:0;right:36px;z-index:999;
+                background:var(--bg2);border:1px solid var(--gold);border-radius:8px;
+                overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.4);margin-top:2px;">
+                    </div>
+                </div>
+                <div id="campoTelefone" class="modal-field full">
+                    <label>Telefone</label>
+                    <input type="tel" name="telefone" id="modal-telefone" placeholder="(00) 00000-0000">
+                </div>
                 <div class="modal-field full">
                     <label>Funcionário</label>
                     <select name="barbeiro" id="modal-barbeiro" required>
@@ -566,8 +583,8 @@
     // ── Dados do backend ──────────────────────────────────
     const todosAgendamentos = [
         {{#each agendamentos}}
-    {id: {{id}}, nome: "{{nome}}", telefone: "{{telefone}}", data: "{{data}}", horario: "{{horario}}", hora_fim: "{{hora_fim}}", servico: "{{servico}}", barbeiro: "{{barbeiro}}", pago: {{#if pago }} 1{{else }} 0{{/if }}, pacote_id: "{{pacote_id}}" },
-    {{/each }}
+    {id: {{id}}, nome: "{{nome}}", telefone: "{{telefone}}", data: "{{data}}", horario: "{{horario}}", hora_fim: "{{hora_fim}}", servico: "{{servico}}", barbeiro: "{{barbeiro}}", pago: {{#if pago}} 1{{else}} 0{{/if}}, pacote_id: "{{pacote_id}}" },
+    {{/each}}
     ];
 
     const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -1764,6 +1781,77 @@
             console.error('Erro ao recarregar:', e);
         }
     }
+
+    // ── Busca de clientes cadastrados ─────────────────────
+    let _buscaTimeout = null;
+
+    function onNomeInput(valor) {
+        clearTimeout(_buscaTimeout);
+        const box = document.getElementById('cliente-suggestions');
+        if (valor.length < 2) { box.style.display = 'none'; return; }
+        _buscaTimeout = setTimeout(() => buscarClientes(valor), 300);
+    }
+
+    function toggleBuscaCliente() {
+        const box = document.getElementById('cliente-suggestions');
+        if (box.style.display !== 'none') { box.style.display = 'none'; return; }
+        const q = document.getElementById('modal-nome').value.trim();
+        if (q.length >= 2) {
+            buscarClientes(q);
+        } else {
+            box.innerHTML = `<div style="padding:10px 14px;font-size:12px;color:var(--muted);">
+            Digite ao menos 2 letras para buscar</div>`;
+            box.style.display = '';
+        }
+    }
+
+    async function buscarClientes(q) {
+        const box = document.getElementById('cliente-suggestions');
+        box.innerHTML = `<div style="padding:10px 14px;font-size:12px;color:var(--muted);">Buscando...</div>`;
+        box.style.display = '';
+        try {
+            const res = await fetch(`/admin/clientes/buscar?q=${encodeURIComponent(q)}`);
+            const json = await res.json();
+
+            if (!json.clientes?.length) {
+                box.innerHTML = `<div style="padding:10px 14px;font-size:12px;color:var(--muted);">
+                Nenhum cliente encontrado — será criado ao salvar</div>`;
+                return;
+            }
+
+            box.innerHTML = '';
+            json.clientes.forEach(c => {
+                const item = document.createElement('div');
+                item.style.cssText = `padding:10px 14px;cursor:pointer;display:flex;
+                justify-content:space-between;align-items:center;
+                border-bottom:1px solid var(--border);font-size:13px;transition:background .15s;`;
+                item.innerHTML = `
+                <div>
+                    <div style="font-weight:600;color:var(--text);">${c.nome}</div>
+                    <div style="font-size:11px;color:var(--muted);">${c.telefone}</div>
+                </div>
+                <span style="font-size:10px;color:var(--gold);letter-spacing:1px;">USAR</span>`;
+                item.addEventListener('mouseenter', () => item.style.background = 'var(--bg3)');
+                item.addEventListener('mouseleave', () => item.style.background = '');
+                item.addEventListener('click', () => {
+                    document.getElementById('modal-nome').value = c.nome;
+                    document.getElementById('modal-telefone').value = c.telefone;
+                    box.style.display = 'none';
+                });
+                box.appendChild(item);
+            });
+        } catch {
+            box.innerHTML = `<div style="padding:10px 14px;font-size:12px;color:var(--muted);">Erro ao buscar</div>`;
+        }
+    }
+
+    // Fecha sugestões ao clicar fora
+    document.addEventListener('click', e => {
+        if (!e.target.closest('#campoNome')) {
+            const box = document.getElementById('cliente-suggestions');
+            if (box) box.style.display = 'none';
+        }
+    });
     // ── Vincular dropdown aos modais ──────────────────────
     bindMenuItemToModal('menu-feriados', 'modal-feriados-overlay', carregarFeriados);
     bindMenuItemToModal('menu-servicos', 'modal-servicos-overlay', carregarServicos);

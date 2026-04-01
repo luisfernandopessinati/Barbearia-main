@@ -294,10 +294,17 @@
             width: 340px;
             flex-shrink: 0;
             height: 100%;
+            overflow-y: auto; 
             overflow: hidden;
-            /* 👈 não scrolla o painel todo */
         }
 
+        .panel-right-footer {
+            margin-top: auto;        /* empurra para o fundo */
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-shrink: 0;
+        }
         /* lista de itens scrolla sozinha */
         .items-list {
             flex: 1;
@@ -621,6 +628,16 @@
                 width: 100%;
                 padding: 16px;
                 gap: 12px;
+                overflow-y: visible;
+            }
+            
+            .panel-right-footer {
+                margin-top: 0;
+                position: sticky;      /* 👈 fica visível ao rolar */
+                bottom: 0;
+                background: #050505;
+                padding: 12px 0 4px;
+                z-index: 10;
             }
 
             .total-value {
@@ -688,41 +705,36 @@
 
             <!-- PAINEL DIREITO -->
             <div class="panel-right">
-                <!-- Lista de itens aqui dentro -->
-                <div class="items-list" id="listaItens">
-                    <div class="empty-state" id="emptyMsg">
-                        <span>&#128717;</span>
-                        <p>Carrinho vazio</p>
-                    </div>
-                </div> 
+                <!-- Lista de itens aqui dentro -->                
                 <div class="input-group">
                     <label>Forma de Pagamento</label>
                     <select id="formaPagamento">
                         <option value="Dinheiro">Dinheiro</option>
                         <option value="Pix">Pix</option>
-                        <option value="Cartao Debito">Cart&#227;o D&#233;bito</option>
-                        <option value="Cartao Credito">Cart&#227;o Cr&#233;dito</option>
+                        <option value="Cartao Debito">Cartão Débito</option>
+                        <option value="Cartao Credito">Cartão Crédito</option>
                     </select>
                 </div>
 
-                <div class="input-group">
-                    <label>Desconto (R$)</label>
-                    <input type="number" id="descontoInput" value="0" step="0.01" min="0">
+                    <!-- 👇 tudo que não pode sumir fica aqui -->
+                <div class="panel-right-footer">
+                    <div class="input-group">
+                        <label>Desconto (R$)</label>
+                        <input type="number" id="descontoInput" value="0" step="0.01" min="0">
+                    </div>                
+                    <div class="total-box">
+                        <div class="total-label">Total a Pagar</div>
+                        <div class="total-value" id="totalGeralDisplay">R$ 0,00</div>
+                    </div>
+
+                    <button class="btn-finish" id="btnFinalizar" onclick="finalizarVenda()">
+                        &#10004; Finalizar Venda
+                    </button>
+
+                    <a href="/admin/fechamento" class="link-fechamento">
+                        &#128196; Fechamento de Caixa
+                    </a>
                 </div>
-
-                <div class="total-box">
-                    <div class="total-label">Total a Pagar</div>
-                    <div class="total-value" id="totalGeralDisplay">R$ 0,00</div>
-                </div>
-
-                <button class="btn-finish" id="btnFinalizar" onclick="finalizarVenda()">
-                    &#10004; Finalizar Venda
-                </button>
-
-                <a href="/admin/fechamento" class="link-fechamento">
-                    &#128196; Fechamento de Caixa
-                </a>
-            </div>
 
         </div>
     </div>

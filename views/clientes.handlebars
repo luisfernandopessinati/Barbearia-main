@@ -841,18 +841,27 @@
 
     {{!-- LISTA COMPLETA --}}
     <div class="clientes-header">
-        <div style="display:flex;align-items:center;gap:10px;">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
             <div class="section-titulo" style="margin-bottom:0">👥 Todos os Clientes</div>
             <button id="btn-aniversarios" style="
-            background:none;border:1px solid var(--border);color:var(--muted);
-            padding:6px 14px;border-radius:6px;font-size:11px;letter-spacing:1px;
-            text-transform:uppercase;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;"
+                background:none;border:1px solid var(--border);color:var(--muted);
+                padding:6px 14px;border-radius:6px;font-size:11px;letter-spacing:1px;
+                text-transform:uppercase;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;"
                 onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'"
                 onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
                 🎂 Aniversários
             </button>
+            <button id="btn-novo-cliente" style="
+                background:var(--gold);border:none;color:#000;
+                padding:6px 14px;border-radius:6px;font-size:11px;letter-spacing:1px;
+                text-transform:uppercase;cursor:pointer;transition:opacity .2s;font-family:'DM Sans',sans-serif;font-weight:600;">
+                + Incluir Cliente
+            </button>
         </div>
-        <div class="section-titulo" style="margin-bottom:0">👥 Todos os Clientes</div>
+        <div class="clientes-search-wrap">
+            <svg viewBox="0 0 20 20"><path d="M13.5 12.5l4 4M8.5 14a5.5 5.5 0 100-11 5.5 5.5 0 000 11z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+            <input class="clientes-search" id="clientes-search" placeholder="Buscar por nome ou telefone..." />
+        </div>
     </div>
 
     {{#if clientes.length}}
@@ -903,7 +912,39 @@
 
 </div>
 
-{{!-- MODAL EDIÇÃO CLIENTE --}}
+<!-- MODAL NOVO CLIENTE -->
+<div class="modal-cli-overlay" id="modal-novo-cli-overlay">
+    <div class="modal-cli">
+        <button class="modal-cli-close" id="modal-novo-cli-close">✕</button>
+        <div class="modal-cli-title">Novo Cliente</div>
+        <p class="modal-cli-sub">Cadastro manual de cliente</p>
+        <div class="modal-cli-field">
+            <label>Nome</label>
+            <input id="novo-cli-nome" type="text" placeholder="Nome completo">
+        </div>
+        <div class="modal-cli-field">
+            <label>Telefone</label>
+            <input id="novo-cli-tel" type="tel" placeholder="(00) 00000-0000">
+        </div>
+        <div class="modal-cli-field">
+            <label>Data de Nascimento</label>
+            <input id="novo-cli-nascimento" type="date">
+        </div>
+        <div class="modal-cli-field">
+            <label>Observação</label>
+            <textarea id="novo-cli-obs" rows="3"
+                style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;resize:vertical;transition:border-color .2s;"
+                onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"
+                placeholder="Alergias, preferências, observações..."></textarea>
+        </div>
+        <div class="modal-cli-erro" id="novo-cli-erro"></div>
+        <div class="modal-cli-actions">
+            <button class="btn-cli-cancelar" id="btn-novo-cli-cancelar">Cancelar</button>
+            <button class="btn-cli-salvar" id="btn-novo-cli-salvar">Cadastrar</button>
+        </div>
+    </div>
+</div>
+
 {{!-- MODAL EDIÇÃO CLIENTE --}}
 <div class="modal-cli-overlay" id="modal-cli-overlay">
     <div class="modal-cli">
@@ -1311,5 +1352,86 @@
         </div>`;
         modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
         document.body.appendChild(modal);
+    });
+
+        // ── Modal novo cliente ──────────────────────────────
+    const novoCliOverlay = document.getElementById('modal-novo-cli-overlay');
+
+    document.getElementById('btn-novo-cliente').addEventListener('click', () => {
+        document.getElementById('novo-cli-nome').value = '';
+        document.getElementById('novo-cli-tel').value = '';
+        document.getElementById('novo-cli-nascimento').value = '';
+        document.getElementById('novo-cli-obs').value = '';
+        document.getElementById('novo-cli-erro').textContent = '';
+        novoCliOverlay.classList.add('open');
+    });
+
+    function fecharNovoCliModal() { novoCliOverlay.classList.remove('open'); }
+
+    document.getElementById('modal-novo-cli-close').addEventListener('click', fecharNovoCliModal);
+    document.getElementById('btn-novo-cli-cancelar').addEventListener('click', fecharNovoCliModal);
+    novoCliOverlay.addEventListener('click', e => { if (e.target === novoCliOverlay) fecharNovoCliModal(); });
+
+    document.getElementById('btn-novo-cli-salvar').addEventListener('click', async () => {
+        const nome = document.getElementById('novo-cli-nome').value.trim();
+        const tel = document.getElementById('novo-cli-tel').value.trim();
+        const nascimento = document.getElementById('novo-cli-nascimento').value;
+        const obs = document.getElementById('novo-cli-obs').value.trim();
+        const erro = document.getElementById('novo-cli-erro');
+        const btn = document.getElementById('btn-novo-cli-salvar');
+
+        if (!nome || !tel) { erro.textContent = '⚠ Nome e telefone são obrigatórios.'; return; }
+
+        btn.textContent = 'Salvando...';
+        btn.disabled = true;
+        erro.textContent = '';
+
+        try {
+            const res = await fetch('/clientes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, telefone: tel, nascimento: nascimento || null, observacao: obs || null })
+            });
+            const json = await res.json();
+
+            if (json.sucesso) {
+                fecharNovoCliModal();
+                // Adiciona linha na tabela sem recarregar a página
+                const tbody = document.getElementById('clientes-tbody');
+                if (tbody) {
+                    const tr = document.createElement('tr');
+                    tr.dataset.id = json.cliente.id;
+                    tr.dataset.nome = json.cliente.nome;
+                    tr.dataset.telefone = json.cliente.telefone;
+                    tr.dataset.obs = obs;
+                    tr.dataset.nascimento = nascimento;
+                    tr.innerHTML = `
+                        <td>
+                            <div class="td-nome-wrap">
+                                <div class="td-avatar">${json.cliente.nome.substring(0,2).toUpperCase()}</div>
+                                <span id="cli-nome-${json.cliente.id}">${json.cliente.nome}</span>
+                            </div>
+                        </td>
+                        <td class="td-muted" id="cli-tel-${json.cliente.id}">${json.cliente.telefone}</td>
+                        <td><span class="td-total">0</span></td>
+                        <td class="td-muted">${nascimento ? nascimento.split('-').reverse().join('/') : '—'}</td>
+                        <td class="td-muted">—</td>
+                        <td style="display:flex;gap:6px;">
+                            <button class="btn-cli-edit" data-id="${json.cliente.id}" data-nome="${json.cliente.nome}"
+                                data-tel="${json.cliente.telefone}" data-obs="${obs}" data-nascimento="${nascimento}" title="Editar">✎</button>
+                            <button class="btn-cli-historico" data-id="${json.cliente.id}" data-nome="${json.cliente.nome}"
+                                data-tel="${json.cliente.telefone}" title="Histórico">📋</button>
+                        </td>`;
+                    tbody.prepend(tr);
+                }
+            } else {
+                erro.textContent = '⚠ ' + (json.erro || 'Erro ao cadastrar.');
+            }
+        } catch {
+            erro.textContent = '⚠ Erro de conexão.';
+        } finally {
+            btn.textContent = 'Cadastrar';
+            btn.disabled = false;
+        }
     });
 </script>

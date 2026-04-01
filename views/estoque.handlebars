@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --gold: #D4AF37;
-            --gold-glow: rgba(212,175,55,.18);
+            --gold-glow: rgba(212, 175, 55, .18);
             --bg: #0d0d0d;
             --surface: #161616;
             --card: #1a1a1a;
-            --card-border: rgba(212,175,55,.15);
+            --card-border: rgba(212, 175, 55, .15);
             --text: #e8e8e8;
             --muted: #666;
             --danger: #e05454;
@@ -24,748 +27,1473 @@
 
             /* tipo cores */
             --entrada: #4caf7d;
-            --entrada-bg: rgba(76,175,125,.12);
+            --entrada-bg: rgba(76, 175, 125, .12);
             --saida: #e05454;
-            --saida-bg: rgba(224,84,84,.12);
+            --saida-bg: rgba(224, 84, 84, .12);
             --ajuste: #D4AF37;
-            --ajuste-bg: rgba(212,175,55,.12);
+            --ajuste-bg: rgba(212, 175, 55, .12);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { background: var(--bg); color: var(--text); font-family: var(--font-main); height: 100%; overflow: hidden; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-main);
+            height: 100%;
+            overflow: hidden;
+        }
 
         /* ── HEADER ── */
         header {
-            background: #000; border-bottom: 1px solid var(--card-border);
-            padding: 0 20px; height: 56px; flex-shrink: 0;
-            display: flex; align-items: center; justify-content: space-between;
+            background: #000;
+            border-bottom: 1px solid var(--card-border);
+            padding: 0 20px;
+            height: 56px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-        .btn-back { text-decoration: none; color: var(--gold); display: flex; align-items: center; gap: 5px; font-weight: 600; font-size: 14px; }
+
+        .btn-back {
+            text-decoration: none;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 600;
+            font-size: 14px;
+        }
 
         /* ── TIPO BADGE TOPO ── */
         .tipo-bar {
-            display: flex; gap: 10px; padding: 12px 16px;
-            background: var(--surface); border-bottom: 1px solid var(--card-border); flex-shrink: 0;
+            display: flex;
+            gap: 10px;
+            padding: 12px 16px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--card-border);
+            flex-shrink: 0;
         }
+
         .tipo-btn {
-            flex: 1; padding: 10px; border-radius: 8px; border: 2px solid transparent;
-            font-family: var(--font-main); font-size: 15px; font-weight: 700;
-            letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
-            transition: all .2s; background: var(--card);
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            font-family: var(--font-main);
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all .2s;
+            background: var(--card);
         }
-        .tipo-btn.entrada { color: var(--entrada); }
-        .tipo-btn.entrada.ativo { background: var(--entrada-bg); border-color: var(--entrada); box-shadow: 0 0 14px rgba(76,175,125,.2); }
-        .tipo-btn.saida   { color: var(--saida); }
-        .tipo-btn.saida.ativo   { background: var(--saida-bg);   border-color: var(--saida);   box-shadow: 0 0 14px rgba(224,84,84,.2); }
-        .tipo-btn.ajuste  { color: var(--ajuste); }
-        .tipo-btn.ajuste.ativo  { background: var(--ajuste-bg);  border-color: var(--ajuste);  box-shadow: 0 0 14px rgba(212,175,55,.2); }
+
+        .tipo-btn.entrada {
+            color: var(--entrada);
+        }
+
+        .tipo-btn.entrada.ativo {
+            background: var(--entrada-bg);
+            border-color: var(--entrada);
+            box-shadow: 0 0 14px rgba(76, 175, 125, .2);
+        }
+
+        .tipo-btn.saida {
+            color: var(--saida);
+        }
+
+        .tipo-btn.saida.ativo {
+            background: var(--saida-bg);
+            border-color: var(--saida);
+            box-shadow: 0 0 14px rgba(224, 84, 84, .2);
+        }
+
+        .tipo-btn.ajuste {
+            color: var(--ajuste);
+        }
+
+        .tipo-btn.ajuste.ativo {
+            background: var(--ajuste-bg);
+            border-color: var(--ajuste);
+            box-shadow: 0 0 14px rgba(212, 175, 55, .2);
+        }
 
         /* ── ABAS ── */
-        .tabs { display: flex; border-bottom: 1px solid var(--card-border); flex-shrink: 0; background: var(--surface); }
-        .tab-btn {
-            flex: 1; padding: 12px; background: none; border: none; color: var(--muted);
-            font-family: var(--font-main); font-size: 14px; font-weight: 600;
-            letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
-            border-bottom: 2px solid transparent; transition: all .2s;
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--card-border);
+            flex-shrink: 0;
+            background: var(--surface);
         }
-        .tab-btn.ativo { color: var(--gold); border-bottom-color: var(--gold); }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-family: var(--font-main);
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all .2s;
+        }
+
+        .tab-btn.ativo {
+            color: var(--gold);
+            border-bottom-color: var(--gold);
+        }
 
         /* ── APP ── */
-        .app-wrapper { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .tab-content { display: none; flex: 1; overflow: hidden; }
-        .tab-content.ativo { display: flex; flex-direction: column; }
+        .app-wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .tab-content {
+            display: none;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .tab-content.ativo {
+            display: flex;
+            flex-direction: column;
+        }
 
         /* ── PAINEL LANÇAMENTO ── */
-        .pdv-wrap { display: flex; flex: 1; overflow: hidden; }
+        .pdv-wrap {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
 
         .panel-left {
-            display: flex; flex-direction: column; flex: 1;
-            border-right: 1px solid var(--card-border); overflow: hidden; min-width: 0;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            border-right: 1px solid var(--card-border);
+            overflow: hidden;
+            min-width: 0;
+            min-height: 0;
         }
 
-        .search-area { padding: 16px; background: var(--surface); border-bottom: 1px solid var(--card-border); flex-shrink: 0; }
-        .search-row  { display: flex; gap: 10px; align-items: flex-end; }
-
-        .input-group { position: relative; flex: 1; }
-        .input-group label { display: block; color: var(--gold); font-size: 11px; text-transform: uppercase; margin-bottom: 5px; font-weight: 600; letter-spacing: 1px; }
-        input, select, textarea {
-            width: 100%; background: var(--card); border: 1px solid var(--card-border);
-            border-radius: 8px; color: #fff; padding: 10px 12px;
-            font-family: var(--font-main); font-size: 15px; outline: none; transition: border-color .2s;
+        .search-area {
+            padding: 16px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--card-border);
+            flex-shrink: 0;
         }
-        input:focus, select:focus, textarea:focus { border-color: var(--gold); }
-        textarea { resize: none; height: 42px; font-size: 14px; }
+
+        .search-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .input-group {
+            position: relative;
+            flex: 1;
+        }
+
+        .input-group label {
+            display: block;
+            color: var(--gold);
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            color: #fff;
+            padding: 10px 12px;
+            font-family: var(--font-main);
+            font-size: 15px;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--gold);
+        }
+
+        textarea {
+            resize: none;
+            height: 42px;
+            font-size: 14px;
+        }
 
         .btn-camera-est {
-            background: var(--card); border: 1px solid var(--card-border); color: var(--gold);
-            width: 44px; height: 44px; border-radius: 8px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 20px; flex-shrink: 0; transition: border-color .2s;
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            color: var(--gold);
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            transition: border-color .2s;
             align-self: flex-end;
         }
-        .btn-camera-est:hover { border-color: var(--gold); }
+
+        .btn-camera-est:hover {
+            border-color: var(--gold);
+        }
 
         .scanner-est {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,.95);
-            z-index: 500; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .95);
+            z-index: 500;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
         }
-        .scanner-est.open { display: flex; }
-        .scanner-est-box { position: relative; width: 100%; max-width: 380px; border-radius: 12px; overflow: hidden; border: 2px solid var(--gold); background: #000; }
-        .scanner-est video { width: 100%; max-height: 280px; object-fit: cover; display: block; }
-        .scanner-est-line { position: absolute; left: 0; right: 0; top: 50%; height: 2px; background: var(--gold); opacity: .8; animation: scanest 1.8s ease-in-out infinite; }
-        @keyframes scanest { 0%{top:15%} 50%{top:85%} 100%{top:15%} }
-        .scanner-est-msg { color: rgba(255,255,255,.6); font-size: 13px; letter-spacing: 1px; text-align: center; }
-        .btn-fechar-scanner-est { background: var(--card); border: 1px solid var(--card-border); color: var(--text); padding: 12px 32px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: var(--font-main); }
-        .btn-fechar-scanner-est:hover { border-color: var(--danger); color: var(--danger); }
 
-        .items-list { flex: 1; padding: 16px; overflow-y: auto; }
+        .scanner-est.open {
+            display: flex;
+        }
+
+        .scanner-est-box {
+            position: relative;
+            width: 100%;
+            max-width: 380px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid var(--gold);
+            background: #000;
+        }
+
+        .scanner-est video {
+            width: 100%;
+            max-height: 280px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .scanner-est-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 2px;
+            background: var(--gold);
+            opacity: .8;
+            animation: scanest 1.8s ease-in-out infinite;
+        }
+
+        @keyframes scanest {
+            0% {
+                top: 15%
+            }
+
+            50% {
+                top: 85%
+            }
+
+            100% {
+                top: 15%
+            }
+        }
+
+        .scanner-est-msg {
+            color: rgba(255, 255, 255, .6);
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .btn-fechar-scanner-est {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            color: var(--text);
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: var(--font-main);
+        }
+
+        .btn-fechar-scanner-est:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .items-list {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+        }
 
         /* ── ITEM ESTOQUE ── */
         .est-item {
-            background: var(--card); padding: 12px 14px; margin-bottom: 10px;
-            border-radius: 8px; animation: fadeIn .2s ease;
+            background: var(--card);
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            animation: fadeIn .2s ease;
             border-left: 4px solid var(--gold);
         }
-        .est-item.entrada-item { border-left-color: var(--entrada); }
-        .est-item.saida-item   { border-left-color: var(--saida); }
 
-        @keyframes fadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
+        .est-item.entrada-item {
+            border-left-color: var(--entrada);
+        }
 
-        .est-item-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        .est-item-name { font-weight: bold; font-size: 15px; }
-        .est-item-info { font-size: 12px; color: var(--muted); margin-top: 3px; }
+        .est-item.saida-item {
+            border-left-color: var(--saida);
+        }
 
-        .est-item-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-        .est-item-qtd { font-family: var(--font-mono); font-weight: bold; font-size: 16px; }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
 
-        .btn-remove { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 15px; padding: 2px 5px; border-radius: 4px; transition: background .2s; }
-        .btn-remove:hover { background: rgba(224,84,84,.15); }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        .est-item-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .est-item-name {
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .est-item-info {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 3px;
+        }
+
+        .est-item-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .est-item-qtd {
+            font-family: var(--font-mono);
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .btn-remove {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 15px;
+            padding: 2px 5px;
+            border-radius: 4px;
+            transition: background .2s;
+        }
+
+        .btn-remove:hover {
+            background: rgba(224, 84, 84, .15);
+        }
 
         /* edit row */
-        .edit-row { display: none; gap: 8px; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--card-border); }
-        .edit-row.open { display: flex; }
-        .edit-row input { background: var(--surface); border: 1px solid var(--gold); color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 14px; font-family: var(--font-mono); }
-        .edit-row label { font-size: 11px; color: var(--muted); white-space: nowrap; }
-        .edit-field { display: flex; flex-direction: column; gap: 3px; flex: 1; }
-        .btn-ok { background: var(--gold); color: #000; border: none; padding: 7px 16px; border-radius: 6px; font-weight: 700; font-size: 13px; cursor: pointer; }
+        .edit-row {
+            display: none;
+            gap: 8px;
+            align-items: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--card-border);
+        }
+
+        .edit-row.open {
+            display: flex;
+        }
+
+        .edit-row input {
+            background: var(--surface);
+            border: 1px solid var(--gold);
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: var(--font-mono);
+        }
+
+        .edit-row label {
+            font-size: 11px;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        .edit-field {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            flex: 1;
+        }
+
+        .btn-ok {
+            background: var(--gold);
+            color: #000;
+            border: none;
+            padding: 7px 16px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+        }
 
         /* ── PAINEL DIREITO ── */
-        .panel-right { padding: 20px; background: #050505; display: flex; flex-direction: column; gap: 14px; width: 300px; flex-shrink: 0; overflow-y: auto; }
+        .panel-right {
+            padding: 20px;
+            background: #050505;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            width: 300px;
+            flex-shrink: 0;
+            height: 100%;
+            overflow: hidden;
+            /* não scrolla o painel todo */
+        }
 
-        .obs-group label { color: var(--gold); font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+        .panel-right-footer {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            flex-shrink: 0;
+        }
 
-        .counter-box { background: var(--card); padding: 16px; border-radius: var(--radius); border: 1px solid var(--card-border); text-align: center; }
-        .counter-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
-        .counter-value { font-family: var(--font-mono); font-size: 32px; font-weight: 600; margin-top: 4px; color: var(--gold); }
-        .counter-value.entrada-cor { color: var(--entrada); }
-        .counter-value.saida-cor   { color: var(--saida); }
+        .obs-group label {
+            color: var(--gold);
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .counter-box {
+            background: var(--card);
+            padding: 16px;
+            border-radius: var(--radius);
+            border: 1px solid var(--card-border);
+            text-align: center;
+        }
+
+        .counter-label {
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .counter-value {
+            font-family: var(--font-mono);
+            font-size: 32px;
+            font-weight: 600;
+            margin-top: 4px;
+            color: var(--gold);
+        }
+
+        .counter-value.entrada-cor {
+            color: var(--entrada);
+        }
+
+        .counter-value.saida-cor {
+            color: var(--saida);
+        }
 
         .btn-finish {
-            background: var(--gold); color: #000; border: none; padding: 16px;
-            border-radius: var(--radius); font-weight: 700; font-size: 16px; cursor: pointer;
-            text-transform: uppercase; letter-spacing: 1px; margin-top: auto;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
+            background: var(--gold);
+            color: #000;
+            border: none;
+            padding: 16px;
+            border-radius: var(--radius);
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             transition: opacity .2s;
         }
-        .btn-finish.entrada-btn { background: var(--entrada); }
-        .btn-finish.saida-btn   { background: var(--saida); }
-        .btn-finish:hover    { opacity: .88; }
-        .btn-finish:disabled { opacity: .4; cursor: not-allowed; }
+
+        .btn-finish.entrada-btn {
+            background: var(--entrada);
+        }
+
+        .btn-finish.saida-btn {
+            background: var(--saida);
+        }
+
+        .btn-finish:hover {
+            opacity: .88;
+        }
+
+        .btn-finish:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+        }
 
         /* ── SUGESTÕES ── */
         #suggestsEst {
-            position: absolute; top: 100%; left: 0; right: 0; background: #222; z-index: 200;
-            border-radius: 0 0 8px 8px; max-height: 280px; overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,.6); border: 1px solid var(--card-border); border-top: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #222;
+            z-index: 200;
+            border-radius: 0 0 8px 8px;
+            max-height: 280px;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .6);
+            border: 1px solid var(--card-border);
+            border-top: none;
         }
-        .sug-item { padding: 12px 14px; border-bottom: 1px solid var(--card-border); cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 14px; transition: background .15s; }
-        .sug-item:last-child  { border-bottom: none; }
-        .sug-item:hover       { background: var(--gold-glow); }
-        .sug-item.sem-result  { color: var(--muted); justify-content: center; cursor: default; }
-        .sug-item.loading     { color: var(--muted); justify-content: center; cursor: default; font-style: italic; }
-        .sug-estoque { font-size: 11px; color: var(--muted); margin-top: 2px; }
-        .sug-right   { text-align: right; flex-shrink: 0; }
-        .sug-qtd     { color: var(--gold); font-family: var(--font-mono); font-weight: 600; }
+
+        .sug-item {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--card-border);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            transition: background .15s;
+        }
+
+        .sug-item:last-child {
+            border-bottom: none;
+        }
+
+        .sug-item:hover {
+            background: var(--gold-glow);
+        }
+
+        .sug-item.sem-result {
+            color: var(--muted);
+            justify-content: center;
+            cursor: default;
+        }
+
+        .sug-item.loading {
+            color: var(--muted);
+            justify-content: center;
+            cursor: default;
+            font-style: italic;
+        }
+
+        .sug-estoque {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .sug-right {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .sug-qtd {
+            color: var(--gold);
+            font-family: var(--font-mono);
+            font-weight: 600;
+        }
 
         /* ── EMPTY ── */
-        .empty-state { text-align: center; margin-top: 60px; opacity: .25; pointer-events: none; }
-        .empty-state span { font-size: 48px; display: block; margin-bottom: 10px; }
+        .empty-state {
+            text-align: center;
+            margin-top: 60px;
+            opacity: .25;
+            pointer-events: none;
+        }
+
+        .empty-state span {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 10px;
+        }
 
         /* ── SPINNER ── */
-        .spinner { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,.2); border-top-color: #000; border-radius: 50%; animation: spin .6s linear infinite; display: inline-block; }
-        .spinner.light { border-color: rgba(255,255,255,.2); border-top-color: var(--gold); }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(0, 0, 0, .2);
+            border-top-color: #000;
+            border-radius: 50%;
+            animation: spin .6s linear infinite;
+            display: inline-block;
+        }
+
+        .spinner.light {
+            border-color: rgba(255, 255, 255, .2);
+            border-top-color: var(--gold);
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
         /* ── TOAST ── */
-        #toast { position: fixed; top: 16px; right: 16px; z-index: 9999; background: var(--success); color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 15px; font-weight: 600; display: none; align-items: center; gap: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.5); max-width: 320px; }
-        #toast.error { background: var(--danger); }
-        #toast.show  { display: flex; }
+        #toast {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9999;
+            background: var(--success);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, .5);
+            max-width: 320px;
+        }
+
+        #toast.error {
+            background: var(--danger);
+        }
+
+        #toast.show {
+            display: flex;
+        }
 
         /* ═══════════════════════════════════
            ABA CONSULTA
         ═══════════════════════════════════ */
-        .consulta-wrap { flex: 1; overflow-y: auto; padding: 16px; }
+        .consulta-wrap {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
 
-        .consulta-filtro { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 16px; flex-wrap: wrap; }
-        .consulta-filtro .input-group input[type="date"] { color-scheme: dark; }
-        .btn-buscar-c { background: var(--gold); color: #000; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; transition: opacity .2s; }
-        .btn-buscar-c:hover { opacity: .85; }
-        .btn-buscar-c:disabled { opacity: .4; cursor: not-allowed; }
+        .consulta-filtro {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .consulta-filtro .input-group input[type="date"] {
+            color-scheme: dark;
+        }
+
+        .btn-buscar-c {
+            background: var(--gold);
+            color: #000;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: opacity .2s;
+        }
+
+        .btn-buscar-c:hover {
+            opacity: .85;
+        }
+
+        .btn-buscar-c:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+        }
 
         /* card lançamento */
-        .lanc-card { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius); margin-bottom: 10px; overflow: hidden; cursor: pointer; transition: border-color .2s; }
-        .lanc-card:hover { border-color: rgba(212,175,55,.4); }
-        .lanc-card.cancelado { opacity: .45; }
+        .lanc-card {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            margin-bottom: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: border-color .2s;
+        }
 
-        .lanc-card-header { padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-        .lanc-card-left   { display: flex; align-items: center; gap: 12px; min-width: 0; }
-        .lanc-icon        { font-size: 20px; flex-shrink: 0; }
-        .lanc-id          { font-weight: 700; font-size: 15px; }
-        .lanc-meta        { font-size: 12px; color: var(--muted); margin-top: 2px; }
+        .lanc-card:hover {
+            border-color: rgba(212, 175, 55, .4);
+        }
 
-        .lanc-badge { font-size: 10px; font-weight: 700; letter-spacing: 1px; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; flex-shrink: 0; }
-        .badge-E  { background: var(--entrada-bg); color: var(--entrada); border: 1px solid var(--entrada); }
-        .badge-S  { background: var(--saida-bg);   color: var(--saida);   border: 1px solid var(--saida); }
-        .badge-A  { background: var(--ajuste-bg);  color: var(--ajuste);  border: 1px solid var(--ajuste); }
-        .badge-F  { background: rgba(76,175,125,.12); color: var(--success); }
-        .badge-C  { background: rgba(224,84,84,.12);  color: var(--danger); }
+        .lanc-card.cancelado {
+            opacity: .45;
+        }
 
-        .lanc-card-right { text-align: right; flex-shrink: 0; }
-        .lanc-qtd-total  { font-family: var(--font-mono); font-weight: 700; font-size: 14px; }
-        .btn-cancelar-lanc { background: none; border: none; color: var(--danger); font-size: 12px; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: background .2s; margin-top: 4px; display: block; margin-left: auto; }
-        .btn-cancelar-lanc:hover { background: rgba(224,84,84,.12); }
+        .lanc-card-header {
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .lanc-card-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .lanc-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .lanc-id {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .lanc-meta {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .lanc-badge {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        .badge-E {
+            background: var(--entrada-bg);
+            color: var(--entrada);
+            border: 1px solid var(--entrada);
+        }
+
+        .badge-S {
+            background: var(--saida-bg);
+            color: var(--saida);
+            border: 1px solid var(--saida);
+        }
+
+        .badge-A {
+            background: var(--ajuste-bg);
+            color: var(--ajuste);
+            border: 1px solid var(--ajuste);
+        }
+
+        .badge-F {
+            background: rgba(76, 175, 125, .12);
+            color: var(--success);
+        }
+
+        .badge-C {
+            background: rgba(224, 84, 84, .12);
+            color: var(--danger);
+        }
+
+        .lanc-card-right {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .lanc-qtd-total {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .btn-cancelar-lanc {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-size: 12px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background .2s;
+            margin-top: 4px;
+            display: block;
+            margin-left: auto;
+        }
+
+        .btn-cancelar-lanc:hover {
+            background: rgba(224, 84, 84, .12);
+        }
 
         /* itens expandidos */
-        .lanc-itens { display: none; padding: 0 16px 14px; border-top: 1px solid var(--card-border); }
-        .lanc-itens.open { display: block; }
-        .item-linha { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.04); font-size: 14px; }
-        .item-linha:last-child { border-bottom: none; }
-        .item-nome { color: var(--text); }
-        .item-qtd-detalhe { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+        .lanc-itens {
+            display: none;
+            padding: 0 16px 14px;
+            border-top: 1px solid var(--card-border);
+        }
 
-        .empty-consulta { text-align: center; padding: 60px 20px; opacity: .3; }
-        .empty-consulta span { font-size: 48px; display: block; margin-bottom: 10px; }
+        .lanc-itens.open {
+            display: block;
+        }
+
+        .item-linha {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, .04);
+            font-size: 14px;
+        }
+
+        .item-linha:last-child {
+            border-bottom: none;
+        }
+
+        .item-nome {
+            color: var(--text);
+        }
+
+        .item-qtd-detalhe {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .empty-consulta {
+            text-align: center;
+            padding: 60px 20px;
+            opacity: .3;
+        }
+
+        .empty-consulta span {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 10px;
+        }
 
         /* ── MOBILE ── */
         @media (max-width: 640px) {
-            html, body { overflow: auto; height: auto; }
-            .app-wrapper { height: auto; overflow: visible; }
-            .tab-content.ativo { overflow: visible; }
-            .pdv-wrap { flex-direction: column; overflow: visible; }
-            .panel-left { border-right: none; border-bottom: 1px solid var(--card-border); overflow: visible; flex: none; }
-            .items-list { overflow: visible; max-height: none; }
-            .panel-right { width: 100%; padding: 16px; }
-            .counter-value { font-size: 26px; }
-            .consulta-wrap { overflow: visible; }
+
+            html,
+            body {
+                overflow: auto;
+                height: auto;
+            }
+
+            .app-wrapper {
+                height: auto;
+                overflow: visible;
+            }
+
+            .tab-content.ativo {
+                overflow: visible;
+            }
+
+            .pdv-wrap {
+                flex-direction: column;
+                overflow: visible;
+            }
+
+            .panel-left {
+                border-right: none;
+                border-bottom: 1px solid var(--card-border);
+                overflow: visible;
+                flex: none;
+            }
+            
+            .panel-right-footer {
+                position: sticky;
+                bottom: 0;
+                background: #050505;
+                padding: 12px 0 4px;
+                z-index: 10;
+                margin-top: 0;
+            }
+
+            .items-list {
+                overflow: visible;
+                max-height: none;
+            }
+
+            .panel-right {
+                width: 100%;
+                padding: 16px;
+            }
+
+            .counter-value {
+                font-size: 26px;
+            }
+
+            .consulta-wrap {
+                overflow: visible;
+            }
         }
     </style>
 </head>
+
 <body>
 
-<div id="toast"></div>
+    <div id="toast"></div>
 
-<!-- Scanner câmera -->
-<div class="scanner-est" id="scannerEst">
-    <div class="scanner-est-box">
-        <video id="scannerEstVideo" playsinline muted></video>
-        <div class="scanner-est-line"></div>
-    </div>
-    <div class="scanner-est-msg">Aponte para o c&#243;digo de barras</div>
-    <button type="button" class="btn-fechar-scanner-est" onclick="fecharScannerEst()">&#215; Fechar C&#226;mera</button>
-</div>
-
-<div class="app-wrapper">
-
-    <header>
-        <a href="/admin" class="btn-back">&#8592; VOLTAR</a>
-        <span style="color:var(--gold);font-weight:700;font-size:15px;letter-spacing:2px;text-transform:uppercase;">Estoque</span>
-        <div style="width:60px;"></div>
-    </header>
-
-    <!-- TIPO -->
-    <div class="tipo-bar">
-        <button class="tipo-btn entrada ativo" id="btnEntrada" onclick="setTipo('E')">&#9650; Entrada</button>
-        <button class="tipo-btn saida"          id="btnSaida"   onclick="setTipo('S')">&#9660; Sa&#237;da</button>
-        <button class="tipo-btn ajuste"         id="btnAjuste"  onclick="setTipo('A')">&#9632; Ajuste</button>
+    <!-- Scanner câmera -->
+    <div class="scanner-est" id="scannerEst">
+        <div class="scanner-est-box">
+            <video id="scannerEstVideo" playsinline muted></video>
+            <div class="scanner-est-line"></div>
+        </div>
+        <div class="scanner-est-msg">Aponte para o c&#243;digo de barras</div>
+        <button type="button" class="btn-fechar-scanner-est" onclick="fecharScannerEst()">&#215; Fechar
+            C&#226;mera</button>
     </div>
 
-    <!-- ABAS -->
-    <div class="tabs">
-        <button class="tab-btn ativo" id="tabLanc"     onclick="setTab('lanc')">&#43; Lan&#231;amento</button>
-        <button class="tab-btn"       id="tabConsulta" onclick="setTab('consulta')">&#128196; Consulta</button>
-    </div>
+    <div class="app-wrapper">
 
-    <!-- ABA LANÇAMENTO -->
-    <div class="tab-content ativo" id="contentLanc">
-        <div class="pdv-wrap">
+        <header>
+            <a href="/admin" class="btn-back">&#8592; VOLTAR</a>
+            <span
+                style="color:var(--gold);font-weight:700;font-size:15px;letter-spacing:2px;text-transform:uppercase;">Estoque</span>
+            <div style="width:60px;"></div>
+        </header>
 
-            <div class="panel-left">
-                <div class="search-area">
-                    <div class="search-row">
-                        <div class="input-group">
-                            <label>Buscar Produto</label>
-                            <input type="text" id="buscaEst" placeholder="Toque para listar ou filtre..." autocomplete="off">
-                            <div id="suggestsEst"></div>
+        <!-- TIPO -->
+        <div class="tipo-bar">
+            <button class="tipo-btn entrada ativo" id="btnEntrada" onclick="setTipo('E')">&#9650; Entrada</button>
+            <button class="tipo-btn saida" id="btnSaida" onclick="setTipo('S')">&#9660; Sa&#237;da</button>
+            <button class="tipo-btn ajuste" id="btnAjuste" onclick="setTipo('A')">&#9632; Ajuste</button>
+        </div>
+
+        <!-- ABAS -->
+        <div class="tabs">
+            <button class="tab-btn ativo" id="tabLanc" onclick="setTab('lanc')">&#43; Lan&#231;amento</button>
+            <button class="tab-btn" id="tabConsulta" onclick="setTab('consulta')">&#128196; Consulta</button>
+        </div>
+
+        <!-- ABA LANÇAMENTO -->
+        <div class="tab-content ativo" id="contentLanc">
+            <div class="pdv-wrap">
+
+                <div class="panel-left">
+                    <div class="search-area">
+                        <div class="search-row">
+                            <div class="input-group">
+                                <label>Buscar Produto</label>
+                                <input type="text" id="buscaEst" placeholder="Toque para listar ou filtre..."
+                                    autocomplete="off">
+                                <div id="suggestsEst"></div>
+                            </div>
+                            <div class="input-group" style="max-width:72px;">
+                                <label>Qtd</label>
+                                <input type="number" id="qtdEst" value="1" min="1" step="0.001">
+                            </div>
+                            <button type="button" class="btn-camera-est" id="btnCameraEst"
+                                title="C&#226;mera">&#128247;</button>
                         </div>
-                        <div class="input-group" style="max-width:72px;">
-                            <label>Qtd</label>
-                            <input type="number" id="qtdEst" value="1" min="1" step="0.001">
+                    </div>
+
+                    <div class="items-list" id="listaEst">
+                        <div class="empty-state">
+                            <span>&#128230;</span>
+                            <p>Nenhum item adicionado</p>
                         </div>
-                        <button type="button" class="btn-camera-est" id="btnCameraEst" title="C&#226;mera">&#128247;</button>
                     </div>
                 </div>
 
-                <div class="items-list" id="listaEst">
-                    <div class="empty-state">
-                        <span>&#128230;</span>
-                        <p>Nenhum item adicionado</p>
+                <div class="panel-right">
+                    <div class="obs-group">
+                        <label>Observa&#231;&#227;o</label>
+                        <textarea id="obsEst" placeholder="Opcional..."></textarea>
+                    </div>
+
+                    <!-- 👇 tudo que não pode sumir fica aqui -->
+                    <div class="panel-right-footer">
+                        <div class="counter-box">
+                            <div class="counter-label">Total de Itens</div>
+                            <div class="counter-value" id="totalItensDisplay">0</div>
+                        </div>
+
+                        <div class="counter-box">
+                            <div class="counter-label">Total de Pe&#231;as</div>
+                            <div class="counter-value" id="totalPecasDisplay">0,000</div>
+                        </div>
+
+                        <button class="btn-finish entrada-btn" id="btnFinalizar" onclick="finalizar()">
+                            &#10004; Finalizar Lan&#231;amento
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ABA CONSULTA -->
+        <div class="tab-content" id="contentConsulta">
+            <div class="consulta-wrap">
+                <div class="consulta-filtro">
+                    <div class="input-group" style="max-width:200px;">
+                        <label>Data</label>
+                        <input type="date" id="filtroDataEst">
+                    </div>
+                    <div class="input-group" style="max-width:150px;">
+                        <label>Tipo</label>
+                        <select id="filtroTipoEst">
+                            <option value="">Todos</option>
+                            <option value="E">Entrada</option>
+                            <option value="S">Sa&#237;da</option>
+                            <option value="A">Ajuste</option>
+                        </select>
+                    </div>
+                    <button class="btn-buscar-c" id="btnBuscarC" onclick="buscarLancamentos()">
+                        &#8635; Buscar
+                    </button>
+                </div>
+                <div id="listaLancamentos">
+                    <div class="empty-consulta"><span>&#128196;</span>
+                        <p>Selecione uma data e busque</p>
                     </div>
                 </div>
             </div>
-
-            <div class="panel-right">
-                <div class="obs-group">
-                    <label>Observa&#231;&#227;o</label>
-                    <textarea id="obsEst" placeholder="Opcional..."></textarea>
-                </div>
-
-                <div class="counter-box">
-                    <div class="counter-label">Total de Itens</div>
-                    <div class="counter-value" id="totalItensDisplay">0</div>
-                </div>
-
-                <div class="counter-box">
-                    <div class="counter-label">Total de Pe&#231;as</div>
-                    <div class="counter-value" id="totalPecasDisplay">0,000</div>
-                </div>
-
-                <button class="btn-finish entrada-btn" id="btnFinalizar" onclick="finalizar()">
-                    &#10004; Finalizar Lan&#231;amento
-                </button>
-            </div>
-
         </div>
+
     </div>
 
-    <!-- ABA CONSULTA -->
-    <div class="tab-content" id="contentConsulta">
-        <div class="consulta-wrap">
-            <div class="consulta-filtro">
-                <div class="input-group" style="max-width:200px;">
-                    <label>Data</label>
-                    <input type="date" id="filtroDataEst">
-                </div>
-                <div class="input-group" style="max-width:150px;">
-                    <label>Tipo</label>
-                    <select id="filtroTipoEst">
-                        <option value="">Todos</option>
-                        <option value="E">Entrada</option>
-                        <option value="S">Sa&#237;da</option>
-                        <option value="A">Ajuste</option>
-                    </select>
-                </div>
-                <button class="btn-buscar-c" id="btnBuscarC" onclick="buscarLancamentos()">
-                    &#8635; Buscar
-                </button>
-            </div>
-            <div id="listaLancamentos">
-                <div class="empty-consulta"><span>&#128196;</span><p>Selecione uma data e busque</p></div>
-            </div>
-        </div>
-    </div>
+    <script>
+        /* ══════════════════════════════════════════
+           ESTADO
+        ══════════════════════════════════════════ */
+        var itensEst = [];
+        var tipoAtual = 'E';
+        var debTimer = null;
+        var buscaEst = document.getElementById('buscaEst');
+        var suggestsEl = document.getElementById('suggestsEst');
 
-</div>
-
-<script>
-/* ══════════════════════════════════════════
-   ESTADO
-══════════════════════════════════════════ */
-var itensEst   = [];
-var tipoAtual  = 'E';
-var debTimer   = null;
-var buscaEst   = document.getElementById('buscaEst');
-var suggestsEl = document.getElementById('suggestsEst');
-
-/* ── TOAST ── */
-function toast(msg, tipo) {
-    var el = document.getElementById('toast');
-    el.textContent = msg;
-    el.className = 'show' + (tipo === 'error' ? ' error' : '');
-    clearTimeout(el._t);
-    el._t = setTimeout(function(){ el.className = ''; }, 3500);
-}
-
-/* ── ABAS ── */
-function setTab(tab) {
-    document.getElementById('tabLanc').classList.toggle('ativo',     tab === 'lanc');
-    document.getElementById('tabConsulta').classList.toggle('ativo', tab === 'consulta');
-    document.getElementById('contentLanc').classList.toggle('ativo',     tab === 'lanc');
-    document.getElementById('contentConsulta').classList.toggle('ativo', tab === 'consulta');
-    if (tab === 'consulta') buscarLancamentos();
-}
-
-/* ── TIPO ── */
-function setTipo(tipo) {
-    tipoAtual = tipo;
-    ['E','S','A'].forEach(function(t) {
-        var map = { E:'entrada', S:'saida', A:'ajuste' };
-        var btn = document.getElementById('btn' + (t==='E'?'Entrada':t==='S'?'Saida':'Ajuste'));
-        btn.classList.toggle('ativo', t === tipo);
-    });
-
-    // Cor do botão finalizar e counter
-    var btnF   = document.getElementById('btnFinalizar');
-    var ctr    = document.getElementById('totalItensDisplay');
-    var ctr2   = document.getElementById('totalPecasDisplay');
-    btnF.className = 'btn-finish ' + (tipo==='E' ? 'entrada-btn' : tipo==='S' ? 'saida-btn' : '');
-    ctr.className  = 'counter-value ' + (tipo==='E' ? 'entrada-cor' : tipo==='S' ? 'saida-cor' : '');
-    ctr2.className = 'counter-value ' + (tipo==='E' ? 'entrada-cor' : tipo==='S' ? 'saida-cor' : '');
-
-    // Reborda os itens
-    renderItensEst();
-}
-
-/* ── BUSCA ── */
-buscaEst.addEventListener('focus', function() {
-    if (!suggestsEl.innerHTML) buscarProdutosEst('');
-});
-
-buscaEst.addEventListener('input', function(e) {
-    clearTimeout(debTimer);
-    var termo = e.target.value.trim();
-    var delay = /^\d{6,}$/.test(termo) ? 200 : 350;
-    debTimer  = setTimeout(function(){ buscarProdutosEst(termo); }, delay);
-});
-
-function buscarProdutosEst(termo) {
-    suggestsEl.innerHTML = '<div class="sug-item loading"><span class="spinner light"></span>&nbsp;Buscando...</div>';
-    var url = '/admin/estoque/produtos' + (termo ? '?busca=' + encodeURIComponent(termo) : '');
-    fetch(url, { credentials: 'include' })
-        .then(function(res) {
-            var ct = res.headers.get('content-type') || '';
-            if (!ct.includes('application/json')) { suggestsEl.innerHTML = '<div class="sug-item sem-result">Sess\u00e3o expirada</div>'; return; }
-            return res.json().then(function(json) {
-                if (!res.ok) throw new Error(json.message || 'Erro');
-                var lista = json.data || [];
-
-                if (/^\d{6,}$/.test(termo)) {
-                    for (var k = 0; k < lista.length; k++) {
-                        if (String(lista[k].codbarras) === termo) {
-                            adicionarItem(lista[k]); fecharSugsEst(); buscaEst.value = ''; return;
-                        }
-                    }
-                }
-                renderSugsEst(lista);
-            });
-        })
-        .catch(function(err) { suggestsEl.innerHTML = '<div class="sug-item sem-result">&#9888; ' + err.message + '</div>'; });
-}
-
-function renderSugsEst(lista) {
-    if (!lista.length) { suggestsEl.innerHTML = '<div class="sug-item sem-result">Nenhum produto encontrado</div>'; return; }
-    suggestsEl._cache = lista;
-    var html = '';
-    for (var i = 0; i < lista.length; i++) {
-        var p = lista[i];
-        html += '<div class="sug-item" data-idx="' + i + '">'
-              + '<div><div>' + p.descricao + '</div><div class="sug-estoque">Estoque atual: ' + (p.estoque != null ? p.estoque : '&mdash;') + '</div></div>'
-              + '<div class="sug-right"><div class="sug-qtd">' + (p.estoque != null ? p.estoque : '&mdash;') + '</div><div style="font-size:10px;color:var(--muted)">em estoque</div></div>'
-              + '</div>';
-    }
-    suggestsEl.innerHTML = html;
-    var els = suggestsEl.querySelectorAll('.sug-item[data-idx]');
-    for (var j = 0; j < els.length; j++) {
-        els[j].addEventListener('click', (function(idx){
-            return function() {
-                var prod = (suggestsEl._cache || [])[idx];
-                if (prod) { adicionarItem(prod); fecharSugsEst(); }
-            };
-        })(j));
-    }
-}
-
-function fecharSugsEst() { suggestsEl.innerHTML = ''; suggestsEl._cache = null; }
-document.addEventListener('click', function(e) { if (!e.target.closest('.input-group')) fecharSugsEst(); });
-
-/* ── ITENS ── */
-function adicionarItem(produto) {
-    var qtd = Math.max(0.001, parseFloat(document.getElementById('qtdEst').value) || 1);
-    var existente = null;
-    for (var i = 0; i < itensEst.length; i++) {
-        if (itensEst[i].produto_id === produto.id) { existente = itensEst[i]; break; }
-    }
-    if (existente) {
-        existente.quantidade += qtd;
-    } else {
-        itensEst.push({ produto_id: produto.id, descricao: produto.descricao, estoque_atual: parseFloat(produto.estoque) || 0, quantidade: qtd });
-    }
-    document.getElementById('qtdEst').value = 1;
-    buscaEst.value = '';
-    renderItensEst();
-    buscaEst.focus();
-}
-
-function renderItensEst() {
-    var container = document.getElementById('listaEst');
-    if (!itensEst.length) {
-        container.innerHTML = '<div class="empty-state"><span>&#128230;</span><p>Nenhum item adicionado</p></div>';
-        atualizarContadores();
-        return;
-    }
-    var corClass = tipoAtual === 'E' ? 'entrada-item' : tipoAtual === 'S' ? 'saida-item' : '';
-    var html = '';
-    for (var i = 0; i < itensEst.length; i++) {
-        var item = itensEst[i];
-        html += '<div class="est-item ' + corClass + '" data-idx="' + i + '">'
-              + '<div class="est-item-top">'
-              +   '<div><div class="est-item-name">' + item.descricao + '</div>'
-              +   '<div class="est-item-info">Estoque atual: ' + item.estoque_atual + '</div></div>'
-              +   '<div class="est-item-right">'
-              +     '<div class="est-item-qtd">' + fmtQtd(item.quantidade) + '</div>'
-              +     '<button class="btn-remove btn-edit-est" data-idx="' + i + '" title="Editar">&#9998;</button>'
-              +     '<button class="btn-remove" data-idx="' + i + '" title="Remover">&#x2715;</button>'
-              +   '</div>'
-              + '</div>'
-              + '<div class="edit-row" id="editEstRow' + i + '">'
-              +   '<div class="edit-field"><label>Quantidade</label><input type="number" class="edit-qtd-est" value="' + item.quantidade + '" min="0.001" step="0.001"></div>'
-              +   '<button class="btn-ok btn-ok-est" data-idx="' + i + '">OK</button>'
-              + '</div>'
-              + '</div>';
-    }
-    container.innerHTML = html;
-
-    var btnsEdit   = container.querySelectorAll('.btn-edit-est');
-    var btnsRemove = container.querySelectorAll('.btn-remove:not(.btn-edit-est)');
-    var btnsOk     = container.querySelectorAll('.btn-ok-est');
-
-    for (var j = 0; j < btnsEdit.length; j++) {
-        btnsEdit[j].addEventListener('click', (function(idx){
-            return function(e) { e.stopPropagation(); document.getElementById('editEstRow' + idx).classList.toggle('open'); };
-        })(j));
-    }
-    for (var k = 0; k < btnsRemove.length; k++) {
-        btnsRemove[k].addEventListener('click', (function(idx){
-            return function() { itensEst.splice(idx, 1); renderItensEst(); };
-        })(k));
-    }
-    for (var m = 0; m < btnsOk.length; m++) {
-        btnsOk[m].addEventListener('click', (function(idx){
-            return function() {
-                var row = document.getElementById('editEstRow' + idx);
-                var novaQtd = Math.max(0.001, parseFloat(row.querySelector('.edit-qtd-est').value) || 0.001);
-                itensEst[idx].quantidade = novaQtd;
-                renderItensEst();
-            };
-        })(m));
-    }
-    atualizarContadores();
-}
-
-function atualizarContadores() {
-    var totalPecas = 0;
-    for (var i = 0; i < itensEst.length; i++) totalPecas += itensEst[i].quantidade;
-    document.getElementById('totalItensDisplay').textContent = itensEst.length;
-    document.getElementById('totalPecasDisplay').textContent = fmtQtd(totalPecas);
-}
-
-/* ── FINALIZAR ── */
-function finalizar() {
-    if (!itensEst.length) { toast('Adicione pelo menos um item!', 'error'); return; }
-    var btn = document.getElementById('btnFinalizar');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>&nbsp;Salvando...';
-
-    var payload = {
-        tipo:       tipoAtual,
-        observacao: document.getElementById('obsEst').value.trim(),
-        itens: itensEst.map(function(i){ return { produto_id: i.produto_id, quantidade: i.quantidade }; })
-    };
-
-    fetch('/admin/estoque', {
-        method: 'POST', credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    })
-    .then(function(res) {
-        var ct = res.headers.get('content-type') || '';
-        if (!ct.includes('application/json')) throw new Error('Sess\u00e3o expirada');
-        return res.json().then(function(json) {
-            if (!res.ok) throw new Error(json.message || 'Erro ao salvar');
-            toast('Lan\u00e7amento #' + json.data.id + ' registrado! \u2714');
-            itensEst = [];
-            document.getElementById('obsEst').value = '';
-            renderItensEst();
-            buscaEst.focus();
-        });
-    })
-    .catch(function(err) { toast('Erro: ' + err.message, 'error'); })
-    .finally(function() { btn.disabled = false; var t = tipoAtual==='E'?'entrada-btn':tipoAtual==='S'?'saida-btn':''; btn.className = 'btn-finish ' + t; btn.innerHTML = '&#10004; Finalizar Lan\u00e7amento'; });
-}
-
-/* ═══════════════════════════════════════════
-   ABA CONSULTA
-═══════════════════════════════════════════ */
-var hoje = new Date();
-var dd   = String(hoje.getDate()).padStart(2,'0');
-var mm   = String(hoje.getMonth()+1).padStart(2,'0');
-var yyyy = hoje.getFullYear();
-document.getElementById('filtroDataEst').value = yyyy + '-' + mm + '-' + dd;
-
-function buscarLancamentos() {
-    var btn  = document.getElementById('btnBuscarC');
-    var data = document.getElementById('filtroDataEst').value;
-    var tipo = document.getElementById('filtroTipoEst').value;
-    if (!data) { toast('Selecione uma data', 'error'); return; }
-
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner dark"></span>';
-
-    fetch('/admin/estoque/consulta/dados?data=' + data, { credentials: 'include' })
-        .then(function(res) { return res.json(); })
-        .then(function(json) {
-            var lista = json.data || [];
-            if (tipo) lista = lista.filter(function(l){ return l.tipo === tipo; });
-            renderLancamentos(lista);
-        })
-        .catch(function(err) { toast('Erro: ' + err.message, 'error'); })
-        .finally(function() { btn.disabled = false; btn.innerHTML = '&#8635; Buscar'; });
-}
-
-function renderLancamentos(lista) {
-    var container = document.getElementById('listaLancamentos');
-    if (!lista.length) {
-        container.innerHTML = '<div class="empty-consulta"><span>&#128196;</span><p>Nenhum lan\u00e7amento encontrado</p></div>';
-        return;
-    }
-
-    var nomeTipo = { E:'Entrada', S:'Sa\u00edda', A:'Ajuste' };
-    var nomeStatus = { F:'Finalizado', C:'Cancelado', A:'Aberto' };
-    var html = '';
-
-    for (var i = 0; i < lista.length; i++) {
-        var l = lista[i];
-        var cancelado = l.status === 'C';
-        var itens = l.Itens || [];
-        var totalPecas = 0;
-        for (var j = 0; j < itens.length; j++) totalPecas += parseFloat(itens[j].quantidade) || 0;
-
-        var itensHtml = '';
-        for (var k = 0; k < itens.length; k++) {
-            var it   = itens[k];
-            var nome = (it.Produto && it.Produto.descricao) ? it.Produto.descricao : 'Produto #' + it.produto_id;
-            itensHtml += '<div class="item-linha"><div class="item-nome">' + nome + '</div><div class="item-qtd-detalhe">' + fmtQtd(parseFloat(it.quantidade)) + '</div></div>';
+        /* ── TOAST ── */
+        function toast(msg, tipo) {
+            var el = document.getElementById('toast');
+            el.textContent = msg;
+            el.className = 'show' + (tipo === 'error' ? ' error' : '');
+            clearTimeout(el._t);
+            el._t = setTimeout(function () { el.className = ''; }, 3500);
         }
 
-        var dtStr = '';
-        try { var d = new Date(l.data); dtStr = d.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}); } catch(e){}
+        /* ── ABAS ── */
+        function setTab(tab) {
+            document.getElementById('tabLanc').classList.toggle('ativo', tab === 'lanc');
+            document.getElementById('tabConsulta').classList.toggle('ativo', tab === 'consulta');
+            document.getElementById('contentLanc').classList.toggle('ativo', tab === 'lanc');
+            document.getElementById('contentConsulta').classList.toggle('ativo', tab === 'consulta');
+            if (tab === 'consulta') buscarLancamentos();
+        }
 
-        var btnCancel = cancelado ? '' : '<button class="btn-cancelar-lanc" onclick="event.stopPropagation();cancelarLanc(' + l.id + ')">&#128465; Cancelar</button>';
+        /* ── TIPO ── */
+        function setTipo(tipo) {
+            tipoAtual = tipo;
+            ['E', 'S', 'A'].forEach(function (t) {
+                var map = { E: 'entrada', S: 'saida', A: 'ajuste' };
+                var btn = document.getElementById('btn' + (t === 'E' ? 'Entrada' : t === 'S' ? 'Saida' : 'Ajuste'));
+                btn.classList.toggle('ativo', t === tipo);
+            });
 
-        html += '<div class="lanc-card' + (cancelado ? ' cancelado' : '') + '" id="lancCard' + l.id + '">'
-              + '<div class="lanc-card-header" onclick="toggleLancItens(' + l.id + ')">'
-              +   '<div class="lanc-card-left">'
-              +     '<span class="lanc-icon">' + (l.tipo==='E'?'&#9650;':l.tipo==='S'?'&#9660;':'&#9632;') + '</span>'
-              +     '<div><div class="lanc-id">Lan\u00e7amento #' + l.id + '</div>'
-              +     '<div class="lanc-meta">' + (nomeTipo[l.tipo]||l.tipo) + ' &bull; ' + itens.length + ' produto(s) &bull; ' + dtStr + (l.observacao ? ' &bull; ' + l.observacao : '') + '</div></div>'
-              +   '</div>'
-              +   '<div class="lanc-card-right">'
-              +     '<span class="lanc-badge badge-' + l.tipo + '">' + (nomeTipo[l.tipo]||l.tipo) + '</span> '
-              +     '<span class="lanc-badge badge-' + l.status + '">' + (nomeStatus[l.status]||l.status) + '</span>'
-              +     '<div class="lanc-qtd-total">' + fmtQtd(totalPecas) + ' pe\u00e7as</div>'
-              +     btnCancel
-              +   '</div>'
-              + '</div>'
-              + '<div class="lanc-itens" id="lancItens' + l.id + '">' + itensHtml + '</div>'
-              + '</div>';
-    }
-    container.innerHTML = html;
-}
+            // Cor do botão finalizar e counter
+            var btnF = document.getElementById('btnFinalizar');
+            var ctr = document.getElementById('totalItensDisplay');
+            var ctr2 = document.getElementById('totalPecasDisplay');
+            btnF.className = 'btn-finish ' + (tipo === 'E' ? 'entrada-btn' : tipo === 'S' ? 'saida-btn' : '');
+            ctr.className = 'counter-value ' + (tipo === 'E' ? 'entrada-cor' : tipo === 'S' ? 'saida-cor' : '');
+            ctr2.className = 'counter-value ' + (tipo === 'E' ? 'entrada-cor' : tipo === 'S' ? 'saida-cor' : '');
 
-function toggleLancItens(id) {
-    var el = document.getElementById('lancItens' + id);
-    if (el) el.classList.toggle('open');
-}
+            // Reborda os itens
+            renderItensEst();
+        }
 
-function cancelarLanc(id) {
-    if (!confirm('Cancelar lan\u00e7amento #' + id + '? O estoque ser\u00e1 estornado.')) return;
-    fetch('/admin/estoque/' + id + '/cancelar', { method: 'PATCH', credentials: 'include' })
-        .then(function(res) { return res.json().then(function(json) {
-            if (!res.ok) throw new Error(json.message || 'Erro');
-            toast('Lan\u00e7amento #' + id + ' cancelado');
-            buscarLancamentos();
-        }); })
-        .catch(function(err) { toast('Erro: ' + err.message, 'error'); });
-}
+        /* ── BUSCA ── */
+        buscaEst.addEventListener('focus', function () {
+            if (!suggestsEl.innerHTML) buscarProdutosEst('');
+        });
 
-/* ═══════════════════════════════════════════
-   SCANNER CÂMERA
-═══════════════════════════════════════════ */
-var estStream = null;
-var estLoop   = null;
+        buscaEst.addEventListener('input', function (e) {
+            clearTimeout(debTimer);
+            var termo = e.target.value.trim();
+            var delay = /^\d{6,}$/.test(termo) ? 200 : 350;
+            debTimer = setTimeout(function () { buscarProdutosEst(termo); }, delay);
+        });
 
-document.getElementById('btnCameraEst').addEventListener('click', function() {
-    var box = document.getElementById('scannerEst');
-    box.classList.contains('open') ? fecharScannerEst() : abrirScannerEst();
-});
+        function buscarProdutosEst(termo) {
+            suggestsEl.innerHTML = '<div class="sug-item loading"><span class="spinner light"></span>&nbsp;Buscando...</div>';
+            var url = '/admin/estoque/produtos' + (termo ? '?busca=' + encodeURIComponent(termo) : '');
+            fetch(url, { credentials: 'include' })
+                .then(function (res) {
+                    var ct = res.headers.get('content-type') || '';
+                    if (!ct.includes('application/json')) { suggestsEl.innerHTML = '<div class="sug-item sem-result">Sess\u00e3o expirada</div>'; return; }
+                    return res.json().then(function (json) {
+                        if (!res.ok) throw new Error(json.message || 'Erro');
+                        var lista = json.data || [];
 
-function abrirScannerEst() {
-    var box   = document.getElementById('scannerEst');
-    var video = document.getElementById('scannerEstVideo');
-    box.classList.add('open');
+                        if (/^\d{6,}$/.test(termo)) {
+                            for (var k = 0; k < lista.length; k++) {
+                                if (String(lista[k].codbarras) === termo) {
+                                    adicionarItem(lista[k]); fecharSugsEst(); buscaEst.value = ''; return;
+                                }
+                            }
+                        }
+                        renderSugsEst(lista);
+                    });
+                })
+                .catch(function (err) { suggestsEl.innerHTML = '<div class="sug-item sem-result">&#9888; ' + err.message + '</div>'; });
+        }
 
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-        .then(function(stream) {
-            estStream       = stream;
-            video.srcObject = stream;
-            video.play();
-
-            if ('BarcodeDetector' in window) {
-                var det = new BarcodeDetector({ formats: ['ean_13','ean_8','code_128','code_39','upc_a','upc_e','qr_code'] });
-                estLoop = setInterval(function() {
-                    det.detect(video).then(function(r) { if (r.length) codigoLidoEst(r[0].rawValue); }).catch(function(){});
-                }, 400);
-            } else {
-                var s = document.createElement('script');
-                s.src = 'https://cdnjs.cloudflare.com/ajax/libs/zxing-js/0.20.0/zxing.min.js';
-                s.onload = function() {
-                    try {
-                        var reader = new ZXing.BrowserMultiFormatReader();
-                        reader.decodeFromVideoElement(video, function(result) {
-                            if (result) { codigoLidoEst(result.getText()); reader.reset(); }
-                        });
-                        if (estStream) estStream._zxing = reader;
-                    } catch(e) {}
-                };
-                if (!document.querySelector('script[src*="zxing"]')) document.head.appendChild(s);
-                else if (typeof ZXing !== 'undefined') s.onload();
+        function renderSugsEst(lista) {
+            if (!lista.length) { suggestsEl.innerHTML = '<div class="sug-item sem-result">Nenhum produto encontrado</div>'; return; }
+            suggestsEl._cache = lista;
+            var html = '';
+            for (var i = 0; i < lista.length; i++) {
+                var p = lista[i];
+                html += '<div class="sug-item" data-idx="' + i + '">'
+                    + '<div><div>' + p.descricao + '</div><div class="sug-estoque">Estoque atual: ' + (p.estoque != null ? p.estoque : '&mdash;') + '</div></div>'
+                    + '<div class="sug-right"><div class="sug-qtd">' + (p.estoque != null ? p.estoque : '&mdash;') + '</div><div style="font-size:10px;color:var(--muted)">em estoque</div></div>'
+                    + '</div>';
             }
-        })
-        .catch(function(err) { alert('C\u00e2mera n\u00e3o dispon\u00edvel: ' + err.message); fecharScannerEst(); });
-}
+            suggestsEl.innerHTML = html;
+            var els = suggestsEl.querySelectorAll('.sug-item[data-idx]');
+            for (var j = 0; j < els.length; j++) {
+                els[j].addEventListener('click', (function (idx) {
+                    return function () {
+                        var prod = (suggestsEl._cache || [])[idx];
+                        if (prod) { adicionarItem(prod); fecharSugsEst(); }
+                    };
+                })(j));
+            }
+        }
 
-function codigoLidoEst(codigo) {
-    fecharScannerEst();
-    buscaEst.value = codigo;
-    if (navigator.vibrate) navigator.vibrate(120);
-    buscarProdutosEst(codigo);
-}
+        function fecharSugsEst() { suggestsEl.innerHTML = ''; suggestsEl._cache = null; }
+        document.addEventListener('click', function (e) { if (!e.target.closest('.input-group')) fecharSugsEst(); });
 
-function fecharScannerEst() {
-    document.getElementById('scannerEst').classList.remove('open');
-    if (estLoop)  { clearInterval(estLoop); estLoop = null; }
-    if (estStream) {
-        if (estStream._zxing) { try { estStream._zxing.reset(); } catch(e){} }
-        estStream.getTracks().forEach(function(t){ t.stop(); });
-        estStream = null;
-    }
-    document.getElementById('scannerEstVideo').srcObject = null;
-}
+        /* ── ITENS ── */
+        function adicionarItem(produto) {
+            var qtd = Math.max(0.001, parseFloat(document.getElementById('qtdEst').value) || 1);
+            var existente = null;
+            for (var i = 0; i < itensEst.length; i++) {
+                if (itensEst[i].produto_id === produto.id) { existente = itensEst[i]; break; }
+            }
+            if (existente) {
+                existente.quantidade += qtd;
+            } else {
+                itensEst.push({ produto_id: produto.id, descricao: produto.descricao, estoque_atual: parseFloat(produto.estoque) || 0, quantidade: qtd });
+            }
+            document.getElementById('qtdEst').value = 1;
+            buscaEst.value = '';
+            renderItensEst();
+            buscaEst.focus();
+        }
 
-/* ── UTIL ── */
-function fmtQtd(n) {
-    var v = parseFloat(n) || 0;
-    return v % 1 === 0 ? v.toFixed(0) : v.toFixed(3).replace('.',',');
-}
-</script>
+        function renderItensEst() {
+            var container = document.getElementById('listaEst');
+            if (!itensEst.length) {
+                container.innerHTML = '<div class="empty-state"><span>&#128230;</span><p>Nenhum item adicionado</p></div>';
+                atualizarContadores();
+                return;
+            }
+            var corClass = tipoAtual === 'E' ? 'entrada-item' : tipoAtual === 'S' ? 'saida-item' : '';
+            var html = '';
+            for (var i = 0; i < itensEst.length; i++) {
+                var item = itensEst[i];
+                html += '<div class="est-item ' + corClass + '" data-idx="' + i + '">'
+                    + '<div class="est-item-top">'
+                    + '<div><div class="est-item-name">' + item.descricao + '</div>'
+                    + '<div class="est-item-info">Estoque atual: ' + item.estoque_atual + '</div></div>'
+                    + '<div class="est-item-right">'
+                    + '<div class="est-item-qtd">' + fmtQtd(item.quantidade) + '</div>'
+                    + '<button class="btn-remove btn-edit-est" data-idx="' + i + '" title="Editar">&#9998;</button>'
+                    + '<button class="btn-remove" data-idx="' + i + '" title="Remover">&#x2715;</button>'
+                    + '</div>'
+                    + '</div>'
+                    + '<div class="edit-row" id="editEstRow' + i + '">'
+                    + '<div class="edit-field"><label>Quantidade</label><input type="number" class="edit-qtd-est" value="' + item.quantidade + '" min="0.001" step="0.001"></div>'
+                    + '<button class="btn-ok btn-ok-est" data-idx="' + i + '">OK</button>'
+                    + '</div>'
+                    + '</div>';
+            }
+            container.innerHTML = html;
+
+            var btnsEdit = container.querySelectorAll('.btn-edit-est');
+            var btnsRemove = container.querySelectorAll('.btn-remove:not(.btn-edit-est)');
+            var btnsOk = container.querySelectorAll('.btn-ok-est');
+
+            for (var j = 0; j < btnsEdit.length; j++) {
+                btnsEdit[j].addEventListener('click', (function (idx) {
+                    return function (e) { e.stopPropagation(); document.getElementById('editEstRow' + idx).classList.toggle('open'); };
+                })(j));
+            }
+            for (var k = 0; k < btnsRemove.length; k++) {
+                btnsRemove[k].addEventListener('click', (function (idx) {
+                    return function () { itensEst.splice(idx, 1); renderItensEst(); };
+                })(k));
+            }
+            for (var m = 0; m < btnsOk.length; m++) {
+                btnsOk[m].addEventListener('click', (function (idx) {
+                    return function () {
+                        var row = document.getElementById('editEstRow' + idx);
+                        var novaQtd = Math.max(0.001, parseFloat(row.querySelector('.edit-qtd-est').value) || 0.001);
+                        itensEst[idx].quantidade = novaQtd;
+                        renderItensEst();
+                    };
+                })(m));
+            }
+            atualizarContadores();
+        }
+
+        function atualizarContadores() {
+            var totalPecas = 0;
+            for (var i = 0; i < itensEst.length; i++) totalPecas += itensEst[i].quantidade;
+            document.getElementById('totalItensDisplay').textContent = itensEst.length;
+            document.getElementById('totalPecasDisplay').textContent = fmtQtd(totalPecas);
+        }
+
+        /* ── FINALIZAR ── */
+        function finalizar() {
+            if (!itensEst.length) { toast('Adicione pelo menos um item!', 'error'); return; }
+            var btn = document.getElementById('btnFinalizar');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>&nbsp;Salvando...';
+
+            var payload = {
+                tipo: tipoAtual,
+                observacao: document.getElementById('obsEst').value.trim(),
+                itens: itensEst.map(function (i) { return { produto_id: i.produto_id, quantidade: i.quantidade }; })
+            };
+
+            fetch('/admin/estoque', {
+                method: 'POST', credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+                .then(function (res) {
+                    var ct = res.headers.get('content-type') || '';
+                    if (!ct.includes('application/json')) throw new Error('Sess\u00e3o expirada');
+                    return res.json().then(function (json) {
+                        if (!res.ok) throw new Error(json.message || 'Erro ao salvar');
+                        toast('Lan\u00e7amento #' + json.data.id + ' registrado! \u2714');
+                        itensEst = [];
+                        document.getElementById('obsEst').value = '';
+                        renderItensEst();
+                        buscaEst.focus();
+                    });
+                })
+                .catch(function (err) { toast('Erro: ' + err.message, 'error'); })
+                .finally(function () { btn.disabled = false; var t = tipoAtual === 'E' ? 'entrada-btn' : tipoAtual === 'S' ? 'saida-btn' : ''; btn.className = 'btn-finish ' + t; btn.innerHTML = '&#10004; Finalizar Lan\u00e7amento'; });
+        }
+
+        /* ═══════════════════════════════════════════
+           ABA CONSULTA
+        ═══════════════════════════════════════════ */
+        var hoje = new Date();
+        var dd = String(hoje.getDate()).padStart(2, '0');
+        var mm = String(hoje.getMonth() + 1).padStart(2, '0');
+        var yyyy = hoje.getFullYear();
+        document.getElementById('filtroDataEst').value = yyyy + '-' + mm + '-' + dd;
+
+        function buscarLancamentos() {
+            var btn = document.getElementById('btnBuscarC');
+            var data = document.getElementById('filtroDataEst').value;
+            var tipo = document.getElementById('filtroTipoEst').value;
+            if (!data) { toast('Selecione uma data', 'error'); return; }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner dark"></span>';
+
+            fetch('/admin/estoque/consulta/dados?data=' + data, { credentials: 'include' })
+                .then(function (res) { return res.json(); })
+                .then(function (json) {
+                    var lista = json.data || [];
+                    if (tipo) lista = lista.filter(function (l) { return l.tipo === tipo; });
+                    renderLancamentos(lista);
+                })
+                .catch(function (err) { toast('Erro: ' + err.message, 'error'); })
+                .finally(function () { btn.disabled = false; btn.innerHTML = '&#8635; Buscar'; });
+        }
+
+        function renderLancamentos(lista) {
+            var container = document.getElementById('listaLancamentos');
+            if (!lista.length) {
+                container.innerHTML = '<div class="empty-consulta"><span>&#128196;</span><p>Nenhum lan\u00e7amento encontrado</p></div>';
+                return;
+            }
+
+            var nomeTipo = { E: 'Entrada', S: 'Sa\u00edda', A: 'Ajuste' };
+            var nomeStatus = { F: 'Finalizado', C: 'Cancelado', A: 'Aberto' };
+            var html = '';
+
+            for (var i = 0; i < lista.length; i++) {
+                var l = lista[i];
+                var cancelado = l.status === 'C';
+                var itens = l.Itens || [];
+                var totalPecas = 0;
+                for (var j = 0; j < itens.length; j++) totalPecas += parseFloat(itens[j].quantidade) || 0;
+
+                var itensHtml = '';
+                for (var k = 0; k < itens.length; k++) {
+                    var it = itens[k];
+                    var nome = (it.Produto && it.Produto.descricao) ? it.Produto.descricao : 'Produto #' + it.produto_id;
+                    itensHtml += '<div class="item-linha"><div class="item-nome">' + nome + '</div><div class="item-qtd-detalhe">' + fmtQtd(parseFloat(it.quantidade)) + '</div></div>';
+                }
+
+                var dtStr = '';
+                try { var d = new Date(l.data); dtStr = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); } catch (e) { }
+
+                var btnCancel = cancelado ? '' : '<button class="btn-cancelar-lanc" onclick="event.stopPropagation();cancelarLanc(' + l.id + ')">&#128465; Cancelar</button>';
+
+                html += '<div class="lanc-card' + (cancelado ? ' cancelado' : '') + '" id="lancCard' + l.id + '">'
+                    + '<div class="lanc-card-header" onclick="toggleLancItens(' + l.id + ')">'
+                    + '<div class="lanc-card-left">'
+                    + '<span class="lanc-icon">' + (l.tipo === 'E' ? '&#9650;' : l.tipo === 'S' ? '&#9660;' : '&#9632;') + '</span>'
+                    + '<div><div class="lanc-id">Lan\u00e7amento #' + l.id + '</div>'
+                    + '<div class="lanc-meta">' + (nomeTipo[l.tipo] || l.tipo) + ' &bull; ' + itens.length + ' produto(s) &bull; ' + dtStr + (l.observacao ? ' &bull; ' + l.observacao : '') + '</div></div>'
+                    + '</div>'
+                    + '<div class="lanc-card-right">'
+                    + '<span class="lanc-badge badge-' + l.tipo + '">' + (nomeTipo[l.tipo] || l.tipo) + '</span> '
+                    + '<span class="lanc-badge badge-' + l.status + '">' + (nomeStatus[l.status] || l.status) + '</span>'
+                    + '<div class="lanc-qtd-total">' + fmtQtd(totalPecas) + ' pe\u00e7as</div>'
+                    + btnCancel
+                    + '</div>'
+                    + '</div>'
+                    + '<div class="lanc-itens" id="lancItens' + l.id + '">' + itensHtml + '</div>'
+                    + '</div>';
+            }
+            container.innerHTML = html;
+        }
+
+        function toggleLancItens(id) {
+            var el = document.getElementById('lancItens' + id);
+            if (el) el.classList.toggle('open');
+        }
+
+        function cancelarLanc(id) {
+            if (!confirm('Cancelar lan\u00e7amento #' + id + '? O estoque ser\u00e1 estornado.')) return;
+            fetch('/admin/estoque/' + id + '/cancelar', { method: 'PATCH', credentials: 'include' })
+                .then(function (res) {
+                    return res.json().then(function (json) {
+                        if (!res.ok) throw new Error(json.message || 'Erro');
+                        toast('Lan\u00e7amento #' + id + ' cancelado');
+                        buscarLancamentos();
+                    });
+                })
+                .catch(function (err) { toast('Erro: ' + err.message, 'error'); });
+        }
+
+        /* ═══════════════════════════════════════════
+           SCANNER CÂMERA
+        ═══════════════════════════════════════════ */
+        var estStream = null;
+        var estLoop = null;
+
+        document.getElementById('btnCameraEst').addEventListener('click', function () {
+            var box = document.getElementById('scannerEst');
+            box.classList.contains('open') ? fecharScannerEst() : abrirScannerEst();
+        });
+
+        function abrirScannerEst() {
+            var box = document.getElementById('scannerEst');
+            var video = document.getElementById('scannerEstVideo');
+            box.classList.add('open');
+
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(function (stream) {
+                    estStream = stream;
+                    video.srcObject = stream;
+                    video.play();
+
+                    if ('BarcodeDetector' in window) {
+                        var det = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'code_128', 'code_39', 'upc_a', 'upc_e', 'qr_code'] });
+                        estLoop = setInterval(function () {
+                            det.detect(video).then(function (r) { if (r.length) codigoLidoEst(r[0].rawValue); }).catch(function () { });
+                        }, 400);
+                    } else {
+                        var s = document.createElement('script');
+                        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/zxing-js/0.20.0/zxing.min.js';
+                        s.onload = function () {
+                            try {
+                                var reader = new ZXing.BrowserMultiFormatReader();
+                                reader.decodeFromVideoElement(video, function (result) {
+                                    if (result) { codigoLidoEst(result.getText()); reader.reset(); }
+                                });
+                                if (estStream) estStream._zxing = reader;
+                            } catch (e) { }
+                        };
+                        if (!document.querySelector('script[src*="zxing"]')) document.head.appendChild(s);
+                        else if (typeof ZXing !== 'undefined') s.onload();
+                    }
+                })
+                .catch(function (err) { alert('C\u00e2mera n\u00e3o dispon\u00edvel: ' + err.message); fecharScannerEst(); });
+        }
+
+        function codigoLidoEst(codigo) {
+            fecharScannerEst();
+            buscaEst.value = codigo;
+            if (navigator.vibrate) navigator.vibrate(120);
+            buscarProdutosEst(codigo);
+        }
+
+        function fecharScannerEst() {
+            document.getElementById('scannerEst').classList.remove('open');
+            if (estLoop) { clearInterval(estLoop); estLoop = null; }
+            if (estStream) {
+                if (estStream._zxing) { try { estStream._zxing.reset(); } catch (e) { } }
+                estStream.getTracks().forEach(function (t) { t.stop(); });
+                estStream = null;
+            }
+            document.getElementById('scannerEstVideo').srcObject = null;
+        }
+
+        /* ── UTIL ── */
+        function fmtQtd(n) {
+            var v = parseFloat(n) || 0;
+            return v % 1 === 0 ? v.toFixed(0) : v.toFixed(3).replace('.', ',');
+        }
+    </script>
 </body>
+
 </html>

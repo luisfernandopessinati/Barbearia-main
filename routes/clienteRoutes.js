@@ -261,4 +261,57 @@ router.get('/clientes/:id/agendamentos', isAdminAuthenticated, async (req, res) 
     }
 });
 
+//buscar clientes
+
+router.get('/admin/clientes/buscar', isAdminAuthenticated, async (req, res) => {
+    try {
+        const q = req.query.q?.trim();
+        if (!q || q.length < 2) return res.json({ clientes: [] });
+
+        const clientes = await Cliente.findAll({
+            where: {
+                idEmpresa: req.user.idEmpresa,
+                [sequelize.Sequelize.Op.or]: [
+                    { nome: { [sequelize.Sequelize.Op.like]: `%${q}%` } },
+                    { telefone: { [sequelize.Sequelize.Op.like]: `%${q}%` } }
+                ]
+            },
+            limit: 8,
+            order: [['nome', 'ASC']],
+            attributes: ['id', 'nome', 'telefone']
+        });
+
+        res.json({ clientes });
+    } catch (e) {
+        res.status(500).json({ clientes: [] });
+    }
+});
+
+// ── Criar cliente manualmente (admin) ──
+router.post('/clientes', isAdminAuthenticated, async (req, res) => {
+    try {
+        const { nome, telefone, nascimento, observacao } = req.body;
+        if (!nome || !telefone) return res.status(400).json({ erro: 'Nome e telefone são obrigatórios.' });
+
+        const telNormalizado = normalizarTelefone(telefone);
+
+        const existente = await Cliente.findOne({ 
+            where: { telefone: telNormalizado, idEmpresa: req.user.idEmpresa } 
+        });
+        if (existente) return res.status(409).json({ erro: 'Já existe um cliente com este telefone.' });
+
+        const cliente = await Cliente.create({
+            nome: nome.trim(),
+            telefone: telNormalizado,
+            nascimento: nascimento || null,
+            observacao: observacao?.trim() || null,
+            idEmpresa: req.user.idEmpresa
+        });
+
+        res.json({ sucesso: true, cliente: { id: cliente.id, nome: cliente.nome, telefone: cliente.telefone } });
+    } catch (error) {
+        res.status(500).json({ erro: error.message });
+    }
+});
+
 module.exports = router;

@@ -1,1056 +1,371 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --gold: #D4AF37;
-            --gold-glow: rgba(212, 175, 55, .18);
-            --bg: #0d0d0d;
-            --surface: #161616;
-            --card: #1a1a1a;
-            --card-border: rgba(212, 175, 55, .15);
-            --text: #e8e8e8;
-            --muted: #666;
-            --danger: #e05454;
-            --success: #4caf7d;
-            --radius: 12px;
-            --font-main: 'Rajdhani', sans-serif;
+            --gold: #D4AF37; --gold-glow: rgba(212,175,55,.18);
+            --bg: #0d0d0d; --surface: #161616; --card: #1a1a1a;
+            --card-border: rgba(212,175,55,.15); --text: #e8e8e8;
+            --muted: #666; --danger: #e05454; --success: #4caf7d;
+            --radius: 12px; --font-main: 'Rajdhani', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
+            --header-h: 56px;
+            --footer-h: 240px;
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html,
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: var(--font-main);
-            height: 100%;
-            overflow: hidden;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-main); }
 
         header {
-            background: #000;
-            border-bottom: 1px solid var(--card-border);
-            padding: 0 24px;
-            height: 56px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            position: fixed; top: 0; left: 0; right: 0; height: var(--header-h);
+            background: #000; border-bottom: 1px solid var(--card-border);
+            padding: 0 20px; z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
         }
 
-        #toast {
+        .area-itens {
             position: fixed;
-            top: 16px;
-            right: 16px;
-            z-index: 9999;
-            background: var(--success);
-            color: #fff;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
-            display: none;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, .5);
-            max-width: 320px;
-        }
-
-        #toast.error {
-            background: var(--danger);
-        }
-
-        #toast.show {
-            display: flex;
-        }
-
-        .app-wrapper {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .pdv-container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-            min-height: 0;
-        }
-
-        .panel-left {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            border-right: 1px solid var(--card-border);
-            background: var(--bg);
-            overflow: hidden;
-            min-width: 0;
-            min-height: 0;
+            top: var(--header-h); left: 0; right: 0; bottom: var(--footer-h);
+            display: flex; flex-direction: column; overflow: hidden;
         }
 
         .search-area {
-            padding: 16px;
-            background: var(--surface);
-            border-bottom: 1px solid var(--card-border);
-            flex-shrink: 0;
+            background: var(--surface); border-bottom: 1px solid var(--card-border);
+            padding: 14px 16px; flex-shrink: 0;
         }
+        .search-row { display: flex; gap: 10px; align-items: flex-end; }
+        .input-group { position: relative; flex: 1; }
+        .input-group label { display: block; color: var(--gold); font-size: 11px; text-transform: uppercase; margin-bottom: 5px; font-weight: 600; letter-spacing: 1px; }
 
-        .search-row {
-            display: flex;
-            gap: 10px;
+        input, select {
+            width: 100%; background: var(--card); border: 1px solid var(--card-border);
+            border-radius: 8px; color: #fff; padding: 10px 12px;
+            font-family: var(--font-main); font-size: 15px; outline: none; transition: border-color .2s;
         }
+        input:focus { border-color: var(--gold); }
 
-        .input-group {
-            position: relative;
-            flex: 1;
-        }
+        .items-list { flex: 1; overflow-y: auto; padding: 14px 16px; }
 
-        .input-group label {
-            display: block;
-            color: var(--gold);
-            font-size: 11px;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-            font-weight: 600;
-            letter-spacing: 1px;
+        .area-footer {
+            position: fixed; bottom: 0; left: 0; right: 0; height: var(--footer-h);
+            background: #050505; border-top: 1px solid var(--card-border);
+            padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; z-index: 100;
         }
-
-        input,
-        select {
-            width: 100%;
-            background: var(--card);
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            color: #fff;
-            padding: 10px 12px;
-            font-family: var(--font-main);
-            font-size: 15px;
-            outline: none;
-            transition: border-color .2s;
-        }
-
-        input:focus {
-            border-color: var(--gold);
-        }
-
-        .items-list {
-            flex: 1;
-            padding: 16px;
-            overflow-y: auto;
-        }
-
-        /* ── ITEM DO CARRINHO ── */
-        .sale-item {
-            background: var(--card);
-            border-left: 4px solid var(--gold);
-            padding: 12px 14px;
-            margin-bottom: 10px;
-            border-radius: 0 8px 8px 0;
-            animation: fadeIn .2s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-4px);
-            }
-
-            to {
-                opacity: 1;
-                transform: none;
-            }
-        }
-
-        .sale-item-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .sale-item-name {
-            font-weight: bold;
-            font-size: 15px;
-        }
-
-        .sale-item-qty {
-            font-size: 12px;
-            color: var(--gold);
-            margin-top: 3px;
-        }
-
-        .sale-item-right {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-            font-family: var(--font-mono);
-            font-weight: bold;
-            white-space: nowrap;
-        }
-
-        .sale-item-edit {
-            background: none;
-            border: none;
-            color: var(--gold);
-            cursor: pointer;
-            font-size: 15px;
-            padding: 2px 5px;
-            border-radius: 4px;
-            transition: background .2s;
-            line-height: 1;
-        }
-
-        .sale-item-edit:hover {
-            background: var(--gold-glow);
-        }
-
-        .btn-remove {
-            background: none;
-            border: none;
-            color: var(--danger);
-            cursor: pointer;
-            font-size: 15px;
-            padding: 2px 5px;
-            border-radius: 4px;
-            transition: background .2s;
-        }
-
-        .btn-remove:hover {
-            background: rgba(224, 84, 84, .15);
-        }
-
-        /* ── PAINEL EDIÇÃO INLINE ── */
-        .edit-row {
-            display: none;
-            gap: 8px;
-            align-items: center;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid var(--card-border);
-        }
-
-        .edit-row.open {
-            display: flex;
-        }
-
-        .edit-row input {
-            background: var(--surface);
-            border: 1px solid var(--gold);
-            color: #fff;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-family: var(--font-mono);
-        }
-
-        .edit-row label {
-            font-size: 11px;
-            color: var(--muted);
-            white-space: nowrap;
-        }
-
-        .edit-field {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-            flex: 1;
-        }
-
-        .btn-confirm {
-            background: var(--gold);
-            color: #000;
-            border: none;
-            padding: 7px 14px;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        /* ── PAINEL DIREITO ── */
-        .panel-right {
-            padding: 20px;
-            background: #050505;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            width: 340px;
-            flex-shrink: 0;
-            height: 100%;
-            overflow-y: auto; 
-            overflow: hidden;
-        }
-
-        .panel-right-footer {
-            margin-top: auto;        /* empurra para o fundo */
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            flex-shrink: 0;
-        }
-        /* lista de itens scrolla sozinha */
-        .items-list {
-            flex: 1;
-            padding: 16px;
-            overflow-y: auto;
-            min-height: 0;
-            /* 👈 essencial para o flex+scroll funcionar */
-        }
+        .footer-row { display: flex; gap: 10px; }
+        .footer-row .input-group { flex: 1; }
 
         .total-box {
-            background: var(--card);
-            padding: 18px 20px;
-            border-radius: var(--radius);
-            text-align: right;
-            border: 1px solid var(--card-border);
+            background: var(--card); padding: 10px 16px;
+            border-radius: var(--radius); border: 1px solid var(--card-border);
+            display: flex; align-items: center; justify-content: space-between;
         }
+        .total-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+        .total-value { font-family: var(--font-mono); font-size: 26px; color: var(--gold); font-weight: 600; }
 
-        .total-label {
-            color: var(--muted);
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .total-value {
-            font-family: var(--font-mono);
-            font-size: 38px;
-            color: var(--gold);
-            font-weight: 600;
-            margin-top: 4px;
-        }
-
+        .footer-actions { display: flex; gap: 10px; }
         .btn-finish {
-            background: var(--gold);
-            color: #000;
-            border: none;
-            padding: 18px;
-            border-radius: var(--radius);
-            font-weight: 700;
-            font-size: 17px;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 0;
-            /* 👈 era auto */
-            transition: opacity .2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            flex: 1; background: var(--gold); color: #000; border: none;
+            padding: 12px; border-radius: var(--radius); font-weight: 700; font-size: 15px;
+            cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: opacity .2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
+        .btn-finish:hover { opacity: .88; }
+        .btn-finish:disabled { opacity: .4; cursor: not-allowed; }
 
-        .btn-finish:hover {
-            opacity: .88;
-        }
-
-        .btn-finish:disabled {
-            opacity: .4;
-            cursor: not-allowed;
-        }
-
-        /* ── LINK FECHAMENTO ── */
         .link-fechamento {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            color: var(--muted);
-            font-size: 13px;
-            text-decoration: none;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid var(--card-border);
-            transition: color .2s, border-color .2s;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            color: var(--muted); font-size: 12px; text-decoration: none;
+            padding: 12px 14px; border-radius: var(--radius);
+            border: 1px solid var(--card-border); transition: color .2s, border-color .2s; white-space: nowrap;
         }
+        .link-fechamento:hover { color: var(--gold); border-color: var(--gold); }
 
-        .link-fechamento:hover {
-            color: var(--gold);
-            border-color: var(--gold);
+        .sale-item {
+            background: var(--card); border-left: 4px solid var(--gold);
+            padding: 11px 13px; margin-bottom: 8px; border-radius: 0 8px 8px 0;
+            animation: fadeIn .2s ease;
         }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
+        .sale-item-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+        .sale-item-name { font-weight: bold; font-size: 14px; }
+        .sale-item-qty  { font-size: 11px; color: var(--gold); margin-top: 2px; }
+        .sale-item-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; font-family: var(--font-mono); font-weight: bold; font-size: 14px; white-space: nowrap; }
 
+        .btn-edit-item { background: none; border: none; color: var(--gold); cursor: pointer; font-size: 14px; padding: 2px 4px; border-radius: 4px; transition: background .2s; }
+        .btn-edit-item:hover { background: var(--gold-glow); }
+        .btn-remove { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 14px; padding: 2px 4px; border-radius: 4px; }
+        .btn-remove:hover { background: rgba(224,84,84,.15); }
 
-        /* ── SCANNER CÂMERA ── */
-        .btn-camera-pdv {
-            background: var(--card);
-            border: 1px solid var(--card-border);
-            color: var(--gold);
-            width: 44px;
-            height: 44px;
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            font-size: 20px;
-            transition: border-color .2s, background .2s;
-            align-self: flex-end;
-        }
+        .edit-row { display: none; gap: 8px; align-items: center; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--card-border); }
+        .edit-row.open { display: flex; }
+        .edit-row input { background: var(--surface); border: 1px solid var(--gold); color: #fff; padding: 5px 8px; border-radius: 6px; font-size: 13px; font-family: var(--font-mono); }
+        .edit-row label { font-size: 10px; color: var(--muted); white-space: nowrap; }
+        .edit-field { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+        .btn-ok { background: var(--gold); color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
 
-        .btn-camera-pdv:hover {
-            border-color: var(--gold);
-            background: var(--gold-glow);
-        }
+        .empty-state { text-align: center; margin-top: 50px; opacity: .25; pointer-events: none; }
+        .empty-state span { font-size: 44px; display: block; margin-bottom: 8px; }
 
-        .scanner-pdv {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 500;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-        }
+        #toast { position: fixed; top: 70px; right: 16px; z-index: 9999; background: var(--success); color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 15px; font-weight: 600; display: none; align-items: center; gap: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.5); max-width: 320px; }
+        #toast.error { background: var(--danger); }
+        #toast.show  { display: flex; }
 
-        .scanner-pdv.open {
-            display: flex;
-        }
+        .spinner { width: 15px; height: 15px; border: 2px solid rgba(0,0,0,.2); border-top-color: #000; border-radius: 50%; animation: spin .6s linear infinite; display: inline-block; }
+        .spinner.light { border-color: rgba(255,255,255,.2); border-top-color: var(--gold); }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .scanner-pdv-box {
-            position: relative;
-            width: 100%;
-            max-width: 380px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 2px solid var(--gold);
-            background: #000;
-        }
+        #suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #222; z-index: 200; border-radius: 0 0 8px 8px; max-height: 260px; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,.6); border: 1px solid var(--card-border); border-top: none; }
+        .sugestao-item { padding: 11px 14px; border-bottom: 1px solid var(--card-border); cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 14px; transition: background .15s; }
+        .sugestao-item:last-child { border-bottom: none; }
+        .sugestao-item:hover { background: var(--gold-glow); }
+        .sugestao-item.sem-result { color: var(--muted); justify-content: center; cursor: default; }
+        .sugestao-item.loading { color: var(--muted); justify-content: center; font-style: italic; }
+        .sugestao-price { color: var(--gold); font-family: var(--font-mono); font-weight: 600; white-space: nowrap; }
+        .sugestao-estoque { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
-        .scanner-pdv video {
-            width: 100%;
-            max-height: 280px;
-            object-fit: cover;
-            display: block;
-        }
+        .btn-camera-pdv { background: var(--card); border: 1px solid var(--card-border); color: var(--gold); width: 44px; height: 44px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px; transition: border-color .2s; }
+        .btn-camera-pdv:hover { border-color: var(--gold); }
 
-        .scanner-pdv-line {
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 50%;
-            height: 2px;
-            background: var(--gold);
-            opacity: 0.8;
-            animation: scanpdv 1.8s ease-in-out infinite;
-        }
+        .scanner-pdv { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.95); z-index: 500; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+        .scanner-pdv.open { display: flex; }
+        .scanner-pdv-box { position: relative; width: 100%; max-width: 380px; border-radius: 12px; overflow: hidden; border: 2px solid var(--gold); background: #000; }
+        .scanner-pdv video { width: 100%; max-height: 280px; object-fit: cover; display: block; }
+        .scanner-pdv-line { position: absolute; left: 0; right: 0; top: 50%; height: 2px; background: var(--gold); opacity: .8; animation: scanpdv 1.8s ease-in-out infinite; }
+        @keyframes scanpdv { 0%{top:15%} 50%{top:85%} 100%{top:15%} }
+        .scanner-pdv-msg { color: rgba(255,255,255,.6); font-size: 13px; text-align: center; }
+        .btn-fechar-scanner-pdv { background: var(--card); border: 1px solid var(--card-border); color: var(--text); padding: 12px 32px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: var(--font-main); }
+        .btn-fechar-scanner-pdv:hover { border-color: var(--danger); color: var(--danger); }
 
-        @keyframes scanpdv {
-            0% {
-                top: 15%;
-            }
-
-            50% {
-                top: 85%;
-            }
-
-            100% {
-                top: 15%;
-            }
-        }
-
-        .scanner-pdv-msg {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 13px;
-            letter-spacing: 1px;
-            text-align: center;
-        }
-
-        .btn-fechar-scanner-pdv {
-            background: var(--card);
-            border: 1px solid var(--card-border);
-            color: var(--text);
-            padding: 12px 32px;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: var(--font-main);
-            letter-spacing: 1px;
-        }
-
-        .btn-fechar-scanner-pdv:hover {
-            border-color: var(--danger);
-            color: var(--danger);
-        }
-
-        /* ── SUGESTÕES ── */
-        #suggestions {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: #222;
-            z-index: 200;
-            border-radius: 0 0 8px 8px;
-            max-height: 300px;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, .6);
-            border: 1px solid var(--card-border);
-            border-top: none;
-        }
-
-        .sugestao-item {
-            padding: 12px 14px;
-            border-bottom: 1px solid var(--card-border);
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-            transition: background .15s;
-        }
-
-        .sugestao-item:last-child {
-            border-bottom: none;
-        }
-
-        .sugestao-item:hover {
-            background: var(--gold-glow);
-        }
-
-        .sugestao-item.sem-result {
-            color: var(--muted);
-            justify-content: center;
-            cursor: default;
-        }
-
-        .sugestao-item.loading {
-            color: var(--muted);
-            justify-content: center;
-            cursor: default;
-            font-style: italic;
-        }
-
-        .sugestao-price {
-            color: var(--gold);
-            font-family: var(--font-mono);
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .sugestao-estoque {
-            font-size: 11px;
-            color: var(--muted);
-            margin-top: 2px;
-        }
-
-        /* ── EMPTY ── */
-        .empty-state {
-            text-align: center;
-            margin-top: 60px;
-            opacity: .25;
-            pointer-events: none;
-        }
-
-        .empty-state span {
-            font-size: 48px;
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        /* ── SPINNER ── */
-        .spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(0, 0, 0, .2);
-            border-top-color: #000;
-            border-radius: 50%;
-            animation: spin .6s linear infinite;
-            display: inline-block;
-        }
-
-        .spinner.light {
-            border-color: rgba(255, 255, 255, .2);
-            border-top-color: var(--gold);
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* ── MOBILE ── */
         @media (max-width: 640px) {
-
-            html,
-            body {
-                overflow: auto;
-                height: auto;
-            }
-
-            .app-wrapper {
-                height: auto;
-                overflow: visible;
-            }
-
-            .pdv-container {
-                flex-direction: column;
-                overflow: visible;
-                min-height: unset;
-            }
-
-            .panel-left {
-                border-right: none;
-                border-bottom: 1px solid var(--card-border);
-                overflow: visible;
-                min-height: unset;
-                flex: none;
-            }
-
-            .items-list {
-                overflow: visible;
-                max-height: none;
-            }
-
-            .panel-right {
-                width: 100%;
-                padding: 16px;
-                gap: 12px;
-                overflow-y: visible;
-            }
-            
-            .panel-right-footer {
-                margin-top: 0;
-                position: sticky;      /* 👈 fica visível ao rolar */
-                bottom: 0;
-                background: #050505;
-                padding: 12px 0 4px;
-                z-index: 10;
-            }
-
-            .total-value {
-                font-size: 30px;
-            }
-
-            .btn-finish {
-                font-size: 16px;
-                padding: 16px;
-            }
+            :root { --footer-h: 312px; }
+            .footer-row { flex-direction: column; gap: 8px; }
+            .total-value { font-size: 22px; }
         }
     </style>
 </head>
-
 <body>
+<div id="toast"></div>
 
-    <div id="toast"></div>
+<header>
+    <a href="/admin" style="text-decoration:none;color:var(--gold);display:flex;align-items:center;gap:5px;font-weight:600;font-size:14px;">&#8592; VOLTAR</a>
+</header>
 
-    <div class="app-wrapper">
-        <header>
-            <a href="/admin"
-                style="text-decoration:none;color:var(--gold);display:flex;align-items:center;gap:5px;font-weight:600;font-size:14px;">
-                &#8592; VOLTAR
-            </a>
-        </header>
-
-        <div class="pdv-container">
-
-            <!-- PAINEL ESQUERDO -->
-            <div class="panel-left">
-                <div class="search-area">
-                    <div class="search-row">
-                        <div class="input-group">
-                            <label>Buscar Produto</label>
-                            <input type="text" id="buscaInput" placeholder="Toque para listar ou filtre pelo nome..."
-                                autocomplete="off">
-                            <div id="suggestions"></div>
-                        </div>
-                        <div class="input-group" style="max-width:72px;">
-                            <label>Qtd</label>
-                            <input type="number" id="qtdInput" value="1" min="1">
-                        </div>
-                        <button type="button" class="btn-camera-pdv" id="btnCameraPdv"
-                            title="Escanear c&#243;digo de barras">&#128247;</button>
-                    </div>
-                </div>
-
-                <!-- Scanner câmera PDV -->
-                <div class="scanner-pdv" id="scannerPdv">
-                    <div class="scanner-pdv-box">
-                        <video id="scannerPdvVideo" playsinline muted></video>
-                        <div class="scanner-pdv-line"></div>
-                    </div>
-                    <div class="scanner-pdv-msg">Aponte para o c&#243;digo de barras do produto</div>
-                    <button type="button" class="btn-fechar-scanner-pdv" onclick="fecharScannerPdv()">&#215; Fechar
-                        C&#226;mera</button>
-                </div>
-                <div class="items-list" id="listaItens">
-                    <div class="empty-state" id="emptyMsg">
-                        <span>&#128717;</span>
-                        <p>Carrinho vazio</p>
-                    </div>
-                </div>
+<div class="area-itens">
+    <div class="search-area">
+        <div class="search-row">
+            <div class="input-group">
+                <label>Buscar Produto</label>
+                <input type="text" id="buscaInput" placeholder="Toque para listar ou filtre..." autocomplete="off">
+                <div id="suggestions"></div>
             </div>
-
-            <!-- PAINEL DIREITO -->
-            <div class="panel-right">
-                <!-- Lista de itens aqui dentro -->                
-                <div class="input-group">
-                    <label>Forma de Pagamento</label>
-                    <select id="formaPagamento">
-                        <option value="Dinheiro">Dinheiro</option>
-                        <option value="Pix">Pix</option>
-                        <option value="Cartao Debito">Cartão Débito</option>
-                        <option value="Cartao Credito">Cartão Crédito</option>
-                    </select>
-                </div>
-
-                    <!-- 👇 tudo que não pode sumir fica aqui -->
-                <div class="panel-right-footer">
-                    <div class="input-group">
-                        <label>Desconto (R$)</label>
-                        <input type="number" id="descontoInput" value="0" step="0.01" min="0">
-                    </div>                
-                    <div class="total-box">
-                        <div class="total-label">Total a Pagar</div>
-                        <div class="total-value" id="totalGeralDisplay">R$ 0,00</div>
-                    </div>
-
-                    <button class="btn-finish" id="btnFinalizar" onclick="finalizarVenda()">
-                        &#10004; Finalizar Venda
-                    </button>
-
-                    <a href="/admin/fechamento" class="link-fechamento">
-                        &#128196; Fechamento de Caixa
-                    </a>
-                </div>
-
+            <div class="input-group" style="max-width:72px;">
+                <label>Qtd</label>
+                <input type="number" id="qtdInput" value="1" min="1">
+            </div>
+            <button type="button" class="btn-camera-pdv" id="btnCameraPdv">&#128247;</button>
         </div>
     </div>
 
-    <script>
-        var itensVenda = [];
-        var debounceTimer = null;
-        var buscaInput = document.getElementById('buscaInput');
-        var suggestionsEl = document.getElementById('suggestions');
+    <div class="scanner-pdv" id="scannerPdv">
+        <div class="scanner-pdv-box">
+            <video id="scannerPdvVideo" playsinline muted></video>
+            <div class="scanner-pdv-line"></div>
+        </div>
+        <div class="scanner-pdv-msg">Aponte para o c&#243;digo de barras</div>
+        <button type="button" class="btn-fechar-scanner-pdv" onclick="fecharScannerPdv()">&#215; Fechar C&#226;mera</button>
+    </div>
 
-        /* TOAST */
-        function toast(msg, tipo) {
-            var el = document.getElementById('toast');
-            el.textContent = msg;
-            el.className = 'show' + (tipo === 'error' ? ' error' : '');
-            clearTimeout(el._t);
-            el._t = setTimeout(function () { el.className = ''; }, 3500);
-        }
+    <div class="items-list" id="listaItens">
+        <div class="empty-state"><span>&#128717;</span><p>Carrinho vazio</p></div>
+    </div>
+</div>
 
-        /* SUGESTOES */
-        function fecharSugestoes() {
-            suggestionsEl.innerHTML = '';
-            suggestionsEl._cache = null;
-        }
+<div class="area-footer">
+    <div class="footer-row">
+        <div class="input-group">
+            <label>Forma de Pagamento</label>
+            <select id="formaPagamento">
+                <option value="Dinheiro">Dinheiro</option>
+                <option value="Pix">Pix</option>
+                <option value="Cartao Debito">Cart&#227;o D&#233;bito</option>
+                <option value="Cartao Credito">Cart&#227;o Cr&#233;dito</option>
+            </select>
+        </div>
+        <div class="input-group" style="max-width:130px;">
+            <label>Desconto (R$)</label>
+            <input type="number" id="descontoInput" value="0" step="0.01" min="0">
+        </div>
+    </div>
+    <div class="total-box">
+        <span class="total-label">Total a Pagar</span>
+        <span class="total-value" id="totalGeralDisplay">R$ 0,00</span>
+    </div>
+    <div class="footer-actions">
+        <button class="btn-finish" id="btnFinalizar" onclick="finalizarVenda()">&#10004; Finalizar Venda</button>
+        <a href="/admin/fechamento" class="link-fechamento">&#128196; Caixa</a>
+    </div>
+</div>
 
-        buscaInput.addEventListener('focus', function () {
-            if (!suggestionsEl.innerHTML) buscarProdutos(buscaInput.value.trim());
-        });
+<script>
+    var itensVenda = [], debounceTimer = null;
+    var buscaInput = document.getElementById('buscaInput');
+    var suggestionsEl = document.getElementById('suggestions');
 
-        buscaInput.addEventListener('input', function (e) {
-            clearTimeout(debounceTimer);
-            var termo = e.target.value.trim();
-            var delay = /^\d{6,}$/.test(termo) ? 200 : 350;
-            debounceTimer = setTimeout(function () { buscarProdutos(termo); }, delay);
-        });
+    function toast(msg, tipo) {
+        var el = document.getElementById('toast');
+        el.textContent = msg; el.className = 'show' + (tipo === 'error' ? ' error' : '');
+        clearTimeout(el._t); el._t = setTimeout(function(){ el.className = ''; }, 3500);
+    }
 
-        function buscarProdutos(termo) {
-            suggestionsEl.innerHTML = '<div class="sugestao-item loading"><span class="spinner light"></span>&nbsp;Buscando...</div>';
-            var url = '/admin/vendas/produtos' + (termo ? '?busca=' + encodeURIComponent(termo) : '');
-            fetch(url, { credentials: 'include' })
-                .then(function (res) {
-                    var ct = res.headers.get('content-type') || '';
-                    if (!ct.includes('application/json')) {
-                        suggestionsEl.innerHTML = '<div class="sugestao-item sem-result">Sess&#227;o expirada &#8212; recarregue</div>';
-                        return;
-                    }
-                    return res.json().then(function (json) {
-                        if (!res.ok) throw new Error(json.message || 'Erro na busca');
-                        var lista = json.data || [];
-                        if (/^\d{6,}$/.test(termo)) {
-                            var exato = null;
-                            for (var k = 0; k < lista.length; k++) {
-                                if (String(lista[k].codbarras) === termo) { exato = lista[k]; break; }
-                            }
-                            if (exato) { adicionarProduto(exato); fecharSugestoes(); return; }
+    function fecharSugestoes() { suggestionsEl.innerHTML = ''; suggestionsEl._cache = null; }
+
+    buscaInput.addEventListener('focus', function() { if (!suggestionsEl.innerHTML) buscarProdutos(''); });
+    buscaInput.addEventListener('input', function(e) {
+        clearTimeout(debounceTimer);
+        var t = e.target.value.trim();
+        debounceTimer = setTimeout(function(){ buscarProdutos(t); }, /^\d{6,}$/.test(t) ? 200 : 350);
+    });
+
+    function buscarProdutos(termo) {
+        suggestionsEl.innerHTML = '<div class="sugestao-item loading"><span class="spinner light"></span>&nbsp;Buscando...</div>';
+        fetch('/admin/vendas/produtos' + (termo ? '?busca=' + encodeURIComponent(termo) : ''), { credentials: 'include' })
+            .then(function(res) {
+                var ct = res.headers.get('content-type') || '';
+                if (!ct.includes('application/json')) { suggestionsEl.innerHTML = '<div class="sugestao-item sem-result">Sess&#227;o expirada</div>'; return; }
+                return res.json().then(function(json) {
+                    if (!res.ok) throw new Error(json.message || 'Erro');
+                    var lista = json.data || [];
+                    if (/^\d{6,}$/.test(termo)) {
+                        for (var k = 0; k < lista.length; k++) {
+                            if (String(lista[k].codbarras) === termo) { adicionarProduto(lista[k]); fecharSugestoes(); return; }
                         }
-                        renderSugestoes(lista);
-                    });
-                })
-                .catch(function (err) {
-                    suggestionsEl.innerHTML = '<div class="sugestao-item sem-result">&#9888; ' + err.message + '</div>';
-                });
-        }
-
-        function renderSugestoes(produtos) {
-            if (!produtos.length) {
-                suggestionsEl.innerHTML = '<div class="sugestao-item sem-result">Nenhum produto encontrado</div>';
-                return;
-            }
-            suggestionsEl._cache = produtos;
-            var html = '';
-            for (var i = 0; i < produtos.length; i++) {
-                var p = produtos[i];
-                html += '<div class="sugestao-item" data-idx="' + i + '">'
-                    + '<div><div>' + p.descricao + '</div>'
-                    + '<div class="sugestao-estoque">Estoque: ' + (p.estoque != null ? p.estoque : '&mdash;') + '</div></div>'
-                    + '<span class="sugestao-price">R$ ' + fmtNum(p.preco) + '</span>'
-                    + '</div>';
-            }
-            suggestionsEl.innerHTML = html;
-            var els = suggestionsEl.querySelectorAll('.sugestao-item[data-idx]');
-            for (var j = 0; j < els.length; j++) {
-                els[j].addEventListener('click', (function (idx) {
-                    return function () {
-                        var prod = (suggestionsEl._cache || [])[idx];
-                        if (prod) { adicionarProduto(prod); fecharSugestoes(); }
-                    };
-                })(j));
-            }
-        }
-
-        document.addEventListener('click', function (e) {
-            if (!e.target.closest('.input-group')) fecharSugestoes();
-        });
-
-        /* CARRINHO */
-        function adicionarProduto(produto) {
-            var qtd = Math.max(1, parseInt(document.getElementById('qtdInput').value) || 1);
-            var existente = null;
-            for (var i = 0; i < itensVenda.length; i++) {
-                if (itensVenda[i].produto_id === produto.id) { existente = itensVenda[i]; break; }
-            }
-            if (existente) {
-                existente.quantidade += qtd;
-                existente.subtotal = existente.preco_unitario * existente.quantidade;
-            } else {
-                itensVenda.push({
-                    produto_id: produto.id,
-                    descricao: produto.descricao,
-                    preco_unitario: parseFloat(produto.preco),
-                    quantidade: qtd,
-                    subtotal: parseFloat(produto.preco) * qtd
-                });
-            }
-            document.getElementById('qtdInput').value = 1;
-            buscaInput.value = '';
-            renderItens();
-            buscaInput.focus();
-        }
-
-        function renderItens() {
-            var container = document.getElementById('listaItens');
-            if (!itensVenda.length) {
-                container.innerHTML = '<div class="empty-state"><span>&#128717;</span><p>Carrinho vazio</p></div>';
-                atualizarTotal();
-                return;
-            }
-            var html = '';
-            for (var i = 0; i < itensVenda.length; i++) {
-                var item = itensVenda[i];
-                html += '<div class="sale-item" data-idx="' + i + '">'
-
-                    /* linha principal */
-                    + '<div class="sale-item-top">'
-                    + '<div>'
-                    + '<div class="sale-item-name">' + item.descricao + '</div>'
-                    + '<div class="sale-item-qty">' + item.quantidade + 'x &nbsp;R$ ' + fmtNum(item.preco_unitario) + '</div>'
-                    + '</div>'
-                    + '<div class="sale-item-right">'
-                    + 'R$ ' + fmtNum(item.subtotal)
-                    + '<button class="sale-item-edit btn-edit" data-idx="' + i + '" title="Editar">&#9998;</button>'
-                    + '<button class="btn-remove" data-idx="' + i + '" title="Remover">&#x2715;</button>'
-                    + '</div>'
-                    + '</div>'
-
-                    /* painel edição inline */
-                    + '<div class="edit-row" id="editRow' + i + '">'
-                    + '<div class="edit-field">'
-                    + '<label>Qtd</label>'
-                    + '<input type="number" class="edit-qtd" value="' + item.quantidade + '" min="1" style="width:80px;">'
-                    + '</div>'
-                    + '<div class="edit-field">'
-                    + '<label>Pre&#231;o unit. R$</label>'
-                    + '<input type="number" class="edit-preco" value="' + item.preco_unitario.toFixed(2) + '" step="0.01" min="0" style="width:110px;">'
-                    + '</div>'
-                    + '<button class="btn-confirm btn-salvar" data-idx="' + i + '">OK</button>'
-                    + '</div>'
-
-                    + '</div>';
-            }
-            container.innerHTML = html;
-
-            /* eventos dos botões */
-            var btnsEdit = container.querySelectorAll('.btn-edit');
-            var btnsRemove = container.querySelectorAll('.btn-remove');
-            var btnsSalvar = container.querySelectorAll('.btn-salvar');
-
-            for (var j = 0; j < btnsEdit.length; j++) {
-                btnsEdit[j].addEventListener('click', (function (idx) {
-                    return function () {
-                        var row = document.getElementById('editRow' + idx);
-                        row.classList.toggle('open');
-                    };
-                })(j));
-            }
-
-            for (var k = 0; k < btnsRemove.length; k++) {
-                btnsRemove[k].addEventListener('click', (function (idx) {
-                    return function () { itensVenda.splice(idx, 1); renderItens(); };
-                })(k));
-            }
-
-            for (var m = 0; m < btnsSalvar.length; m++) {
-                btnsSalvar[m].addEventListener('click', (function (idx) {
-                    return function () {
-                        var row = document.getElementById('editRow' + idx);
-                        var novaQtd = Math.max(1, parseFloat(row.querySelector('.edit-qtd').value) || 1);
-                        var novoPreco = Math.max(0, parseFloat(row.querySelector('.edit-preco').value) || 0);
-                        itensVenda[idx].quantidade = novaQtd;
-                        itensVenda[idx].preco_unitario = novoPreco;
-                        itensVenda[idx].subtotal = novaQtd * novoPreco;
-                        renderItens();
-                    };
-                })(m));
-            }
-
-            atualizarTotal();
-        }
-
-        function atualizarTotal() {
-            var subtotal = 0;
-            for (var i = 0; i < itensVenda.length; i++) subtotal += itensVenda[i].subtotal;
-            var desconto = parseFloat(document.getElementById('descontoInput').value) || 0;
-            document.getElementById('totalGeralDisplay').textContent = 'R$ ' + fmtNum(Math.max(0, subtotal - desconto));
-        }
-        document.getElementById('descontoInput').addEventListener('input', atualizarTotal);
-
-        /* FINALIZAR */
-        function finalizarVenda() {
-            if (!itensVenda.length) { toast('Adicione pelo menos um item!', 'error'); return; }
-            var btn = document.getElementById('btnFinalizar');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span>&nbsp;Salvando...';
-
-            var payload = {
-                forma_pagamento: document.getElementById('formaPagamento').value,
-                desconto: parseFloat(document.getElementById('descontoInput').value) || 0,
-                itens: itensVenda.map(function (i) {
-                    return { produto_id: i.produto_id, quantidade: i.quantidade, preco_unitario: i.preco_unitario };
-                })
-            };
-
-            fetch('/admin/vendas', {
-                method: 'POST', credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-                .then(function (res) {
-                    var ct = res.headers.get('content-type') || '';
-                    if (!ct.includes('application/json')) throw new Error('Sess\u00e3o expirada \u2014 recarregue');
-                    return res.json().then(function (json) {
-                        if (!res.ok) throw new Error(json.message || 'Erro ao salvar venda');
-                        toast('Venda #' + json.data.id + ' registrada! \u2714');
-                        itensVenda = [];
-                        document.getElementById('descontoInput').value = 0;
-                        renderItens();
-                        buscaInput.focus();
-                    });
-                })
-                .catch(function (err) { toast('Erro: ' + err.message, 'error'); })
-                .finally(function () { btn.disabled = false; btn.innerHTML = '&#10004; Finalizar Venda'; });
-        }
-
-        function fmtNum(n) { return parseFloat(n).toFixed(2).replace('.', ','); }
-
-        /* ══════════════════════════════════════
-           SCANNER CÂMERA — PDV
-        ══════════════════════════════════════ */
-        var pdvStream = null;
-        var pdvLoop = null;
-
-        document.getElementById('btnCameraPdv').addEventListener('click', function () {
-            var box = document.getElementById('scannerPdv');
-            box.classList.contains('open') ? fecharScannerPdv() : abrirScannerPdv();
-        });
-
-        function abrirScannerPdv() {
-            var box = document.getElementById('scannerPdv');
-            var video = document.getElementById('scannerPdvVideo');
-            box.classList.add('open');
-
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-                .then(function (stream) {
-                    pdvStream = stream;
-                    video.srcObject = stream;
-                    video.play();
-
-                    if ('BarcodeDetector' in window) {
-                        var detector = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'code_128', 'code_39', 'upc_a', 'upc_e', 'qr_code'] });
-                        pdvLoop = setInterval(function () {
-                            detector.detect(video).then(function (res) {
-                                if (res.length) codigoLidoPdv(res[0].rawValue);
-                            }).catch(function () { });
-                        }, 400);
-                    } else {
-                        var s = document.createElement('script');
-                        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/zxing-js/0.20.0/zxing.min.js';
-                        s.onload = function () {
-                            try {
-                                var reader = new ZXing.BrowserMultiFormatReader();
-                                reader.decodeFromVideoElement(video, function (result) {
-                                    if (result) { codigoLidoPdv(result.getText()); reader.reset(); }
-                                });
-                                if (pdvStream) pdvStream._zxing = reader;
-                            } catch (e) { }
-                        };
-                        if (!document.querySelector('script[src*="zxing"]')) document.head.appendChild(s);
-                        else if (typeof ZXing !== 'undefined') s.onload();
                     }
-                })
-                .catch(function (err) {
-                    alert('C\u00e2mera n\u00e3o dispon\u00edvel: ' + err.message);
-                    fecharScannerPdv();
+                    renderSugestoes(lista);
                 });
-        }
+            })
+            .catch(function(err) { suggestionsEl.innerHTML = '<div class="sugestao-item sem-result">&#9888; ' + err.message + '</div>'; });
+    }
 
-        function codigoLidoPdv(codigo) {
-            fecharScannerPdv();
-            buscaInput.value = codigo;
-            if (navigator.vibrate) navigator.vibrate(120);
-            buscarProdutos(codigo);
+    function renderSugestoes(lista) {
+        if (!lista.length) { suggestionsEl.innerHTML = '<div class="sugestao-item sem-result">Nenhum produto encontrado</div>'; return; }
+        suggestionsEl._cache = lista;
+        var html = '';
+        for (var i = 0; i < lista.length; i++) {
+            var p = lista[i];
+            html += '<div class="sugestao-item" data-idx="' + i + '"><div><div>' + p.descricao + '</div><div class="sugestao-estoque">Estoque: ' + (p.estoque != null ? p.estoque : '&mdash;') + '</div></div><span class="sugestao-price">R$ ' + fmtNum(p.preco) + '</span></div>';
         }
-        function fecharScannerPdv() {
-            document.getElementById('scannerPdv').classList.remove('open');
-            if (pdvLoop) { clearInterval(pdvLoop); pdvLoop = null; }
-            if (pdvStream) {
-                if (pdvStream._zxing) {
-                    try { pdvStream._zxing.reset(); } catch (e) { }
+        suggestionsEl.innerHTML = html;
+        suggestionsEl.querySelectorAll('[data-idx]').forEach(function(el) {
+            el.addEventListener('click', function() {
+                var prod = (suggestionsEl._cache || [])[parseInt(el.dataset.idx)];
+                if (prod) { adicionarProduto(prod); fecharSugestoes(); }
+            });
+        });
+    }
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('#suggestions') && !e.target.closest('#buscaInput')) fecharSugestoes();
+    });
+
+    function adicionarProduto(produto) {
+        var qtd = Math.max(1, parseInt(document.getElementById('qtdInput').value) || 1);
+        var existente = null;
+        for (var i = 0; i < itensVenda.length; i++) { if (itensVenda[i].produto_id === produto.id) { existente = itensVenda[i]; break; } }
+        if (existente) { existente.quantidade += qtd; existente.subtotal = existente.preco_unitario * existente.quantidade; }
+        else { itensVenda.push({ produto_id: produto.id, descricao: produto.descricao, preco_unitario: parseFloat(produto.preco), quantidade: qtd, subtotal: parseFloat(produto.preco) * qtd }); }
+        document.getElementById('qtdInput').value = 1;
+        buscaInput.value = '';
+        renderItens();
+        setTimeout(function() { buscaInput.focus(); buscarProdutos(''); }, 120);
+    }
+
+    function renderItens() {
+        var c = document.getElementById('listaItens');
+        if (!itensVenda.length) { c.innerHTML = '<div class="empty-state"><span>&#128717;</span><p>Carrinho vazio</p></div>'; atualizarTotal(); return; }
+        var html = '';
+        for (var i = 0; i < itensVenda.length; i++) {
+            var it = itensVenda[i];
+            html += '<div class="sale-item"><div class="sale-item-top"><div><div class="sale-item-name">' + it.descricao + '</div><div class="sale-item-qty">' + it.quantidade + 'x &nbsp;R$ ' + fmtNum(it.preco_unitario) + '</div></div><div class="sale-item-right">R$ ' + fmtNum(it.subtotal) + '<button class="btn-edit-item" data-idx="' + i + '">&#9998;</button><button class="btn-remove" data-idx="' + i + '">&#x2715;</button></div></div><div class="edit-row" id="er' + i + '"><div class="edit-field"><label>Qtd</label><input type="number" class="eq" value="' + it.quantidade + '" min="1" style="width:75px;"></div><div class="edit-field"><label>Pre&#231;o R$</label><input type="number" class="ep" value="' + it.preco_unitario.toFixed(2) + '" step="0.01" min="0" style="width:100px;"></div><button class="btn-ok" data-idx="' + i + '">OK</button></div></div>';
+        }
+        c.innerHTML = html;
+        c.querySelectorAll('.btn-edit-item').forEach(function(b) { b.addEventListener('click', function() { document.getElementById('er' + b.dataset.idx).classList.toggle('open'); }); });
+        c.querySelectorAll('.btn-remove').forEach(function(b) { b.addEventListener('click', function() { itensVenda.splice(parseInt(b.dataset.idx), 1); renderItens(); }); });
+        c.querySelectorAll('.btn-ok').forEach(function(b) {
+            b.addEventListener('click', function() {
+                var idx = parseInt(b.dataset.idx), row = document.getElementById('er' + idx);
+                var q = Math.max(1, parseFloat(row.querySelector('.eq').value) || 1);
+                var p = Math.max(0, parseFloat(row.querySelector('.ep').value) || 0);
+                itensVenda[idx].quantidade = q; itensVenda[idx].preco_unitario = p; itensVenda[idx].subtotal = q * p;
+                renderItens();
+            });
+        });
+        atualizarTotal();
+    }
+
+    function atualizarTotal() {
+        var sub = 0; for (var i = 0; i < itensVenda.length; i++) sub += itensVenda[i].subtotal;
+        var desc = parseFloat(document.getElementById('descontoInput').value) || 0;
+        document.getElementById('totalGeralDisplay').textContent = 'R$ ' + fmtNum(Math.max(0, sub - desc));
+    }
+    document.getElementById('descontoInput').addEventListener('input', atualizarTotal);
+
+    function finalizarVenda() {
+        if (!itensVenda.length) { toast('Adicione pelo menos um item!', 'error'); return; }
+        var btn = document.getElementById('btnFinalizar');
+        btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>&nbsp;Salvando...';
+        fetch('/admin/vendas', {
+            method: 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ forma_pagamento: document.getElementById('formaPagamento').value, desconto: parseFloat(document.getElementById('descontoInput').value) || 0, itens: itensVenda.map(function(i){ return { produto_id: i.produto_id, quantidade: i.quantidade, preco_unitario: i.preco_unitario }; }) })
+        })
+        .then(function(res) {
+            var ct = res.headers.get('content-type') || '';
+            if (!ct.includes('application/json')) throw new Error('Sess\u00e3o expirada');
+            return res.json().then(function(json) {
+                if (!res.ok) throw new Error(json.message || 'Erro ao salvar');
+                toast('Venda #' + json.data.id + ' registrada! \u2714');
+                itensVenda = []; document.getElementById('descontoInput').value = 0;
+                renderItens();
+                setTimeout(function(){ buscaInput.focus(); buscarProdutos(''); }, 120);
+            });
+        })
+        .catch(function(err){ toast('Erro: ' + err.message, 'error'); })
+        .finally(function(){ btn.disabled = false; btn.innerHTML = '&#10004; Finalizar Venda'; });
+    }
+
+    function fmtNum(n) { return parseFloat(n).toFixed(2).replace('.', ','); }
+
+    var pdvStream = null, pdvLoop = null;
+    document.getElementById('btnCameraPdv').addEventListener('click', function() {
+        document.getElementById('scannerPdv').classList.contains('open') ? fecharScannerPdv() : abrirScannerPdv();
+    });
+    function abrirScannerPdv() {
+        var video = document.getElementById('scannerPdvVideo');
+        document.getElementById('scannerPdv').classList.add('open');
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+            .then(function(stream) {
+                pdvStream = stream; video.srcObject = stream; video.play();
+                if ('BarcodeDetector' in window) {
+                    var det = new BarcodeDetector({ formats: ['ean_13','ean_8','code_128','code_39','upc_a','upc_e','qr_code'] });
+                    pdvLoop = setInterval(function() { det.detect(video).then(function(r){ if (r.length) codigoLidoPdv(r[0].rawValue); }).catch(function(){}); }, 400);
+                } else {
+                    var s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/zxing-js/0.20.0/zxing.min.js';
+                    s.onload = function() { try { var reader = new ZXing.BrowserMultiFormatReader(); reader.decodeFromVideoElement(video, function(result){ if (result) { codigoLidoPdv(result.getText()); reader.reset(); } }); if (pdvStream) pdvStream._zxing = reader; } catch(e){} };
+                    if (!document.querySelector('script[src*="zxing"]')) document.head.appendChild(s); else if (typeof ZXing !== 'undefined') s.onload();
                 }
-                pdvStream.getTracks().forEach(function (t) { t.stop(); });
-                pdvStream = null;
-            }
-            var video = document.getElementById('scannerPdvVideo');
-            if (video) { video.srcObject = null; }
-        }
-    </script>
+            })
+            .catch(function(err){ alert('C\u00e2mera n\u00e3o dispon\u00edvel: ' + err.message); fecharScannerPdv(); });
+    }
+    function codigoLidoPdv(codigo) { fecharScannerPdv(); buscaInput.value = codigo; if (navigator.vibrate) navigator.vibrate(120); buscarProdutos(codigo); }
+    function fecharScannerPdv() {
+        document.getElementById('scannerPdv').classList.remove('open');
+        if (pdvLoop) { clearInterval(pdvLoop); pdvLoop = null; }
+        if (pdvStream) { if (pdvStream._zxing) { try { pdvStream._zxing.reset(); } catch(e){} } pdvStream.getTracks().forEach(function(t){ t.stop(); }); pdvStream = null; }
+        document.getElementById('scannerPdvVideo').srcObject = null;
+    }
+</script>
 </body>
-
 </html>

@@ -4,6 +4,12 @@ const router          = express.Router();
 const vendaController = require('../controllers/vendaController');
 const { isAdminAuthenticated } = require('../middlewares/adminMiddleware');
 
+// Dashboard de vendas — página
+router.get('/admin/dashboard/vendas', isAdminAuthenticated, vendaController.viewDashboardVendas);
+
+// Dashboard de vendas — dados JSON
+router.get('/admin/dashboard/vendas/dados', isAdminAuthenticated, vendaController.dashboardVendas);
+
 // PDV — busca produtos
 router.get('/admin/vendas/produtos', isAdminAuthenticated, vendaController.buscarProdutos);
 

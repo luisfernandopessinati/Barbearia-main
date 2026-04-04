@@ -43,6 +43,11 @@
                     <span class="item-label"><span>Dashboard</span><small>Análises e relatórios</small></span>
                     <span class="item-badge">Novo</span>
                 </button>
+                <button class="config-dropdown-item" id="menu-dashboard-vendas">
+                    <span class="item-icon">🛒</span>
+                    <span class="item-label"><span>Dashboard Vendas</span><small>Relatórios de vendas</small></span>
+                    <span class="item-badge">Novo</span>
+                </button>
                 <button class="config-dropdown-item" id="menu-vendas">
                     <span class="item-icon">🛍️</span>
                     <span class="item-label"><span>Vendas</span><small>Área de vendas</small></span>
@@ -1860,6 +1865,7 @@
     bindMenuItemToModal('menu-empresa', 'modal-empresa-overlay', carregarDadosEmpresa);
 
     document.getElementById('menu-dashboard').addEventListener('click', () => { toggleDropdown(false); window.location.href = '/admin/dashboard'; });
+    document.getElementById('menu-dashboard-vendas').addEventListener('click', () => { toggleDropdown(false); window.location.href = '/admin/dashboard/vendas'; });
     document.getElementById('menu-produtos').addEventListener('click', () => { toggleDropdown(false); window.location.href = '/admin/produtos'; });
     document.getElementById('menu-vendas').addEventListener('click', () => { toggleDropdown(false); window.location.href = '/admin/vendas'; });
 

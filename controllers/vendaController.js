@@ -186,3 +186,103 @@ exports.cancelar = async (req, res) => {
 exports.viewFechamento = (req, res) => {
     res.render('fechamento_caixa');
 };
+
+/* ─────────────────────────────────────────────
+   GET /admin/dashboard/vendas
+   Renderiza a página do dashboard de vendas.
+───────────────────────────────────────────── */
+exports.viewDashboardVendas = (req, res) => {
+    res.render('dashboard_vendas');
+};
+
+/* ─────────────────────────────────────────────
+   GET /admin/dashboard/vendas/dados?inicio=&fim=
+   Retorna dados analytics de vendas.
+───────────────────────────────────────────── */
+exports.dashboardVendas = async (req, res) => {
+    try {
+        const idEmpresa = req.user.idEmpresa;
+        const fim    = req.query.fim    ? new Date(req.query.fim    + 'T23:59:59') : new Date();
+        const inicio = req.query.inicio ? new Date(req.query.inicio + 'T00:00:00')
+                                        : new Date(fim.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+        const vendas = await Venda.findAll({
+            where: {
+                idEmpresa,
+                status_pagamento: { [Op.ne]: 'cancelado' },
+                createdAt: { [Op.between]: [inicio, fim] }
+            },
+            include: [{
+                model: VendaItem,
+                as: 'Itens',
+                include: [{ model: Produto, as: 'Produto', attributes: ['descricao'] }]
+            }],
+            order: [['createdAt', 'ASC']]
+        });
+
+        const lista = vendas.map(v => v.get({ plain: true }));
+
+        // ── KPIs ──────────────────────────────────────────
+        const totalVendas      = lista.length;
+        const faturamentoTotal = lista.reduce((s, v) => s + parseFloat(v.total_final || 0), 0);
+        const totalDesconto    = lista.reduce((s, v) => s + parseFloat(v.desconto || 0), 0);
+        const ticketMedio      = totalVendas > 0 ? faturamentoTotal / totalVendas : 0;
+
+        // ── Evolução diária ────────────────────────────────
+        const evolucao = {};
+        lista.forEach(v => {
+            const d = new Date(v.createdAt);
+            const dia = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            if (!evolucao[dia]) evolucao[dia] = { faturamento: 0, quantidade: 0 };
+            evolucao[dia].faturamento += parseFloat(v.total_final || 0);
+            evolucao[dia].quantidade  += 1;
+        });
+
+        // ── Formas de pagamento ────────────────────────────
+        const formasPagamento = {};
+        lista.forEach(v => {
+            const forma = v.forma_pagamento || 'outro';
+            if (!formasPagamento[forma]) formasPagamento[forma] = { count: 0, valor: 0 };
+            formasPagamento[forma].count += 1;
+            formasPagamento[forma].valor += parseFloat(v.total_final || 0);
+        });
+
+        // ── Top produtos ───────────────────────────────────
+        const produtosMap = {};
+        lista.forEach(v => {
+            (v.Itens || []).forEach(item => {
+                const nome = item.Produto?.descricao || `Produto #${item.produto_id}`;
+                if (!produtosMap[nome]) produtosMap[nome] = { quantidade: 0, faturamento: 0 };
+                produtosMap[nome].quantidade  += parseFloat(item.quantidade || 0);
+                produtosMap[nome].faturamento += parseFloat(item.subtotal || 0);
+            });
+        });
+        const topProdutos = Object.entries(produtosMap)
+            .sort((a, b) => b[1].faturamento - a[1].faturamento)
+            .slice(0, 10)
+            .map(([nome, d]) => ({ nome, ...d }));
+
+        const topProduto = topProdutos[0] || null;
+
+        res.json({
+            periodo: {
+                inicio: inicio.toISOString().split('T')[0],
+                fim:    fim.toISOString().split('T')[0]
+            },
+            kpis: {
+                totalVendas,
+                faturamentoTotal: faturamentoTotal.toFixed(2),
+                ticketMedio:      ticketMedio.toFixed(2),
+                totalDesconto:    totalDesconto.toFixed(2),
+                topProduto
+            },
+            evolucao,
+            formasPagamento,
+            topProdutos
+        });
+
+    } catch (err) {
+        console.error('[dashboardVendas]', err);
+        res.status(500).json({ erro: err.message });
+    }
+};

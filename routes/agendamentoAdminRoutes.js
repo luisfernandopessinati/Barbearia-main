@@ -6,13 +6,21 @@ const Agendamento = require('../models/Agendamento');
 const Servico = require('../models/servico');
 const { Op } = require('sequelize');
 
+function normalizarTelefone(tel) {
+    const numeros = tel.replace(/\D/g, '');
+    const semDDI = numeros.startsWith('55') && numeros.length >= 12 ? numeros.slice(2) : numeros;
+    if (semDDI.length === 11) return `(${semDDI.slice(0, 2)}) ${semDDI.slice(2, 7)}-${semDDI.slice(7)}`;
+    if (semDDI.length === 10) return `(${semDDI.slice(0, 2)}) ${semDDI.slice(2, 6)}-${semDDI.slice(6)}`;
+    return semDDI;
+}
+
 // ── Editar agendamento ──
 router.get('/editar/:id', isAdminAuthenticated, async (req, res) => {
     try {
         const id = req.params.id;
         const idEmpresa = req.user.idEmpresa;
         const [agendamento, admins, servicos] = await Promise.all([
-            Agendamento.findByPk(id, { where: { idEmpresa } }),
+            Agendamento.findOne({ where: { id, idEmpresa } }),
             Admin.findAll({ where: { idEmpresa }, attributes: ['id', 'nome'] }),
             Servico.findAll({ where: { ativo: true, idEmpresa }, order: [['nome', 'ASC']] })
         ]);
@@ -37,7 +45,7 @@ router.post('/editar/:id', isAdminAuthenticated, (req, res) => {
     Agendamento.update(
         {
             nome: req.body.nome,
-            telefone: req.body.telefone,
+            telefone: normalizarTelefone(req.body.telefone),
             data: req.body.data,
             horario: req.body.horario,
             servico: req.body.servico,
@@ -52,7 +60,7 @@ router.post('/editar/:id', isAdminAuthenticated, (req, res) => {
 
 // ── Deletar agendamento ──
 router.get('/deletar/:id', isAdminAuthenticated, (req, res) => {
-    Agendamento.destroy({ where: { id: req.params.id } })
+    Agendamento.destroy({ where: { id: req.params.id, idEmpresa: req.user.idEmpresa } })
         .then(() => res.redirect('/admin'))
         .catch(() => res.send('Erro ao excluir o agendamento'));
 });

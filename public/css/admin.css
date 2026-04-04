@@ -179,17 +179,17 @@ body {
 }
 
 :root {
-    --gold: #b8860b;
-    --gold-light: #d4a012;
-    --gold-dim: #b8860b33;
+    --gold: #c9950f;
+    --gold-light: #dba813;
+    --gold-dim: #c9950f33;
     --bg: #090909;
     --bg2: #111111;
-    --bg3: #181818;
-    --border: #222222;
-    --text: #e8e8e8;
-    --muted: #555;
-    --danger: #c0392b;
-    --danger-dim: #c0392b22;
+    --bg3: #1c1c1c;
+    --border: #2e2e2e;
+    --text: #f0f0f0;
+    --muted: #8a8a8a;
+    --danger: #e74c3c;
+    --danger-dim: #e74c3c22;
 }
 
 body {
@@ -241,7 +241,7 @@ body {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 13px;
     letter-spacing: 4px;
-    color: var(--muted);
+    color: var(--text);
     text-transform: uppercase;
 }
 
@@ -593,7 +593,8 @@ body {
 */
 .cal-event {
     background: var(--bg3) !important;
-    border: 1px solid var(--border) !important;
+    border: 1px solid #3a3a3a !important;
+    border-left: 3px solid var(--gold) !important;
     border-radius: 4px !important;
     transition: transform 0.2s, border-color 0.2s;
     padding: 5px !important;
@@ -609,7 +610,7 @@ body {
 
 .cal-event-nome {
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
     color: #fff;
     display: block;
     white-space: nowrap;
@@ -619,7 +620,7 @@ body {
 
 .cal-event-tel {
     font-size: 10px;
-    color: rgba(255, 255, 255, 0.75);
+    color: rgba(255, 255, 255, 0.88);
     display: block;
     white-space: nowrap;
     overflow: hidden;

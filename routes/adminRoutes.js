@@ -235,7 +235,7 @@ router.post('/admin/agendar', isAdminAuthenticated, async (req, res) => {
             barbeiro,
             nome: isCompromisso ? (req.body.motivo || 'Compromisso') : nome,
             email: null,
-            telefone: isCompromisso ? '999999999' : telefone,
+            telefone: isCompromisso ? '999999999' : normalizarTelefone(telefone),
             data, horario: hiInicio,
             servico: isCompromisso ? null : servico,
             valor, idEmpresa,
@@ -276,7 +276,7 @@ router.post('/admin/pacote', isAdminAuthenticated, async (req, res) => {
 
         const pacote = await Pacote.create({
             idEmpresa: req.user.idEmpresa, servico_id,
-            cliente_nome: nome, cliente_telefone: telefone,
+            cliente_nome: nome, cliente_telefone: normalizarTelefone(telefone),
             total_sessoes: sessoesArray.length, status: 'pendente'
         });
 
@@ -285,7 +285,7 @@ router.post('/admin/pacote', isAdminAuthenticated, async (req, res) => {
 
         for (const s of sessoesArray) {
             const ag = await Agendamento.create({
-                barbeiro, nome, telefone, email: null,
+                barbeiro, nome, telefone: normalizarTelefone(telefone), email: null,
                 data: s.data, horario: s.hora_inicio,
                 hora_inicio: s.hora_inicio, hora_fim: s.hora_fim,
                 servico, valor, idEmpresa: req.user.idEmpresa,

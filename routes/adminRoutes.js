@@ -297,6 +297,18 @@ router.post('/admin/pacote', isAdminAuthenticated, async (req, res) => {
                 { replacements: { pacoteId: pacote.id, id: ag.id, idEmpresa: req.user.idEmpresa }, type: QueryTypes.UPDATE }
             );
         }
+        // Cria/atualiza o cliente igual ao agendamento simples
+        if (nome && telefone) {
+            const telNormalizado = normalizarTelefone(telefone);
+            const [cliente] = await Cliente.findOrCreate({
+                where: { telefone: telNormalizado, idEmpresa: req.user.idEmpresa },
+                defaults: { nome: nome.trim(), telefone: telNormalizado, idEmpresa: req.user.idEmpresa }
+            });
+            if (cliente.nome !== nome.trim()) {
+                await cliente.update({ nome: nome.trim() });
+            }
+        }
+
         return res.status(200).json({ sucesso: true, pacote_id: pacote.id });
     } catch (e) {
         return res.status(500).json({ erro: e.message });
@@ -343,10 +355,26 @@ router.patch('/agendamentos/:id/pago', isAdminAuthenticated, async (req, res) =>
 router.get('/admin/agendamentos-json', isAdminAuthenticated, async (req, res) => {
     try {
         const agendamentos = await Agendamento.findAll({
-            where: { empresa_id: req.session.adminUser.empresa_id },
+            where: { idEmpresa: req.user.idEmpresa },
             order: [['data', 'ASC'], ['horario', 'ASC']]
         });
-        res.json({ agendamentos });
+        const formatados = agendamentos.map(a => {
+            const d = new Date(a.data);
+            d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+            return {
+                id: a.id,
+                nome: a.nome,
+                telefone: a.telefone,
+                data: `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`,
+                horario: a.horario,
+                hora_fim: a.hora_fim ? a.hora_fim.substring(0, 5) : '',
+                servico: a.servico,
+                barbeiro: a.barbeiro,
+                pago: a.pago || 0,
+                pacote_id: a.pacote_id || null
+            };
+        });
+        res.json({ agendamentos: formatados });
     } catch (e) {
         res.status(500).json({ erro: 'Erro ao buscar agendamentos' });
     }

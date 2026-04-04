@@ -144,10 +144,58 @@
             .footer-row { flex-direction: column; gap: 8px; }
             .total-value { font-size: 22px; }
         }
+
+        /* ── Modal Impressão ── */
+        .print-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,.85); z-index: 1000;
+            align-items: center; justify-content: center;
+        }
+        .print-overlay.open { display: flex; }
+        .print-modal {
+            background: #161616; border: 1px solid rgba(212,175,55,.25);
+            border-radius: 16px; padding: 32px 28px; width: 90%; max-width: 380px;
+            text-align: center;
+        }
+        .print-modal-icon { font-size: 36px; margin-bottom: 12px; }
+        .print-modal-title { font-size: 20px; font-weight: 700; color: var(--gold); letter-spacing: 1px; margin-bottom: 6px; }
+        .print-modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+        .print-modal-btns { display: flex; flex-direction: column; gap: 10px; }
+        .btn-print-venda {
+            background: var(--gold); color: #000; border: none;
+            padding: 13px; border-radius: 10px; font-weight: 700; font-size: 15px;
+            cursor: pointer; letter-spacing: .5px; transition: opacity .2s;
+        }
+        .btn-print-venda:hover { opacity: .85; }
+        .btn-print-presente {
+            background: none; color: var(--text); border: 1px solid rgba(212,175,55,.4);
+            padding: 13px; border-radius: 10px; font-weight: 600; font-size: 15px;
+            cursor: pointer; transition: border-color .2s, color .2s;
+        }
+        .btn-print-presente:hover { border-color: var(--gold); color: var(--gold); }
+        .btn-print-skip {
+            background: none; color: var(--muted); border: none;
+            padding: 10px; font-size: 13px; cursor: pointer; transition: color .2s;
+        }
+        .btn-print-skip:hover { color: var(--text); }
     </style>
 </head>
 <body>
 <div id="toast"></div>
+
+<!-- Modal de impressão -->
+<div class="print-overlay" id="printOverlay">
+    <div class="print-modal">
+        <div class="print-modal-icon">🧾</div>
+        <div class="print-modal-title" id="printModalVendaNum"></div>
+        <div class="print-modal-sub">Deseja imprimir o comprovante?</div>
+        <div class="print-modal-btns">
+            <button class="btn-print-venda" onclick="imprimirRecibo('venda')">🖨️ Imprimir Venda</button>
+            <button class="btn-print-presente" onclick="imprimirRecibo('presente')">🎁 Imprimir Presente</button>
+            <button class="btn-print-skip" onclick="fecharPrintModal()">✕ Não imprimir</button>
+        </div>
+    </div>
+</div>
 
 <header>
     <a href="/admin" style="text-decoration:none;color:var(--gold);display:flex;align-items:center;gap:5px;font-weight:600;font-size:14px;">&#8592; VOLTAR</a>
@@ -312,28 +360,134 @@
     }
     document.getElementById('descontoInput').addEventListener('input', atualizarTotal);
 
+    var _ultimaVenda = null;
+    var EMPRESA_NOME = '{{empresaNome}}';
+
     function finalizarVenda() {
         if (!itensVenda.length) { toast('Adicione pelo menos um item!', 'error'); return; }
         var btn = document.getElementById('btnFinalizar');
         btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>&nbsp;Salvando...';
+        var forma = document.getElementById('formaPagamento').value;
+        var desconto = parseFloat(document.getElementById('descontoInput').value) || 0;
+        var itensCopia = itensVenda.slice();
         fetch('/admin/vendas', {
             method: 'POST', credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ forma_pagamento: document.getElementById('formaPagamento').value, desconto: parseFloat(document.getElementById('descontoInput').value) || 0, itens: itensVenda.map(function(i){ return { produto_id: i.produto_id, quantidade: i.quantidade, preco_unitario: i.preco_unitario }; }) })
+            body: JSON.stringify({ forma_pagamento: forma, desconto: desconto, itens: itensCopia.map(function(i){ return { produto_id: i.produto_id, quantidade: i.quantidade, preco_unitario: i.preco_unitario }; }) })
         })
         .then(function(res) {
             var ct = res.headers.get('content-type') || '';
             if (!ct.includes('application/json')) throw new Error('Sess\u00e3o expirada');
             return res.json().then(function(json) {
                 if (!res.ok) throw new Error(json.message || 'Erro ao salvar');
-                toast('Venda #' + json.data.id + ' registrada! \u2714');
+                _ultimaVenda = {
+                    id: json.data.id,
+                    total_final: json.data.total_final,
+                    forma_pagamento: forma,
+                    desconto: desconto,
+                    itens: itensCopia,
+                    data: new Date()
+                };
                 itensVenda = []; document.getElementById('descontoInput').value = 0;
                 renderItens();
-                setTimeout(function(){ buscaInput.focus(); buscarProdutos(''); }, 120);
+                abrirPrintModal(_ultimaVenda.id);
             });
         })
         .catch(function(err){ toast('Erro: ' + err.message, 'error'); })
         .finally(function(){ btn.disabled = false; btn.innerHTML = '&#10004; Finalizar Venda'; });
+    }
+
+    function abrirPrintModal(vendaId) {
+        document.getElementById('printModalVendaNum').textContent = 'Venda #' + vendaId + ' registrada ✔';
+        document.getElementById('printOverlay').classList.add('open');
+    }
+
+    function fecharPrintModal() {
+        document.getElementById('printOverlay').classList.remove('open');
+        setTimeout(function(){ buscaInput.focus(); buscarProdutos(''); }, 120);
+    }
+
+    function imprimirRecibo(tipo) {
+        fecharPrintModal();
+        var v = _ultimaVenda;
+        if (!v) return;
+
+        var agora = v.data;
+        var dataFmt = String(agora.getDate()).padStart(2,'0') + '/' +
+                      String(agora.getMonth()+1).padStart(2,'0') + '/' +
+                      agora.getFullYear();
+        var horaFmt = String(agora.getHours()).padStart(2,'0') + ':' +
+                      String(agora.getMinutes()).padStart(2,'0');
+
+        var linhasItens = '';
+        var subtotal = 0;
+        v.itens.forEach(function(it) {
+            subtotal += it.subtotal;
+            if (tipo === 'venda') {
+                linhasItens += '<tr>' +
+                    '<td>' + it.descricao + '</td>' +
+                    '<td style="text-align:center">' + it.quantidade + 'x</td>' +
+                    '<td style="text-align:right">R$ ' + fmtNum(it.preco_unitario) + '</td>' +
+                    '<td style="text-align:right"><strong>R$ ' + fmtNum(it.subtotal) + '</strong></td>' +
+                    '</tr>';
+            } else {
+                linhasItens += '<tr>' +
+                    '<td>' + it.descricao + '</td>' +
+                    '<td style="text-align:center">' + it.quantidade + 'x</td>' +
+                    '</tr>';
+            }
+        });
+
+        var mapaForma = { 'Dinheiro':'Dinheiro', 'Pix':'Pix', 'Cartao Debito':'Cartão Débito', 'Cartao Credito':'Cartão Crédito' };
+        var formaNome = mapaForma[v.forma_pagamento] || v.forma_pagamento;
+
+        var rodape = tipo === 'venda'
+            ? '<tr><td colspan="3" style="text-align:right;padding-top:6px;color:#666">Subtotal</td><td style="text-align:right;padding-top:6px">R$ ' + fmtNum(subtotal) + '</td></tr>' +
+              (v.desconto > 0 ? '<tr><td colspan="3" style="text-align:right;color:#c0392b">Desconto</td><td style="text-align:right;color:#c0392b">- R$ ' + fmtNum(v.desconto) + '</td></tr>' : '') +
+              '<tr><td colspan="3" style="text-align:right;padding-top:8px;font-size:16px;font-weight:700">TOTAL</td><td style="text-align:right;padding-top:8px;font-size:16px;font-weight:700">R$ ' + fmtNum(v.total_final) + '</td></tr>' +
+              '<tr><td colspan="4" style="padding-top:10px;color:#666;font-size:12px">Pagamento: <strong>' + formaNome + '</strong></td></tr>'
+            : '';
+
+        var tabelaHeader = tipo === 'venda'
+            ? '<tr style="border-bottom:1px solid #ddd"><th style="text-align:left">Produto</th><th style="text-align:center">Qtd</th><th style="text-align:right">Unit.</th><th style="text-align:right">Total</th></tr>'
+            : '<tr style="border-bottom:1px solid #ddd"><th style="text-align:left">Produto</th><th style="text-align:center">Qtd</th></tr>';
+
+        var tituloRecibo = tipo === 'venda' ? 'COMPROVANTE DE VENDA' : 'COMPROVANTE DE PRESENTE';
+        var msgFinal = tipo === 'venda'
+            ? '<p style="margin-top:16px;font-size:12px;color:#666">Guarde este comprovante para possíveis trocas.</p>'
+            : '<p style="margin-top:16px;font-size:13px;color:#333">🎁 Com carinho para você!</p>' +
+              '<p style="margin-top:8px;font-size:11px;color:#888">Este item pode ser trocado em até 30 dias<br>mediante apresentação deste comprovante.</p>';
+
+        var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+            '<title>' + tituloRecibo + '</title>' +
+            '<style>' +
+            '  body { font-family: Arial, sans-serif; font-size: 13px; color: #222; max-width: 420px; margin: 20px auto; padding: 0 16px; }' +
+            '  .header { text-align: center; border-bottom: 2px solid #222; padding-bottom: 12px; margin-bottom: 14px; }' +
+            '  .header h1 { font-size: 18px; margin: 0 0 4px; }' +
+            '  .header .sub { font-size: 11px; color: #666; }' +
+            '  .info { display: flex; justify-content: space-between; font-size: 11px; color: #555; margin-bottom: 14px; }' +
+            '  table { width: 100%; border-collapse: collapse; }' +
+            '  td, th { padding: 5px 4px; font-size: 12px; }' +
+            '  .divider { border: none; border-top: 1px dashed #999; margin: 12px 0; }' +
+            '  .footer { text-align: center; margin-top: 20px; border-top: 1px dashed #999; padding-top: 12px; }' +
+            '  @media print { body { margin: 0; } }' +
+            '</style></head><body>' +
+            '<div class="header">' +
+            '  <h1>' + EMPRESA_NOME + '</h1>' +
+            '  <div class="sub">' + tituloRecibo + '</div>' +
+            '</div>' +
+            '<div class="info">' +
+            '  <span>Venda nº <strong>' + v.id + '</strong></span>' +
+            '  <span>' + dataFmt + ' às ' + horaFmt + '</span>' +
+            '</div>' +
+            '<table>' + tabelaHeader + linhasItens + '<tr><td colspan="4"><hr class="divider"></td></tr>' + rodape + '</table>' +
+            '<div class="footer">' + msgFinal + '</div>' +
+            '<script>window.onload=function(){window.print();window.onafterprint=function(){window.close();}}<\/script>' +
+            '</body></html>';
+
+        var win = window.open('', '_blank', 'width=500,height=700');
+        if (win) { win.document.write(html); win.document.close(); }
+        else toast('Permita pop-ups para imprimir.', 'error');
     }
 
     function fmtNum(n) { return parseFloat(n).toFixed(2).replace('.', ','); }

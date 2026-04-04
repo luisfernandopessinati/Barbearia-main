@@ -249,12 +249,16 @@ app.get('/logout', (req, res) => {
 });
 
 // Rota para abrir a tela de PDV (Vendas)
-app.get('/admin/vendas', isAdminAuthenticated, (req, res) => {
-    res.render('vendas', { 
-        // Aqui passamos o token que o JS da página vai precisar
-        // Se você usa JWT na sessão, pegue de lá
-        token: req.user ? jwt.sign({ id: req.user.id, idEmpresa: req.user.idEmpresa }, SECRET) : null 
-    });
+app.get('/admin/vendas', isAdminAuthenticated, async (req, res) => {
+    try {
+        const empresa = await Empresa.findByPk(req.user.idEmpresa, { attributes: ['fantasia', 'nome'] });
+        res.render('vendas', {
+            token: req.user ? jwt.sign({ id: req.user.id, idEmpresa: req.user.idEmpresa }, SECRET) : null,
+            empresaNome: empresa?.fantasia || empresa?.nome || 'Barbearia'
+        });
+    } catch (e) {
+        res.render('vendas', { token: null, empresaNome: 'Barbearia' });
+    }
 });
 
 // Rota para abrir a tela de Fechamento

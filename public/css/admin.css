@@ -1622,6 +1622,26 @@ body {
 
 /* ── Responsive ── */
 @media (max-width: 900px) {
+    html {
+        height: auto;
+        overflow: visible;
+    }
+
+    body {
+        height: auto;
+        min-height: 100dvh;
+        overflow-y: unset;
+    }
+
+    .adm-body {
+        min-height: unset;
+    }
+
+    .adm-content {
+        overflow-x: unset;
+        overflow-y: unset;
+    }
+
     .adm-header {
         padding: 14px 16px;
     }

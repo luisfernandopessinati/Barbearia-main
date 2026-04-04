@@ -1636,6 +1636,7 @@ body {
 
     .adm-content {
         padding: 16px;
+        overflow-x: unset;
     }
 
     .stats-bar {

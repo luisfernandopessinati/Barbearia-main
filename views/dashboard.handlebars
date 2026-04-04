@@ -312,7 +312,7 @@
             const labels = Object.keys(servicos);
             const valores = Object.values(servicos);
             const total   = valores.reduce((s, v) => s + v, 0);
-            const canvasId = `pizza-${barb.replace(/\s/g, '-')}`;
+            const canvasId = `pizza-${barb.replace(/[^a-zA-Z0-9]/g, '-')}`;
 
             const item = document.createElement('div');
             item.className = 'pizza-item';

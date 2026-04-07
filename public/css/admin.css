@@ -1697,12 +1697,13 @@ body {
         border-radius: 18px 18px 0 0;
         max-height: 90dvh;
         overflow-y: auto;
+         height: auto;  
         -webkit-overflow-scrolling: touch;
         padding-bottom: env(safe-area-inset-bottom, 20px);
     }
 
     #modal-overlay {
-        align-items: flex-end;
+        align-items: center;
         padding: 0;
     }
 

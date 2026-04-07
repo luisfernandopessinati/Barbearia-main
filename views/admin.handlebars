@@ -232,6 +232,18 @@
                         <option value="">Selecione Funcionário, serviço e data</option>
                     </select>
                 </div>
+                <div id="campoObservacao" class="modal-field full">
+                    <label>Observação</label>
+                    <textarea 
+                        name="observacao" 
+                        id="modal-observacao"
+                        rows="3"
+                        placeholder="Anotações sobre este agendamento..."
+                        style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;resize:vertical;"
+                        onfocus="this.style.borderColor='var(--gold)'"
+                        onblur="this.style.borderColor='var(--border)'">
+                    </textarea>
+                </div>
                 <input type="hidden" name="profissional_id" id="modal-profissional-id">
                 <input type="hidden" name="hora_inicio" id="modal-hora-inicio">
                 <input type="hidden" name="hora_fim" id="modal-hora-fim">
@@ -698,9 +710,13 @@
         document.getElementById('popup-whatsapp').href = `https://wa.me/55${tel}?text=${mensagem}`;
 
         popup.classList.add('open');
-        const rect = target.getBoundingClientRect(); // 👈 usa target aqui
-        popup.style.top = (rect.bottom + 8 + window.scrollY) + 'px';
-        popup.style.left = (rect.left + window.scrollX) + 'px';
+        const rect = target.getBoundingClientRect(); // 👈 usa target aqui  
+        popup.style.position = 'fixed';      
+        //popup.style.top = (rect.bottom + 8 + window.scrollY) + 'px';
+        //popup.style.left = (rect.left + window.scrollX) + 'px';
+        popup.style.top = (rect.bottom + 8) + 'px';
+        popup.style.left = rect.left + 'px';
+
         requestAnimationFrame(() => {
             const pr = popup.getBoundingClientRect();
             if (pr.right > window.innerWidth - 8) popup.style.left = (window.innerWidth - pr.width - 8) + 'px';

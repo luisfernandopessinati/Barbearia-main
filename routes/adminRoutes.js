@@ -242,7 +242,8 @@ router.post('/admin/agendar', isAdminAuthenticated, async (req, res) => {
             profissional_id: profissional_id || null,
             hora_inicio: hiInicio, hora_fim: hiFim || null,
             servico_id: isCompromisso ? null : (servico_id || null),
-            status: isCompromisso ? 'compromisso' : 'pendente'
+            status: isCompromisso ? 'compromisso' : 'pendente',
+            observacao: isCompromisso ? null : (req.body.observacao || null) 
         });
 
         // ✅ nome e telefone já estão disponíveis do topo — só usar direto

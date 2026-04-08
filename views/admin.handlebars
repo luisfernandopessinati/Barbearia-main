@@ -581,9 +581,9 @@
 <script>
     // ── Dados do backend ──────────────────────────────────
     const todosAgendamentos = [
-        {{ #each agendamentos }}
-    { id: { { id } }, nome: "{{nome}}", telefone: "{{telefone}}", data: "{{data}}", horario: "{{horario}}", hora_fim: "{{hora_fim}}", servico: "{{servico}}", barbeiro: "{{barbeiro}}", pago: { { #if pago } } 1{ {else } } 0{ {/if } }, pacote_id: "{{pacote_id}}" },
-    { {/each } }
+        {{#each agendamentos}}
+    { id: {{id}}, nome: "{{nome}}", telefone: "{{telefone}}", data: "{{data}}", horario: "{{horario}}", hora_fim: "{{hora_fim}}", servico: "{{servico}}", barbeiro: "{{barbeiro}}", pago: {{#if pago}} 1{{else}} 0{{/if}}, pacote_id: "{{pacote_id}}" },
+    {{/each}}
     ];
 
     const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];

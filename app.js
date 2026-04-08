@@ -24,8 +24,9 @@ const Pacote               = require('./models/Pacotes');
 const Venda                = require('./models/Venda');
 const VendaItem            = require('./models/VendaItem');
 const MovtoEstoque         = require('./models/MovtoEstoque');
-const LancEstoque    = require('./models/LancEstoque');
-const LancEstProduto = require('./models/LancEstProduto');
+const LancEstoque          = require('./models/LancEstoque');
+const LancEstProduto       = require('./models/LancEstProduto');
+const AgendamentoHistorico = require('./models/AgendamentoHistorico');
 
 // ─── Associations ─────────────────────────────────────────────────────────────
 Agendamento.belongsTo(Servico,   { foreignKey: 'servico_id',      as: 'Servico' });
@@ -39,6 +40,7 @@ MovtoEstoque.belongsTo(Produto,  { foreignKey: 'produto_id',  as: 'Produto' });
 
 LancEstoque.hasMany(LancEstProduto, { foreignKey: 'lancamento_id', as: 'Itens' });
 LancEstProduto.belongsTo(Produto,   { foreignKey: 'produto_id',    as: 'Produto' });
+AgendamentoHistorico.belongsTo(Empresa, { foreignKey: 'idEmpresa', as: 'Empresa' });
 // ─── Services / Helpers ───────────────────────────────────────────────────────
 const { getSlotsDisponiveis, minutesToTime, temColisao, timeToMinutes } = require('./services/slotService');
 const { verificarConflito } = require('./helpers/conflito');
@@ -131,6 +133,7 @@ app.use('/', require('./routes/servicoRoutes'));
 app.use('/', require('./routes/adminRoutes'));
 app.use('/', require('./routes/slotsRoutes'));
 app.use('/', require('./routes/agendamentoAdminRoutes'));
+
 
 
 // ─── Rotas API (web admin) ────────────────────────────────────────────────────

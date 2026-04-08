@@ -15,6 +15,7 @@ const { Op, QueryTypes } = require('sequelize');
 const sequelize = require('../config/db');
 const { verificarConflito } = require('../helpers/conflito');
 const { minutesToTime, temColisao } = require('../services/slotService');
+const registrarHistorico = require('../helpers/registrarHistorico');
 
 function normalizarTelefone(tel) {
     const numeros = tel.replace(/\D/g, '');
@@ -231,7 +232,7 @@ router.post('/admin/agendar', isAdminAuthenticated, async (req, res) => {
         const servicoObj = !isCompromisso ? await Servico.findOne({ where: { nome: servico, idEmpresa } }) : null;
         const valor = servicoObj ? parseFloat(servicoObj.valor) : 0;
 
-        await Agendamento.create({
+        const novoAgendamento = await Agendamento.create({
             barbeiro,
             nome: isCompromisso ? (req.body.motivo || 'Compromisso') : nome,
             email: null,
@@ -243,19 +244,25 @@ router.post('/admin/agendar', isAdminAuthenticated, async (req, res) => {
             hora_inicio: hiInicio, hora_fim: hiFim || null,
             servico_id: isCompromisso ? null : (servico_id || null),
             status: isCompromisso ? 'compromisso' : 'pendente',
-            observacao: isCompromisso ? null : (req.body.observacao || null) 
+            observacao: isCompromisso ? null : (req.body.observacao || null)
         });
 
-        // ✅ nome e telefone já estão disponíveis do topo — só usar direto
+        // ── Histórico ──
+        await registrarHistorico(
+            novoAgendamento,
+            'criado',
+            'admin',
+            req.user.id,
+            req.user.nome
+        );
+
         if (!isCompromisso && nome && telefone) {
             const telNormalizado = normalizarTelefone(telefone);
             const [cliente] = await Cliente.findOrCreate({
                 where: { telefone: telNormalizado, idEmpresa },
                 defaults: { nome: nome.trim(), telefone: telNormalizado, idEmpresa }
             });
-            if (cliente.nome !== nome.trim()) {
-                await cliente.update({ nome: nome.trim() });
-            }
+            if (cliente.nome !== nome.trim()) await cliente.update({ nome: nome.trim() });
         }
 
         return res.status(200).json({ sucesso: true });
@@ -263,7 +270,6 @@ router.post('/admin/agendar', isAdminAuthenticated, async (req, res) => {
         return res.status(500).json({ erro: error.message });
     }
 });
-
 // ── Admin pacote ──
 router.post('/admin/pacote', isAdminAuthenticated, async (req, res) => {
     const { nome, telefone, servico, servico_id, barbeiro, profissional_id, sessoes } = req.body;
@@ -297,17 +303,24 @@ router.post('/admin/pacote', isAdminAuthenticated, async (req, res) => {
                 'UPDATE Agendamentos SET pacote_id = :pacoteId WHERE id = :id AND idEmpresa = :idEmpresa',
                 { replacements: { pacoteId: pacote.id, id: ag.id, idEmpresa: req.user.idEmpresa }, type: QueryTypes.UPDATE }
             );
+
+            // ── Histórico por sessão ──
+            await registrarHistorico(
+                { ...ag.get({ plain: true }), pacote_id: pacote.id },
+                'criado',
+                'admin',
+                req.user.id,
+                req.user.nome
+            );
         }
-        // Cria/atualiza o cliente igual ao agendamento simples
+
         if (nome && telefone) {
             const telNormalizado = normalizarTelefone(telefone);
             const [cliente] = await Cliente.findOrCreate({
                 where: { telefone: telNormalizado, idEmpresa: req.user.idEmpresa },
                 defaults: { nome: nome.trim(), telefone: telNormalizado, idEmpresa: req.user.idEmpresa }
             });
-            if (cliente.nome !== nome.trim()) {
-                await cliente.update({ nome: nome.trim() });
-            }
+            if (cliente.nome !== nome.trim()) await cliente.update({ nome: nome.trim() });
         }
 
         return res.status(200).json({ sucesso: true, pacote_id: pacote.id });
@@ -315,7 +328,6 @@ router.post('/admin/pacote', isAdminAuthenticated, async (req, res) => {
         return res.status(500).json({ erro: e.message });
     }
 });
-
 // ── Marcar pago ──
 router.patch('/agendamentos/:id/pago', isAdminAuthenticated, async (req, res) => {
     try {
@@ -323,7 +335,7 @@ router.patch('/agendamentos/:id/pago', isAdminAuthenticated, async (req, res) =>
         const idEmpresa = req.user.idEmpresa;
 
         const rows = await sequelize.query(
-            'SELECT pago, pacote_id FROM Agendamentos WHERE id = :id AND idEmpresa = :idEmpresa',
+            'SELECT * FROM Agendamentos WHERE id = :id AND idEmpresa = :idEmpresa',
             { replacements: { id, idEmpresa }, type: QueryTypes.SELECT }
         );
         if (!rows.length) return res.status(404).json({ erro: 'Não encontrado' });
@@ -346,6 +358,16 @@ router.patch('/agendamentos/:id/pago', isAdminAuthenticated, async (req, res) =>
                 { replacements: { novoPago, id, idEmpresa }, type: QueryTypes.UPDATE }
             );
         }
+
+        // ── Histórico ──
+        await registrarHistorico(
+            { ...rows[0], pago: novoPago },
+            'pago',
+            'admin',
+            req.user.id,
+            req.user.nome
+        );
+
         return res.json({ sucesso: true, pago: novoPago });
     } catch (e) {
         return res.status(500).json({ erro: e.message });

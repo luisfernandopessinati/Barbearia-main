@@ -5,6 +5,7 @@ const Admin = require('../models/Admin');
 const Agendamento = require('../models/Agendamento');
 const Servico = require('../models/servico');
 const { Op } = require('sequelize');
+const registrarHistorico = require('../helpers/registrarHistorico'); // ← adicionar
 
 function normalizarTelefone(tel) {
     const numeros = tel.replace(/\D/g, '');
@@ -14,7 +15,7 @@ function normalizarTelefone(tel) {
     return semDDI;
 }
 
-// ── Editar agendamento ──
+// ── Editar agendamento (GET) ── sem alteração
 router.get('/editar/:id', isAdminAuthenticated, async (req, res) => {
     try {
         const id = req.params.id;
@@ -41,31 +42,88 @@ router.get('/editar/:id', isAdminAuthenticated, async (req, res) => {
     }
 });
 
-router.post('/editar/:id', isAdminAuthenticated, (req, res) => {
-    Agendamento.update(
-        {
-            nome: req.body.nome,
-            telefone: normalizarTelefone(req.body.telefone),
-            data: req.body.data,
-            horario: req.body.horario,
-            servico: req.body.servico,
-            barbeiro: req.body.barbeiro,
+// ── Editar agendamento (POST) ──
+router.post('/editar/:id', isAdminAuthenticated, async (req, res) => {
+    try {
+        const id = req.params.id;
+        const idEmpresa = req.user.idEmpresa;
+
+        const agendamento = await Agendamento.findOne({ where: { id, idEmpresa } });
+        if (!agendamento) return res.status(404).send('Agendamento não encontrado');
+
+        // Salva os dados ANTES do update
+        const dadosAntigos = JSON.parse(JSON.stringify(agendamento.get({ plain: true })));
+      
+        await agendamento.update({
+            nome:            req.body.nome?.trim(),
+            telefone:        normalizarTelefone(req.body.telefone),
+            data:            req.body.data,
+            horario:         req.body.horario,
+            servico:         req.body.servico,
+            barbeiro:        req.body.barbeiro,
             profissional_id: req.body.profissional_id,
-            observacao: req.body.observacao || null  // 👈
-        },
-        { where: { id: req.params.id, idEmpresa: req.user.idEmpresa } }
-    ).then(() => res.redirect('/admin'))
-        .catch(error => res.status(500).send('Erro ao atualizar: ' + error.message));
+            observacao:      req.body.observacao?.trim() || null
+        });
+
+        // dadosNovos montado manualmente do req.body
+        const dadosNovos = {
+            id:              agendamento.id,
+            idEmpresa:       agendamento.idEmpresa,
+            nome:            req.body.nome?.trim(),
+            telefone:        normalizarTelefone(req.body.telefone),
+            data:            req.body.data,
+            horario:         req.body.horario,
+            hora_inicio:     dadosAntigos.hora_inicio,
+            hora_fim:        dadosAntigos.hora_fim,
+            servico:         req.body.servico,
+            barbeiro:        req.body.barbeiro,
+            profissional_id: req.body.profissional_id,
+            observacao:      req.body.observacao?.trim() || null,  // ← trim aqui
+            status:          dadosAntigos.status,
+            valor:           dadosAntigos.valor
+        };
+
+        await registrarHistorico(
+            dadosNovos,
+            'editado',
+            'admin',
+            req.user.id,
+            req.user.nome,
+            dadosAntigos
+        );
+        res.redirect('/admin');
+    } catch (error) {
+        res.status(500).send('Erro ao atualizar: ' + error.message);
+    }
 });
 
 // ── Deletar agendamento ──
-router.get('/deletar/:id', isAdminAuthenticated, (req, res) => {
-    Agendamento.destroy({ where: { id: req.params.id, idEmpresa: req.user.idEmpresa } })
-        .then(() => res.redirect('/admin'))
-        .catch(() => res.send('Erro ao excluir o agendamento'));
+router.get('/deletar/:id', isAdminAuthenticated, async (req, res) => {
+    try {
+        const id = req.params.id;
+        const idEmpresa = req.user.idEmpresa;
+
+        // Busca ANTES de deletar — depois do destroy não tem mais snapshot
+        const agendamento = await Agendamento.findOne({ where: { id, idEmpresa } });
+        if (!agendamento) return res.redirect('/admin');
+
+        // Histórico antes de destruir
+        await registrarHistorico(
+            agendamento,
+            'excluido',
+            'admin',
+            req.user.id,
+            req.user.nome
+        );
+
+        await agendamento.destroy();
+        res.redirect('/admin');
+    } catch (error) {
+        res.send('Erro ao excluir o agendamento');
+    }
 });
 
-// ── Dashboard dados ──
+// ── Dashboard dados ── sem alteração
 router.get('/admin/dashboard/dados', isAdminAuthenticated, async (req, res) => {
     try {
         const fim = req.query.fim ? new Date(req.query.fim) : new Date();

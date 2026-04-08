@@ -156,7 +156,6 @@
 <div class="modal-overlay" id="modal-overlay">
     <div class="modal">
         <button class="modal-close" id="modal-close">✕</button>
-        <div class="modal-title">Novo Agendamento</div>
         <p class="modal-sub">Cadastro rápido pelo admin</p>
         <div style="display:flex; gap:8px; margin-bottom:16px;">
             <button type="button" id="btnTipoAgendamento" class="btn-tipo ativo"
@@ -167,11 +166,12 @@
         <form action="/admin/agendar" method="post" id="form-admin" novalidate>
             <input type="hidden" name="tipo" id="inputTipo" value="agendamento">
             <div class="modal-grid">
-                <div id="campoMotivo" style="display:none;" class="modal-grid">
-                    <div class="modal-field full">
-                        <label>Motivo</label>
-                        <input type="text" name="motivo" id="inputMotivo" placeholder="Ex: Almoço, Reunião...">
-                    </div>
+                <div id="campoMotivo" style="display:none; grid-column: 1 / -1; display:none;">
+                <div class="modal-field full">
+                    <label>Motivo</label>
+                    <input type="text" name="motivo" id="inputMotivo" placeholder="Ex: Almoço, Reunião...">
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px;">
                     <div class="modal-field">
                         <label>Hora Início</label>
                         <input type="time" name="compromisso_inicio" id="compromisso-inicio">
@@ -181,6 +181,7 @@
                         <input type="time" name="compromisso_fim" id="compromisso-fim">
                     </div>
                 </div>
+            </div>
                 <div id="campoNome" class="modal-field full" style="position:relative;">
                     <label>Nome do cliente</label>
                     <div style="display:flex;gap:6px;">
@@ -457,103 +458,6 @@
         <div class="admin-lista" id="admin-lista">
             <div class="admins-empty">Carregando...</div>
         </div>
-    </div>
-</div>
-
-<!-- MODAL EMPRESA -->
-<div class="modal-overlay" id="modal-empresa-overlay">
-    <div class="modal">
-        <button class="modal-close" id="modal-empresa-close">✕</button>
-        <div class="modal-title">Dados da Empresa</div>
-        <p class="modal-sub">Informações cadastrais e identidade visual</p>
-
-        <div class="modal-grid">
-
-            <!-- LOGO -->
-            <div class="modal-field full">
-                <label>Logo da Empresa</label>
-                <div style="display:flex;align-items:center;gap:12px;">
-                    <div id="empresa-logo-preview"
-                        style="width:56px;height:56px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);overflow:hidden;flex-shrink:0;">
-                        Logo
-                    </div>
-                    <div style="display:flex;flex-direction:column;gap:4px;">
-                        <label for="empresa-logo-input"
-                            style="cursor:pointer;font-size:12px;padding:6px 12px;border:1px solid var(--border);border-radius:6px;color:var(--muted);transition:all .2s;"
-                            onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'"
-                            onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">Escolher
-                            imagem</label>
-                        <span style="font-size:10px;color:var(--muted);">PNG, JPG ou SVG · máx. 2MB</span>
-                    </div>
-                    <input type="file" id="empresa-logo-input" accept="image/*" style="display:none" onchange="
-                        const f=this.files[0]; if(!f) return;
-                        const r=new FileReader(); r.onload=e=>{
-                            const p=document.getElementById('empresa-logo-preview');
-                            p.innerHTML='<img src=\''+e.target.result+'\' style=\'width:100%;height:100%;object-fit:contain;border-radius:6px;padding:4px;\'>';
-                        }; r.readAsDataURL(f);">
-                </div>
-            </div>
-
-            <!-- IDENTIFICAÇÃO -->
-            <div class="modal-field full">
-                <label>Razão Social</label>
-                <input type="text" id="empresa-nome-input" placeholder="Ex: Barbearia Silva Ltda">
-            </div>
-            <div class="modal-field">
-                <label>Nome Fantasia</label>
-                <input type="text" id="empresa-fantasia-input" placeholder="Ex: Barbearia Silva">
-            </div>
-            <div class="modal-field">
-                <label>CNPJ</label>
-                <input type="text" id="empresa-cnpj-input" placeholder="00.000.000/0001-00" maxlength="18" oninput="
-                    let v=this.value.replace(/\D/g,'');
-                    v=v.replace(/^(\d{2})(\d)/,'$1.$2');
-                    v=v.replace(/^(\d{2})\.(\d{3})(\d)/,'$1.$2.$3');
-                    v=v.replace(/\.(\d{3})(\d)/,'.$1/$2');
-                    v=v.replace(/(\d{4})(\d)/,'$1-$2');
-                    this.value=v;">
-            </div>
-
-            <!-- CONTATO -->
-            <div class="modal-field">
-                <label>Celular / WhatsApp</label>
-                <input type="tel" id="empresa-celular-input" placeholder="(00) 00000-0000" maxlength="15" oninput="
-                    let v=this.value.replace(/\D/g,'');
-                    v=v.replace(/^(\d{2})(\d)/,'($1) $2');
-                    v=v.replace(/(\d{5})(\d{4})$/,'$1-$2');
-                    this.value=v;">
-            </div>
-            <div class="modal-field">
-                <label>Segmento</label>
-                <input type="text" id="empresa-segmento-input" placeholder="Ex: Barbearia, Salão, Clínica...">
-            </div>
-
-            <!-- ENDEREÇO -->
-            <div class="modal-field full">
-                <label>Endereço</label>
-                <input type="text" id="empresa-endereco-input" placeholder="Rua, Avenida...">
-            </div>
-            <div class="modal-field" style="max-width:120px;">
-                <label>Número</label>
-                <input type="text" id="empresa-numero-input" placeholder="123">
-            </div>
-            <div class="modal-field">
-                <label>Bairro</label>
-                <input type="text" id="empresa-bairro-input" placeholder="Centro">
-            </div>
-            <div class="modal-field">
-                <label>Cidade</label>
-                <input type="text" id="empresa-cidade-input" placeholder="São Paulo">
-            </div>
-
-        </div>
-
-        <div style="margin-top:16px;">
-            <button class="btn-confirmar" id="btn-salvar-empresa" style="width:100%;font-size:15px;padding:10px;">
-                Salvar Dados da Empresa
-            </button>
-        </div>
-        <div class="modal-erro" id="empresa-erro"></div>
     </div>
 </div>
 

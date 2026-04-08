@@ -17,7 +17,8 @@ router.get('/slots', async (req, res) => {
         });
         res.json({ slots });
     } catch (error) {
-        res.json({ slots: [] });
+    console.error('[SLOTS ERROR]', error.message);
+    res.json({ slots: [], erro: error.message });
     }
 });
 

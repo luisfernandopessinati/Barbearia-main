@@ -6,23 +6,22 @@ const { Op } = require('sequelize');
 
 async function getSlotsDisponiveis({ profissional_id, servico_id, data, idEmpresa }) {
     const diaSemana = new Date(data + 'T00:00:00').getDay();
-
     const horario = await HorarioFuncionamento.findOne({
         where: { profissional_id, dia_semana: diaSemana, ativo: true, idEmpresa }
     });
-
     if (!horario) return [];
 
     const servico = await Servico.findOne({ where: { id: servico_id, idEmpresa } });
     if (!servico) throw new Error('Serviço não encontrado');
 
     // Verifica se é hoje para filtrar horários passados
-    const hoje = new Date().toISOString().split('T')[0];
+    const agora = new Date();
+    const agoraBrasil = new Date(agora.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+    const hoje = `${agoraBrasil.getFullYear()}-${String(agoraBrasil.getMonth() + 1).padStart(2, '0')}-${String(agoraBrasil.getDate()).padStart(2, '0')}`;
     const isHoje = data === hoje;
-    const minutosAgora = isHoje 
-        ? new Date().getHours() * 60 + new Date().getMinutes()
+    const minutosAgora = isHoje
+        ? agoraBrasil.getHours() * 60 + agoraBrasil.getMinutes()
         : 0;
-
     const slots = gerarSlots(horario.hora_inicio, horario.hora_fim, servico.duracao_minutos, minutosAgora);
 
     const agendamentos = await Agendamento.findAll({
@@ -36,7 +35,6 @@ async function getSlotsDisponiveis({ profissional_id, servico_id, data, idEmpres
         },
         attributes: ['hora_inicio', 'hora_fim']
     });
-
     const bloqueios = await Bloqueio.findAll({
         where: {
             data,
@@ -50,8 +48,15 @@ async function getSlotsDisponiveis({ profissional_id, servico_id, data, idEmpres
     });
 
     return slots.map(slot => {
-        const ocupado = agendamentos.some(a => temColisao(slot, a));
-        const bloqueado = bloqueios.some(b => !b.hora_inicio || temColisao(slot, b));
+        const ocupado = agendamentos.some(a => {
+            const colide = temColisao(slot, a);
+            return colide;
+        });
+        const bloqueado = bloqueios.some(b => {
+            const colide = !b.hora_inicio || temColisao(slot, b);
+            return colide;
+        });
+
 
         return {
             hora_inicio: slot.hora_inicio,

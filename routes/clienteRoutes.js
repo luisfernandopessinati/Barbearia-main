@@ -11,6 +11,7 @@ const Pacote = require('../models/Pacotes');
 const { verificarConflito } = require('../helpers/conflito');
 const { QueryTypes } = require('sequelize');
 const sequelize = require('../config/db');
+const registrarHistorico = require('../helpers/registrarHistorico');
 
 function normalizarTelefone(tel) {
     const numeros = tel.replace(/\D/g, '');
@@ -136,13 +137,22 @@ router.post('/agendar/:token', async (req, res) => {
         const servicoObj = await Servico.findOne({ where: { nome: servico, idEmpresa } });
         const valor = servicoObj ? parseFloat(servicoObj.valor) : 0;
 
-        await Agendamento.create({
+        const novoAgendamento = await Agendamento.create({
             barbeiro, nome: req.session.clienteNome, telefone: req.session.clienteTelefone,
             data, horario: hiInicio, servico, valor, idEmpresa,
             profissional_id: profissional_id || null,
             hora_inicio: hiInicio, hora_fim: hiFim || null,
             servico_id: servico_id || null, status: 'pendente'
         });
+
+        // ── Histórico ──
+        await registrarHistorico(
+            novoAgendamento,
+            'criado',
+            'cliente',
+            req.session.clienteId,
+            req.session.clienteNome
+        );
 
         let whatsappLink = null;
         if (profissional_id) {
@@ -202,6 +212,15 @@ router.post('/pacote/:token', async (req, res) => {
             await sequelize.query(
                 'UPDATE Agendamentos SET pacote_id = :pacoteId WHERE id = :id AND idEmpresa = :idEmpresa',
                 { replacements: { pacoteId: pacote.id, id: ag.id, idEmpresa }, type: QueryTypes.UPDATE }
+            );
+
+            // ── Histórico por sessão ──
+            await registrarHistorico(
+                { ...ag.get({ plain: true }), pacote_id: pacote.id },
+                'criado',
+                'cliente',
+                req.session.clienteId,
+                req.session.clienteNome
             );
         }
 
@@ -311,6 +330,190 @@ router.post('/clientes', isAdminAuthenticated, async (req, res) => {
         res.json({ sucesso: true, cliente: { id: cliente.id, nome: cliente.nome, telefone: cliente.telefone } });
     } catch (error) {
         res.status(500).json({ erro: error.message });
+    }
+});
+// ── Agendamentos abertos do cliente ──
+router.get('/cliente/agendamentos/:token', async (req, res) => {
+    try {
+        if (!req.session.clienteTelefone) {
+            return res.status(401).json({ erro: 'Sessão expirada.' });
+        }
+        const { Op } = require('sequelize');
+        const empresa = await Empresa.findOne({ 
+            where: { token_agendamento: req.params.token } 
+        });
+        if (!empresa) return res.status(404).json({ erro: 'Empresa não encontrada' });
+
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+
+        const agendamentos = await Agendamento.findAll({
+            where: {
+                telefone: req.session.clienteTelefone,
+                idEmpresa: empresa.id,
+                data: { [Op.gte]: hoje },
+                status: { [Op.notIn]: ['cancelado', 'concluido', 'compromisso'] }
+            },
+            order: [['data', 'ASC'], ['hora_inicio', 'ASC']]
+        });
+
+        const formatados = agendamentos.map(a => {
+            const d = new Date(a.data);
+            d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+            return {
+                id: a.id,
+                servico_id: a.servico_id, 
+                data: `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`,
+                horario: a.horario ? a.horario.substring(0, 5) : '',
+                hora_inicio: a.hora_inicio,
+                hora_fim: a.hora_fim,
+                servico: a.servico,
+                barbeiro: a.barbeiro,
+                profissional_id: a.profissional_id,
+                status: a.status,
+                pacote_id: a.pacote_id || null
+            };
+        });
+
+        res.json({ sucesso: true, agendamentos: formatados });
+    } catch (e) {
+        res.status(500).json({ erro: e.message });
+    }
+});
+
+// ── Cliente cancela agendamento ──
+router.post('/cliente/cancelar/:id/:token', async (req, res) => {
+    try {
+        if (!req.session.clienteTelefone) {
+            return res.status(401).json({ erro: 'Sessão expirada.' });
+        }
+        const empresa = await Empresa.findOne({ 
+            where: { token_agendamento: req.params.token } 
+        });
+        if (!empresa) return res.status(404).json({ erro: 'Empresa não encontrada' });
+
+        const agendamento = await Agendamento.findOne({
+            where: {
+                id: req.params.id,
+                telefone: req.session.clienteTelefone,
+                idEmpresa: empresa.id
+            }
+        });
+        if (!agendamento) return res.status(404).json({ erro: 'Agendamento não encontrado.' });
+
+        const dadosAntigos = JSON.parse(JSON.stringify(agendamento.get({ plain: true })));
+        await agendamento.update({ status: 'cancelado' });
+        await registrarHistorico(
+            agendamento,
+            'cancelado',
+            'cliente',
+            req.session.clienteId,
+            req.session.clienteNome,
+            dadosAntigos
+        );
+
+        // ── WhatsApp para o barbeiro ──
+        let whatsappLink = null;
+        if (agendamento.profissional_id) {
+            const adminProf = await Admin.findOne({
+                where: { id: agendamento.profissional_id, idEmpresa: empresa.id },
+                attributes: ['telefone']
+            });
+            const telefoneLimpo = adminProf?.telefone?.replace(/\D/g, '');
+            if (telefoneLimpo) {
+                const d = new Date(agendamento.data);
+                d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+                const dataFmt = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+                const mensagem = encodeURIComponent(
+                    `Olá! Precisei cancelar meu agendamento:\n` +
+                    `📅 Data: ${dataFmt}\n` +
+                    `⏰ Horário: ${agendamento.horario ? agendamento.horario.substring(0,5) : ''}\n` +
+                    `✂️ Serviço: ${agendamento.servico}\n` +
+                    `📱 Cliente: ${req.session.clienteNome}`
+                );
+                whatsappLink = `https://wa.me/55${telefoneLimpo}?text=${mensagem}`;
+            }
+        }
+
+        res.json({ sucesso: true, whatsappLink });
+    } catch (e) {
+        res.status(500).json({ erro: e.message });
+    }
+});
+
+// ── Cliente reagenda ──
+router.post('/cliente/reagendar/:id/:token', async (req, res) => {
+    try {
+        if (!req.session.clienteTelefone) {
+            return res.status(401).json({ erro: 'Sessão expirada.' });
+        }
+
+        const empresa = await Empresa.findOne({
+            where: { token_agendamento: req.params.token }
+        });
+        if (!empresa) return res.status(404).json({ erro: 'Empresa não encontrada' });
+
+        const agendamento = await Agendamento.findOne({
+            where: {
+                id: req.params.id,
+                telefone: req.session.clienteTelefone,
+                idEmpresa: empresa.id
+            }
+        });
+        if (!agendamento) return res.status(404).json({ erro: 'Agendamento não encontrado.' });
+
+        const { data, hora_inicio, hora_fim } = req.body;
+        if (!data || !hora_inicio || !hora_fim) {
+            return res.status(400).json({ erro: 'Dados incompletos.' });
+        }
+
+        const ocupado = await verificarConflito(
+            agendamento.barbeiro, data, hora_inicio, hora_fim, empresa.id, agendamento.id
+        );
+        if (ocupado) return res.status(409).json({ erro: 'Horário indisponível.' });
+
+        const dadosAntigos = JSON.parse(JSON.stringify(agendamento.get({ plain: true })));
+
+        await agendamento.update({
+            data,
+            horario: hora_inicio,
+            hora_inicio,
+            hora_fim
+        });
+
+        await registrarHistorico(
+            agendamento,
+            'editado',
+            'cliente',
+            req.session.clienteId,
+            req.session.clienteNome,
+            dadosAntigos
+        );
+
+        // ── WhatsApp para o barbeiro ──
+        let whatsappLink = null;
+        if (agendamento.profissional_id) {
+            const adminProf = await Admin.findOne({
+                where: { id: agendamento.profissional_id, idEmpresa: empresa.id },
+                attributes: ['telefone']
+            });
+            const telefoneLimpo = adminProf?.telefone?.replace(/\D/g, '');
+            if (telefoneLimpo) {
+                const mensagem = encodeURIComponent(
+                    `Olá! Reagendei meu horário:\n` +
+                    `📅 Nova data: ${data}\n` +
+                    `⏰ Horário: ${hora_inicio.substring(0,5)}\n` +
+                    `✂️ Serviço: ${agendamento.servico}\n` +
+                    `👤 Profissional: ${agendamento.barbeiro}\n` +
+                    `📱 Cliente: ${req.session.clienteNome}`
+                );
+                whatsappLink = `https://wa.me/55${telefoneLimpo}?text=${mensagem}`;
+            }
+        }
+
+        res.json({ sucesso: true, whatsappLink });
+    } catch (e) {
+        res.status(500).json({ erro: e.message });
     }
 });
 

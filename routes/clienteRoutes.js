@@ -116,7 +116,7 @@ router.get('/agendar/:token', async (req, res) => {
 
 // ── Cliente agenda ──
 router.post('/agendar/:token', async (req, res) => {
-    const { barbeiro, data, horario, servico, profissional_id, hora_inicio, hora_fim, servico_id } = req.body;
+    const { barbeiro, data, horario, servico, profissional_id, hora_inicio, hora_fim, servico_id, observacao  } = req.body;
     const { token } = req.params;
     try {
         const empresa = await Empresa.findOne({ where: { token_agendamento: token } });
@@ -142,7 +142,8 @@ router.post('/agendar/:token', async (req, res) => {
             data, horario: hiInicio, servico, valor, idEmpresa,
             profissional_id: profissional_id || null,
             hora_inicio: hiInicio, hora_fim: hiFim || null,
-            servico_id: servico_id || null, status: 'pendente'
+            servico_id: servico_id || null, status: 'pendente',
+            observacao: observacao || null  
         });
 
         // ── Histórico ──

@@ -8,12 +8,48 @@
     <div class="adm-header-center">Painel Administrativo</div>
     <div style="display:flex;align-items:center;gap:8px;">
         <div class="config-menu-wrap">
+            <!-- Sininho de notificações -->
+            <div style="position:relative;display:inline-block;">
+                <button id="btn-sininho" title="Notificações" style="
+        background:none;border:1px solid var(--border);border-radius:8px;
+        width:38px;height:38px;cursor:pointer;font-size:16px;
+        color:var(--gold);display:flex;align-items:center;justify-content:center;
+        transition:border-color .2s;position:relative;" onmouseover="this.style.borderColor='var(--gold)'"
+                    onmouseout="this.style.borderColor='var(--border)'">
+                    🔔
+                    <span id="badge-sininho" style="
+            display:none;position:absolute;top:-5px;right:-5px;
+            background:#e74c3c;color:#fff;border-radius:50%;
+            width:18px;height:18px;font-size:10px;font-weight:700;
+            align-items:center;justify-content:center;
+            font-family:'DM Sans',sans-serif;line-height:1;">0</span>
+                </button>
+                <!-- Dropdown notificações -->
+                <div id="dropdown-sininho" style="
+        display:none;position:absolute;top:46px;right:0;width:320px;
+        background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+        box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:600;overflow:hidden;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;
+            padding:12px 16px;border-bottom:1px solid var(--border);">
+                        <span style="font-size:11px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;">
+                            Notificações
+                        </span>
+                        <button id="btn-marcar-visto" style="font-size:10px;color:var(--muted);background:none;
+                border:none;cursor:pointer;letter-spacing:1px;text-transform:uppercase;
+                transition:color .2s;" onmouseover="this.style.color='var(--gold)'"
+                            onmouseout="this.style.color='var(--muted)'">
+                            Marcar todas como lidas
+                        </button>
+                    </div>
+                    <div id="lista-notificacoes" style="max-height:360px;overflow-y:auto;"></div>
+                </div>
+            </div>
             <button class="btn-config-menu" id="btn-config-menu">
                 <span class="menu-icon"><span></span><span></span><span></span></span>
                 Menu
             </button>
             <div class="config-dropdown" id="config-dropdown">
-                <div class="config-dropdown-label">Compartilhar</div>
+
                 <div class="config-dropdown-item link-agendamento-item">
                     <div class="link-header">
                         <span class="item-icon">🔗</span>
@@ -26,8 +62,9 @@
                         <input type="text" id="input-link-agendamento" readonly />
                         <button id="btn-copiar-link">Copiar</button>
                     </div>
-                    <button id="btn-whatsapp-link" class="btn-whatsapp"> WhatsApp </button>
+                    <button id="btn-whatsapp-link" class="btn-whatsapp">WhatsApp</button>
                 </div>
+
                 {{#if empresa.site}}
                 <a href="/site/{{empresa.site}}" target="_blank" class="config-dropdown-item">
                     <span class="item-icon">🌐</span>
@@ -37,62 +74,107 @@
                     </span>
                 </a>
                 {{/if}}
-                <div class="config-dropdown-label">Sistema</div>
-                <button class="config-dropdown-item" id="menu-dashboard">
-                    <span class="item-icon">📊</span>
-                    <span class="item-label"><span>Dashboard</span><small>Análises e relatórios</small></span>
-                    <span class="item-badge">Novo</span>
-                </button>
-                <button class="config-dropdown-item" id="menu-dashboard-vendas">
-                    <span class="item-icon">🛒</span>
-                    <span class="item-label"><span>Dashboard Vendas</span><small>Relatórios de vendas</small></span>
+
+                <div class="config-dropdown-sep"></div>
+                <div class="config-dropdown-label">Dia a Dia</div>
+
+                <button class="config-dropdown-item" id="menu-clientes">
+                    <span class="item-icon">👥</span>
+                    <span class="item-label">
+                        <span>Clientes</span>
+                        <small>Ranking, histórico e fidelidade</small>
+                    </span>
                     <span class="item-badge">Novo</span>
                 </button>
                 <button class="config-dropdown-item" id="menu-vendas">
                     <span class="item-icon">🛍️</span>
-                    <span class="item-label"><span>Vendas</span><small>Área de vendas</small></span>
+                    <span class="item-label">
+                        <span>Vendas</span>
+                        <small>Registrar e acompanhar vendas</small>
+                    </span>
                     <span class="item-badge">Novo</span>
                 </button>
                 <button class="config-dropdown-item" id="menu-estoque">
                     <span class="item-icon">📦</span>
-                    <span class="item-label"><span>Estoque</span><small>Lançamentos e movimentações</small></span>
+                    <span class="item-label">
+                        <span>Estoque</span>
+                        <small>Entradas e saídas</small>
+                    </span>
                     <span class="item-badge">Novo</span>
                 </button>
+                <button class="config-dropdown-item" id="menu-produtos">
+                    <span class="item-icon">🏷️</span>
+                    <span class="item-label">
+                        <span>Produtos</span>
+                        <small>Catálogo de produtos</small>
+                    </span>
+                    <span class="item-badge">Novo</span>
+                </button>
+
+                <div class="config-dropdown-sep"></div>
+                <div class="config-dropdown-label">Relatórios</div>
+
+                <button class="config-dropdown-item" id="menu-dashboard">
+                    <span class="item-icon">📊</span>
+                    <span class="item-label">
+                        <span>Dashboard</span>
+                        <small>Visão geral do negócio</small>
+                    </span>
+                    <span class="item-badge">Novo</span>
+                </button>
+                <button class="config-dropdown-item" id="menu-dashboard-vendas">
+                    <span class="item-icon">🛒</span>
+                    <span class="item-label">
+                        <span>Dashboard Vendas</span>
+                        <small>Análise de receita e ticket médio</small>
+                    </span>
+                    <span class="item-badge">Novo</span>
+                </button>
+
                 <div class="config-dropdown-sep"></div>
                 <div class="config-dropdown-label">Cadastros</div>
-                <button class="config-dropdown-item" id="menu-empresa">
-                    <span class="item-icon">🏢</span>
-                    <span class="item-label"><span>Empresa</span><small>Dados e identidade visual</small></span>
+
+                <button class="config-dropdown-item" id="menu-servicos">
+                    <span class="item-icon">✂️</span>
+                    <span class="item-label">
+                        <span>Serviços</span>
+                        <small>Preços e catálogo</small>
+                    </span>
                 </button>
                 <button class="config-dropdown-item" id="menu-admins">
                     <span class="item-icon">👤</span>
-                    <span class="item-label"><span>Admins</span><small>Usuários e acessos</small></span>
+                    <span class="item-label">
+                        <span>Admins</span>
+                        <small>Usuários e acessos</small>
+                    </span>
                     <span class="item-badge">Novo</span>
                 </button>
-                <button class="config-dropdown-item" id="menu-clientes">
-                    <span class="item-icon">👥</span>
-                    <span class="item-label"><span>Clientes</span><small>Ranking e histórico</small></span>
-                    <span class="item-badge">Novo</span>
+                <button class="config-dropdown-item" id="menu-empresa">
+                    <span class="item-icon">🏢</span>
+                    <span class="item-label">
+                        <span>Empresa</span>
+                        <small>Dados e identidade visual</small>
+                    </span>
                 </button>
-                <button class="config-dropdown-item" id="menu-servicos">
-                    <span class="item-icon">✂️</span>
-                    <span class="item-label"><span>Serviços</span><small>Preços e catálogo</small></span>
-                </button>
-                <button class="config-dropdown-item" id="menu-produtos">
-                    <span class="item-icon">📦</span>
-                    <span class="item-label"><span>Produtos</span><small>Produtos</small></span>
-                    <span class="item-badge">Novo</span>
-                </button>
+
                 <div class="config-dropdown-sep"></div>
                 <div class="config-dropdown-label">Agenda</div>
+
                 <button class="config-dropdown-item" id="menu-feriados">
                     <span class="item-icon">📅</span>
-                    <span class="item-label"><span>Feriados</span><small>Datas bloqueadas</small></span>
+                    <span class="item-label">
+                        <span>Feriados</span>
+                        <small>Datas bloqueadas</small>
+                    </span>
                 </button>
                 <button class="config-dropdown-item" id="menu-horarios">
                     <span class="item-icon">🕐</span>
-                    <span class="item-label"><span>Horários</span><small>Funcionamento por dia</small></span>
+                    <span class="item-label">
+                        <span>Horários</span>
+                        <small>Funcionamento por dia</small>
+                    </span>
                 </button>
+
             </div>
         </div>
         <button class="btn-sair" id="btn-sair">Sair</button>
@@ -167,21 +249,21 @@
             <input type="hidden" name="tipo" id="inputTipo" value="agendamento">
             <div class="modal-grid">
                 <div id="campoMotivo" style="display:none; grid-column: 1 / -1; display:none;">
-                <div class="modal-field full">
-                    <label>Motivo</label>
-                    <input type="text" name="motivo" id="inputMotivo" placeholder="Ex: Almoço, Reunião...">
-                </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px;">
-                    <div class="modal-field">
-                        <label>Hora Início</label>
-                        <input type="time" name="compromisso_inicio" id="compromisso-inicio">
+                    <div class="modal-field full">
+                        <label>Motivo</label>
+                        <input type="text" name="motivo" id="inputMotivo" placeholder="Ex: Almoço, Reunião...">
                     </div>
-                    <div class="modal-field">
-                        <label>Hora Fim</label>
-                        <input type="time" name="compromisso_fim" id="compromisso-fim">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px;">
+                        <div class="modal-field">
+                            <label>Hora Início</label>
+                            <input type="time" name="compromisso_inicio" id="compromisso-inicio">
+                        </div>
+                        <div class="modal-field">
+                            <label>Hora Fim</label>
+                            <input type="time" name="compromisso_fim" id="compromisso-fim">
+                        </div>
                     </div>
                 </div>
-            </div>
                 <div id="campoNome" class="modal-field full" style="position:relative;">
                     <label>Nome do cliente</label>
                     <div style="display:flex;gap:6px;">
@@ -235,14 +317,10 @@
                 </div>
                 <div id="campoObservacao" class="modal-field full">
                     <label>Observação</label>
-                    <textarea 
-                        name="observacao" 
-                        id="modal-observacao"
-                        rows="3"
+                    <textarea name="observacao" id="modal-observacao" rows="3"
                         placeholder="Anotações sobre este agendamento..."
                         style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;resize:vertical;"
-                        onfocus="this.style.borderColor='var(--gold)'"
-                        onblur="this.style.borderColor='var(--border)'">
+                        onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
                     </textarea>
                 </div>
                 <input type="hidden" name="profissional_id" id="modal-profissional-id">
@@ -503,9 +581,9 @@
 <script>
     // ── Dados do backend ──────────────────────────────────
     const todosAgendamentos = [
-        {{#each agendamentos}}
-    {id: {{id}}, nome: "{{nome}}", telefone: "{{telefone}}", data: "{{data}}", horario: "{{horario}}", hora_fim: "{{hora_fim}}", servico: "{{servico}}", barbeiro: "{{barbeiro}}", pago: {{#if pago}} 1{{else}} 0{{/if}}, pacote_id: "{{pacote_id}}" },
-    {{/each}}
+        {{ #each agendamentos }}
+    { id: { { id } }, nome: "{{nome}}", telefone: "{{telefone}}", data: "{{data}}", horario: "{{horario}}", hora_fim: "{{hora_fim}}", servico: "{{servico}}", barbeiro: "{{barbeiro}}", pago: { { #if pago } } 1{ {else } } 0{ {/if } }, pacote_id: "{{pacote_id}}" },
+    { {/each } }
     ];
 
     const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -615,7 +693,7 @@
 
         popup.classList.add('open');
         const rect = target.getBoundingClientRect(); // 👈 usa target aqui  
-        popup.style.position = 'fixed';      
+        popup.style.position = 'fixed';
         //popup.style.top = (rect.bottom + 8 + window.scrollY) + 'px';
         //popup.style.left = (rect.left + window.scrollX) + 'px';
         popup.style.top = (rect.bottom + 8) + 'px';
@@ -1777,6 +1855,98 @@
             if (box) box.style.display = 'none';
         }
     });
+
+    // ── Sininho de notificações ──────────────────────────────
+    const ACOES_LABEL = {
+        criado: { texto: 'novo agendamento', cor: '#27ae60', icone: '📅' },
+        cancelado: { texto: 'cancelou', cor: '#e74c3c', icone: '❌' },
+        editado: { texto: 'reagendou', cor: '#f39c12', icone: '🔄' },
+    };
+
+    async function carregarNotificacoes() {
+        try {
+            const res = await fetch('/admin/notificacoes');
+            const json = await res.json();
+            const badge = document.getElementById('badge-sininho');
+            const lista = document.getElementById('lista-notificacoes');
+            const qtd = json.notificacoes?.length || 0;
+
+            // Badge
+            if (qtd > 0) {
+                badge.style.display = 'flex';
+                badge.textContent = qtd > 9 ? '9+' : qtd;
+            } else {
+                badge.style.display = 'none';
+            }
+
+            // Lista
+            if (!qtd) {
+                lista.innerHTML = `<div style="padding:24px 16px;text-align:center;
+                font-size:12px;color:var(--muted);">Nenhuma notificação pendente</div>`;
+                return;
+            }
+
+            lista.innerHTML = '';
+            json.notificacoes.forEach(n => {
+                const info = ACOES_LABEL[n.acao] || { texto: n.acao, cor: 'var(--muted)', icone: '📋' };
+                const dataFmt = n.data ? (() => {
+                    const [y, m, d] = n.data.split('-');
+                    return `${d}/${m}/${y}`;
+                })() : '';
+                const hora = n.hora_inicio ? n.hora_inicio.substring(0, 5) : '';
+                const quando = new Date(n.createdAt).toLocaleString('pt-BR', {
+                    day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+                });
+
+                const item = document.createElement('div');
+                item.style.cssText = `padding:12px 16px;border-bottom:1px solid var(--border);
+                display:flex;gap:12px;align-items:flex-start;`;
+                item.innerHTML = `
+                <span style="font-size:18px;flex-shrink:0;margin-top:2px;">${info.icone}</span>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:13px;color:var(--text);font-weight:500;">
+                        <span style="color:${info.cor};">${n.nome}</span>
+                        ${info.texto}
+                    </div>
+                    <div style="font-size:11px;color:var(--muted);margin-top:3px;">
+                        ✂️ ${n.servico || '—'} · 👤 ${n.barbeiro || '—'}
+                        ${dataFmt ? `· 📅 ${dataFmt} ${hora}` : ''}
+                    </div>
+                    <div style="font-size:10px;color:var(--border);margin-top:2px;">${quando}</div>
+                </div>`;
+                lista.appendChild(item);
+            });
+        } catch (e) {
+            console.error('Erro ao carregar notificações:', e);
+        }
+    }
+
+    // Abre/fecha dropdown
+    document.getElementById('btn-sininho').addEventListener('click', async e => {
+        e.stopPropagation();
+        const dd = document.getElementById('dropdown-sininho');
+        const aberto = dd.style.display !== 'none';
+        dd.style.display = aberto ? 'none' : 'block';
+        if (!aberto) await carregarNotificacoes();
+    });
+
+    // Fecha ao clicar fora
+    document.addEventListener('click', e => {
+        if (!e.target.closest('#btn-sininho') && !e.target.closest('#dropdown-sininho')) {
+            document.getElementById('dropdown-sininho').style.display = 'none';
+        }
+    });
+
+    // Marcar todas como lidas
+    document.getElementById('btn-marcar-visto').addEventListener('click', async () => {
+        await fetch('/admin/notificacoes/marcar-visto', { method: 'POST' });
+        await carregarNotificacoes();
+    });
+
+    // Atualiza o badge a cada 60 segundos automaticamente
+    carregarNotificacoes();
+    setInterval(carregarNotificacoes, 60_000);
+
     // ── Vincular dropdown aos modais ──────────────────────
     bindMenuItemToModal('menu-feriados', 'modal-feriados-overlay', carregarFeriados);
     bindMenuItemToModal('menu-servicos', 'modal-servicos-overlay', carregarServicos);

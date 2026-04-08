@@ -659,6 +659,14 @@
           <span>Resumo</span>
           <p id="resumo-texto">Selecione profissional, serviço, data e horário</p>
         </div>
+        <textarea id="input-observacao-agendamento" name="observacao"
+            placeholder="Observação (opcional)..."
+            style="width:100%;background:var(--bg-card);border:1px solid var(--border-color);
+                border-radius:8px;padding:10px 12px;font-family:'DM Sans',sans-serif;
+                font-size:12px;color:var(--text-main);outline:none;resize:none;
+                height:60px;transition:border-color .2s;margin-top:4px;"
+            onfocus="this.style.borderColor='var(--accent)'"
+            onblur="this.style.borderColor='var(--border-color)'"></textarea>    
         <button type="submit" class="btn-agendar" id="btn-submit" disabled>Confirmar</button>
       </div>
     </form>
@@ -1056,8 +1064,9 @@
   document.getElementById('form-agendar').addEventListener('submit', async function (e) {
     e.preventDefault();
 
+    const observacao = document.getElementById('input-observacao-agendamento')?.value?.trim() || '';
+
     if (state.qtdSessoes) {
-      // Pacote
       const ok = confirm(
         `Confirmar pacote?\n\n` +
         `👤 ${state.profissionalNome}\n` +
@@ -1073,6 +1082,7 @@
         servico_id: state.servicoId,
         nome: '{{clienteNome}}',
         telefone: '{{clienteTelefone}}',
+        observacao: observacao,
         sessoes: JSON.stringify(state.sessoes.map(s => ({
           data: s.data,
           hora_inicio: s.horaInicio,
@@ -1097,7 +1107,6 @@
       }
 
     } else {
-      // Normal
       const hora = state.horaInicio
         ? `${state.horaInicio.substring(0, 5)} – ${state.horaFim.substring(0, 5)}`
         : '';
@@ -1110,7 +1119,7 @@
       if (!ok) return;
       this.submit();
     }
-  });
+});
 
 // ── Agendamentos abertos do cliente ─────────────────────
 async function carregarAgendamentosCliente() {

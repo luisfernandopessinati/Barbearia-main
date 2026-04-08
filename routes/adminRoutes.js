@@ -427,4 +427,46 @@ router.get('/admin/empresa-observacao', isAdminAuthenticated, async (req, res) =
     }
 });
 
+// ── Notificações do sininho ──
+router.get('/admin/notificacoes', isAdminAuthenticated, async (req, res) => {
+    try {
+        const AgendamentoHistorico = require('../models/AgendamentoHistorico');
+        const notificacoes = await AgendamentoHistorico.findAll({
+            where: {
+                idEmpresa: req.user.idEmpresa,
+                feito_por: 'cliente',
+                visto_admin: 0
+            },
+            order: [['createdAt', 'DESC']],
+            limit: 20
+        });
+        res.json({ sucesso: true, notificacoes: notificacoes.map(n => ({
+            id: n.id,
+            acao: n.acao,
+            nome: n.nome,
+            servico: n.servico,
+            barbeiro: n.barbeiro,
+            data: n.data,
+            hora_inicio: n.hora_inicio,
+            feito_por_nome: n.feito_por_nome,
+            createdAt: n.createdAt
+        }))});
+    } catch (e) {
+        res.status(500).json({ erro: e.message });
+    }
+});
+
+router.post('/admin/notificacoes/marcar-visto', isAdminAuthenticated, async (req, res) => {
+    try {
+        const AgendamentoHistorico = require('../models/AgendamentoHistorico');
+        await AgendamentoHistorico.update(
+            { visto_admin: 1, visto_em: new Date() },
+            { where: { idEmpresa: req.user.idEmpresa, feito_por: 'cliente', visto_admin: 0 } }
+        );
+        res.json({ sucesso: true });
+    } catch (e) {
+        res.status(500).json({ erro: e.message });
+    }
+});
+
 module.exports = router;

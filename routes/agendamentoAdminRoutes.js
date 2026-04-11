@@ -130,7 +130,11 @@ router.get('/admin/dashboard/dados', isAdminAuthenticated, async (req, res) => {
         inicio.setHours(0, 0, 0, 0);
 
         const agendamentos = await Agendamento.findAll({
-            where: { data: { [Op.between]: [inicio, fim] }, idEmpresa: req.user.idEmpresa },
+            where: {
+                idEmpresa: req.user.idEmpresa,
+                data:      { [Op.between]: [inicio, fim] },
+                status:    { [Op.in]: ['pendente', 'compromisso'] },
+            },
             order: [['data', 'ASC']]
         });
         const lista = agendamentos.map(a => a.get({ plain: true }));

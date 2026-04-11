@@ -38,8 +38,8 @@ const Venda = sequelize.define('Vendas', {
         defaultValue: 0
     },
     forma_pagamento: {
-        type: DataTypes.ENUM('dinheiro', 'cartao_credito', 'cartao_debito', 'pix', 'outro'),
-        allowNull: true
+        type: DataTypes.ENUM('dinheiro', 'cartao_credito', 'cartao_debito', 'pix', 'crediario', 'misto', 'outro'),
+        allowNull: true,
     },
     status_pagamento: {
         type: DataTypes.ENUM('pendente', 'pago', 'cancelado'),

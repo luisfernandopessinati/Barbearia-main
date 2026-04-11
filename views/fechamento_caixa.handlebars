@@ -25,20 +25,14 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { background: var(--bg); color: var(--text); font-family: var(--font-main); min-height: 100%; }
 
-        /* HEADER */
         header {
             background: #000; border-bottom: 1px solid var(--card-border);
             padding: 0 20px; height: 56px; position: sticky; top: 0; z-index: 100;
             display: flex; align-items: center; justify-content: space-between;
         }
         .header-title { color: var(--gold); font-weight: 700; font-size: 16px; letter-spacing: 2px; text-transform: uppercase; }
-        .btn-back {
-            text-decoration: none; color: var(--gold);
-            display: flex; align-items: center; gap: 5px;
-            font-weight: 600; font-size: 14px;
-        }
+        .btn-back { text-decoration: none; color: var(--gold); display: flex; align-items: center; gap: 5px; font-weight: 600; font-size: 14px; }
 
-        /* TOAST */
         #toast {
             position: fixed; top: 66px; right: 16px; z-index: 9999;
             background: var(--success); color: #fff;
@@ -49,23 +43,18 @@
         #toast.error { background: var(--danger); }
         #toast.show  { display: flex; }
 
-        /* LAYOUT */
         .page { max-width: 720px; margin: 0 auto; padding: 20px 16px 40px; }
 
-        /* FILTRO DATA */
-        .filtro-row {
-            display: flex; gap: 10px; align-items: flex-end; margin-bottom: 20px;
-        }
+        /* Filtro */
+        .filtro-row { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 20px; }
         .filtro-row .input-group { flex: 1; }
         .input-group label { display: block; color: var(--gold); font-size: 11px; text-transform: uppercase; margin-bottom: 5px; font-weight: 600; letter-spacing: 1px; }
         .input-group input[type="date"] {
             width: 100%; background: var(--card); border: 1px solid var(--card-border);
             border-radius: 8px; color: #fff; padding: 10px 12px;
-            font-family: var(--font-main); font-size: 15px; outline: none;
-            color-scheme: dark;
+            font-family: var(--font-main); font-size: 15px; outline: none; color-scheme: dark;
         }
         .input-group input[type="date"]:focus { border-color: var(--gold); }
-
         .btn-buscar {
             background: var(--gold); color: #000; border: none;
             padding: 10px 18px; border-radius: 8px; font-weight: 700;
@@ -75,21 +64,17 @@
         .btn-buscar:hover    { opacity: .85; }
         .btn-buscar:disabled { opacity: .4; cursor: not-allowed; }
 
-        /* CARDS DE TOTAIS */
-        .totais-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr);
-            gap: 12px; margin-bottom: 20px;
-        }
-        .total-card {
-            background: var(--card); border: 1px solid var(--card-border);
-            border-radius: var(--radius); padding: 14px 16px;
-        }
+        /* Cards de totais por forma */
+        .totais-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px; }
+        .total-card { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 14px 16px; }
         .total-card-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 4px; }
         .total-card-value { font-family: var(--font-mono); font-size: 22px; font-weight: 600; }
         .val-dinheiro { color: var(--success); }
         .val-pix      { color: var(--info); }
-        .val-cartao   { color: var(--gold); }
+        .val-debito   { color: #a78bfa; }
+        .val-credito  { color: var(--gold); }
 
+        /* Card total geral */
         .total-geral-card {
             background: var(--card); border: 1px solid var(--gold);
             border-radius: var(--radius); padding: 16px 20px;
@@ -97,74 +82,82 @@
             margin-bottom: 24px;
         }
         .total-geral-label { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+        .total-geral-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
         .total-geral-value { font-family: var(--font-mono); font-size: 28px; color: var(--gold); font-weight: 700; }
 
-        /* SECAO VENDAS */
+        /* Vendas */
         .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 12px; font-weight: 600; }
 
-        /* CARD VENDA */
         .venda-card {
             background: var(--card); border: 1px solid var(--card-border);
             border-radius: var(--radius); margin-bottom: 10px;
-            overflow: hidden; cursor: pointer; transition: border-color .2s;
+            overflow: hidden; transition: border-color .2s;
         }
-        .venda-card:hover             { border-color: rgba(212,175,55,.4); }
-        .venda-card.cancelada         { opacity: .45; }
+        .venda-card:hover { border-color: rgba(212,175,55,.4); }
+        .venda-card.cancelada { opacity: .45; }
+
         .venda-card-header {
             padding: 14px 16px; display: flex; align-items: center;
-            justify-content: space-between; gap: 12px;
+            justify-content: space-between; gap: 12px; cursor: pointer;
         }
-        .venda-card-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
-        .venda-icon { font-size: 20px; flex-shrink: 0; }
-        .venda-id   { font-weight: 700; font-size: 15px; }
-        .venda-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
-        .venda-badge {
-            font-size: 10px; font-weight: 700; letter-spacing: 1px;
-            padding: 2px 8px; border-radius: 20px; text-transform: uppercase; flex-shrink: 0;
-        }
-        .badge-pago     { background: rgba(76,175,125,.15); color: var(--success); }
-        .badge-cancelado{ background: rgba(224,84,84,.15);  color: var(--danger); }
-
+        .venda-card-left  { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .venda-icon       { font-size: 20px; flex-shrink: 0; }
+        .venda-id         { font-weight: 700; font-size: 15px; }
+        .venda-meta       { font-size: 12px; color: var(--muted); margin-top: 2px; }
         .venda-card-right { text-align: right; flex-shrink: 0; }
-        .venda-valor { font-family: var(--font-mono); font-weight: 700; font-size: 16px; }
+        .venda-valor      { font-family: var(--font-mono); font-weight: 700; font-size: 16px; }
+
+        .venda-badge { font-size: 10px; font-weight: 700; letter-spacing: 1px; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; }
+        .badge-pago      { background: rgba(76,175,125,.15); color: var(--success); }
+        .badge-pendente  { background: rgba(77,184,212,.15); color: var(--info); }
+        .badge-cancelado { background: rgba(224,84,84,.15);  color: var(--danger); }
+
         .btn-cancelar {
             background: none; border: none; color: var(--danger);
             font-size: 13px; cursor: pointer; padding: 4px 8px;
-            border-radius: 6px; transition: background .2s; margin-top: 4px; display: block; margin-left: auto;
+            border-radius: 6px; transition: background .2s;
+            margin-top: 4px; display: block; margin-left: auto;
         }
         .btn-cancelar:hover { background: rgba(224,84,84,.12); }
 
-        /* ITENS DA VENDA (expande) */
-        .venda-itens {
-            display: none; padding: 0 16px 14px; border-top: 1px solid var(--card-border);
+        /* Itens expandidos */
+        .venda-expand { display: none; border-top: 1px solid var(--card-border); }
+        .venda-expand.open { display: block; }
+
+        /* Bloco de pagamentos dentro do card */
+        .pags-block {
+            padding: 10px 16px; border-bottom: 1px solid var(--card-border);
+            display: flex; flex-wrap: wrap; gap: 8px;
         }
-        .venda-itens.open { display: block; }
+        .pag-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--surface); border: 1px solid var(--card-border);
+            border-radius: 20px; padding: 3px 12px; font-size: 12px;
+        }
+        .pag-pill-forma { color: var(--muted); text-transform: uppercase; font-size: 10px; letter-spacing: .5px; }
+        .pag-pill-valor { font-family: var(--font-mono); font-weight: 600; color: var(--gold); }
+
+        /* Itens do pedido */
+        .itens-block { padding: 0 16px 14px; }
         .item-linha {
             display: flex; justify-content: space-between; align-items: center;
             padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.04); font-size: 14px;
         }
         .item-linha:last-child { border-bottom: none; }
-        .item-nome  { color: var(--text); }
-        .item-qtd   { color: var(--gold); font-size: 12px; margin-top: 2px; }
-        .item-sub   { font-family: var(--font-mono); font-size: 13px; color: var(--text); white-space: nowrap; }
+        .item-nome { color: var(--text); }
+        .item-qtd  { color: var(--gold); font-size: 12px; margin-top: 2px; }
+        .item-sub  { font-family: var(--font-mono); font-size: 13px; white-space: nowrap; }
 
-        /* EMPTY */
+        /* Empty */
         .empty-state { text-align: center; padding: 60px 20px; opacity: .3; }
         .empty-state span { font-size: 48px; display: block; margin-bottom: 10px; }
 
-        /* SPINNER */
-        .spinner {
-            width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.2);
-            border-top-color: #000; border-radius: 50%;
-            animation: spin .6s linear infinite; display: inline-block;
-        }
-        .spinner.dark { border-color: rgba(0,0,0,.2); border-top-color: #000; }
+        .spinner { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,.2); border-top-color: #000; border-radius: 50%; animation: spin .6s linear infinite; display: inline-block; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* MOBILE */
         @media (max-width: 480px) {
             .totais-grid { grid-template-columns: 1fr 1fr; }
-            .total-card-value { font-size: 18px; }
+            .total-card-value  { font-size: 18px; }
             .total-geral-value { font-size: 22px; }
         }
     </style>
@@ -181,18 +174,15 @@
 
 <div class="page">
 
-    <!-- FILTRO -->
     <div class="filtro-row">
         <div class="input-group">
             <label>Data</label>
             <input type="date" id="filtroData">
         </div>
-        <button class="btn-buscar" id="btnBuscar" onclick="buscarVendas()">
-            &#8635; Buscar
-        </button>
+        <button class="btn-buscar" id="btnBuscar" onclick="buscarVendas()">&#8635; Buscar</button>
     </div>
 
-    <!-- TOTAIS -->
+    <!-- Totais por forma — lidos de Pagamentos -->
     <div class="totais-grid">
         <div class="total-card">
             <div class="total-card-label">Dinheiro</div>
@@ -203,175 +193,238 @@
             <div class="total-card-value val-pix" id="totalPix">R$ 0,00</div>
         </div>
         <div class="total-card">
-            <div class="total-card-label">Cart&#245;es</div>
-            <div class="total-card-value val-cartao" id="totalCartao">R$ 0,00</div>
+            <div class="total-card-label">Cart&#227;o D&#233;bito</div>
+            <div class="total-card-value val-debito" id="totalDebito">R$ 0,00</div>
         </div>
+        <div class="total-card">
+            <div class="total-card-label">Cart&#227;o Cr&#233;dito</div>
+            <div class="total-card-value val-credito" id="totalCredito">R$ 0,00</div>
+        </div>
+    </div>
+
+    <!-- Linha extra: qtd de vendas -->
+    <div class="totais-grid" style="margin-bottom:12px;">
         <div class="total-card">
             <div class="total-card-label">Vendas</div>
             <div class="total-card-value" id="totalQtd" style="color:var(--text)">0</div>
+        </div>
+        <div class="total-card">
+            <div class="total-card-label">Descontos</div>
+            <div class="total-card-value" id="totalDescontos" style="color:var(--danger)">R$ 0,00</div>
         </div>
     </div>
 
     <div class="total-geral-card">
         <div>
             <div class="total-geral-label">Total Geral</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:2px;">apenas vendas conclu&#237;das</div>
+            <div class="total-geral-sub">apenas vendas conclu&#237;das</div>
         </div>
         <div class="total-geral-value" id="totalGeral">R$ 0,00</div>
     </div>
 
-    <!-- LISTA -->
     <div class="section-title">Vendas Realizadas</div>
     <div id="listaVendas"></div>
 
 </div>
 
 <script>
-/* DATA INICIAL */
-var hoje = new Date();
-var dd   = String(hoje.getDate()).padStart(2, '0');
-var mm   = String(hoje.getMonth() + 1).padStart(2, '0');
-var yyyy = hoje.getFullYear();
-document.getElementById('filtroData').value = yyyy + '-' + mm + '-' + dd;
-document.getElementById('dataDisplay').textContent = dd + '/' + mm + '/' + yyyy;
+    /* ── Data inicial ── */
+    var hoje = new Date();
+    var dd   = String(hoje.getDate()).padStart(2,'0');
+    var mm   = String(hoje.getMonth()+1).padStart(2,'0');
+    var yyyy = hoje.getFullYear();
+    document.getElementById('filtroData').value    = yyyy + '-' + mm + '-' + dd;
+    document.getElementById('dataDisplay').textContent = dd + '/' + mm + '/' + yyyy;
 
-function toast(msg, tipo) {
-    var el = document.getElementById('toast');
-    el.textContent = msg;
-    el.className = 'show' + (tipo === 'error' ? ' error' : '');
-    clearTimeout(el._t);
-    el._t = setTimeout(function() { el.className = ''; }, 3500);
-}
+    function toast(msg, tipo) {
+        var el = document.getElementById('toast');
+        el.textContent = msg;
+        el.className = 'show' + (tipo === 'error' ? ' error' : '');
+        clearTimeout(el._t);
+        el._t = setTimeout(function(){ el.className = ''; }, 3500);
+    }
 
-function fmtNum(n) { return parseFloat(n || 0).toFixed(2).replace('.', ','); }
+    function fmtNum(n) { return parseFloat(n || 0).toFixed(2).replace('.', ','); }
 
-function nomeForma(f) {
-    var m = { dinheiro:'Dinheiro', pix:'Pix', cartao_debito:'D&#233;bito', cartao_credito:'Cr&#233;dito', outro:'Outro' };
-    return m[f] || (f ? f.toUpperCase() : '&#8212;');
-}
+    var FORMA_LABEL = {
+        dinheiro:       'Dinheiro',
+        pix:            'Pix',
+        cartao_debito:  'Débito',
+        cartao_credito: 'Crédito',
+        crediario:      'Crediário',
+        misto:          'Misto',
+        outro:          'Outro',
+    };
 
-function buscarVendas() {
-    var btn  = document.getElementById('btnBuscar');
-    var data = document.getElementById('filtroData').value;
-    if (!data) { toast('Selecione uma data', 'error'); return; }
+    /* ── Busca ── */
+    function buscarVendas() {
+        var btn  = document.getElementById('btnBuscar');
+        var data = document.getElementById('filtroData').value;
+        if (!data) { toast('Selecione uma data', 'error'); return; }
 
-    var partes = data.split('-');
-    document.getElementById('dataDisplay').textContent = partes[2] + '/' + partes[1] + '/' + partes[0];
+        var p = data.split('-');
+        document.getElementById('dataDisplay').textContent = p[2] + '/' + p[1] + '/' + p[0];
 
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner dark"></span>';
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>';
 
-    fetch('/admin/fechamento/dados?data=' + data, { credentials: 'include' })
-        .then(function(res) {
-            var ct = res.headers.get('content-type') || '';
-            if (!ct.includes('application/json')) {
-                toast('Sess\u00e3o expirada \u2014 recarregue', 'error');
-                return;
+        fetch('/admin/fechamento/dados?data=' + data, { credentials: 'include' })
+            .then(function(res) {
+                var ct = res.headers.get('content-type') || '';
+                if (!ct.includes('application/json')) { toast('Sessão expirada — recarregue', 'error'); return; }
+                return res.json().then(function(json) {
+                    if (!res.ok) throw new Error(json.message || 'Erro ao buscar');
+                    renderVendas(json.data || []);
+                });
+            })
+            .catch(function(err) { toast('Erro: ' + err.message, 'error'); })
+            .finally(function() { btn.disabled = false; btn.innerHTML = '&#8635; Buscar'; });
+    }
+
+    /* ── Render ── */
+    function renderVendas(vendas) {
+        var lista = document.getElementById('listaVendas');
+
+        /* Acumuladores por forma — lidos de v.Pagamentos */
+        var totais = { dinheiro: 0, pix: 0, cartao_debito: 0, cartao_credito: 0 };
+        var totalGeral = 0, totalDescontos = 0, qtdVendas = 0;
+
+        if (!vendas.length) {
+            lista.innerHTML = '<div class="empty-state"><span>&#128196;</span><p>Nenhuma venda neste dia</p></div>';
+            atualizarTotais(totais, 0, 0, 0);
+            return;
+        }
+
+        var html = '';
+        for (var i = 0; i < vendas.length; i++) {
+            var v         = vendas[i];
+            var cancelada = v.status_pagamento === 'cancelado';
+            var valor     = parseFloat(v.total_final) || 0;
+            var desconto  = parseFloat(v.desconto)    || 0;
+
+            /* ── Soma nos totais apenas vendas não canceladas ── */
+            if (!cancelada) {
+                qtdVendas++;
+                totalGeral    += valor;
+                totalDescontos += desconto;
+
+                /* itera Pagamentos (novo modelo) */
+                var pags = v.Pagamentos || [];
+                for (var k = 0; k < pags.length; k++) {
+                    var pag  = pags[k];
+                    if (pag.origem === 'estorno') continue;   /* ignora estornos */
+                    var vPag = parseFloat(pag.valor) || 0;
+                    var f    = pag.forma_pagamento || 'outro';
+                    if (totais[f] !== undefined) totais[f] += vPag;
+                    /* formas não mapeadas nos cards (crediario, misto, outro)
+                       são ignoradas nos cartões mas aparecem nos pills da venda */
+                }
             }
-            return res.json().then(function(json) {
-                if (!res.ok) throw new Error(json.message || 'Erro ao buscar');
-                renderVendas(json.data || []);
-            });
-        })
-        .catch(function(err) { toast('Erro: ' + err.message, 'error'); })
-        .finally(function() { btn.disabled = false; btn.innerHTML = '&#8635; Buscar'; });
-}
 
-function renderVendas(vendas) {
-    var lista = document.getElementById('listaVendas');
-    var d = 0, p = 0, c = 0, qtd = 0;
+            /* ── Pills de pagamento ── */
+            var pillsHtml = '';
+            var pagsVenda = v.Pagamentos || [];
+            if (pagsVenda.length) {
+                for (var m = 0; m < pagsVenda.length; m++) {
+                    var pg = pagsVenda[m];
+                    if (pg.origem === 'estorno') continue;
+                    pillsHtml += '<div class="pag-pill">'
+                        + '<span class="pag-pill-forma">' + (FORMA_LABEL[pg.forma_pagamento] || pg.forma_pagamento) + '</span>'
+                        + '<span class="pag-pill-valor">R$ ' + fmtNum(pg.valor) + '</span>'
+                        + '</div>';
+                }
+            } else {
+                /* fallback para vendas antigas sem Pagamentos */
+                pillsHtml = '<div class="pag-pill">'
+                    + '<span class="pag-pill-forma">' + (FORMA_LABEL[v.forma_pagamento] || v.forma_pagamento || '—') + '</span>'
+                    + '<span class="pag-pill-valor">R$ ' + fmtNum(valor) + '</span>'
+                    + '</div>';
+            }
 
-    if (!vendas.length) {
-        lista.innerHTML = '<div class="empty-state"><span>&#128196;</span><p>Nenhuma venda neste dia</p></div>';
-        atualizarTotais(0, 0, 0, 0);
-        return;
-    }
+            /* ── Itens do pedido ── */
+            var itensHtml = '';
+            var itens = v.Itens || [];
+            for (var j = 0; j < itens.length; j++) {
+                var it    = itens[j];
+                var qtdIt = parseFloat(it.quantidade)     || 0;
+                var prIt  = parseFloat(it.preco_unitario) || 0;
+                var nome  = (it.Produto && it.Produto.descricao) ? it.Produto.descricao : 'Produto #' + it.produto_id;
+                itensHtml += '<div class="item-linha">'
+                    + '<div><div class="item-nome">' + nome + '</div>'
+                    + '<div class="item-qtd">' + qtdIt + 'x &nbsp;R$ ' + fmtNum(prIt) + '</div></div>'
+                    + '<div class="item-sub">R$ ' + fmtNum(qtdIt * prIt) + '</div>'
+                    + '</div>';
+            }
 
-    var html = '';
-    for (var i = 0; i < vendas.length; i++) {
-        var v          = vendas[i];
-        var cancelada  = v.status_pagamento === 'cancelado';
-        var valor      = parseFloat(v.total_final) || 0;
-        var forma      = (v.forma_pagamento || '').toLowerCase();
+            var statusClass = cancelada ? 'badge-cancelado' : (v.status_pagamento === 'pendente' ? 'badge-pendente' : 'badge-pago');
+            var statusLabel = cancelada ? 'Cancelada' : (v.status_pagamento === 'pendente' ? 'Pendente' : 'Paga');
 
-        if (!cancelada) {
-            qtd++;
-            if (forma === 'dinheiro')                       d += valor;
-            else if (forma === 'pix')                       p += valor;
-            else if (forma.includes('cart'))                c += valor;
+            var btnCancel = cancelada ? '' :
+                '<button class="btn-cancelar" onclick="event.stopPropagation();cancelarVenda(' + v.id + ')">&#128465; Cancelar venda</button>';
+
+            /* desconto no meta da venda */
+            var metaForma = pagsVenda.length > 1
+                ? pagsVenda.length + ' formas de pagamento'
+                : (FORMA_LABEL[v.forma_pagamento] || v.forma_pagamento || '—');
+            var metaDesc = desconto > 0 ? ' &bull; Desc. R$ ' + fmtNum(desconto) : '';
+            var metaCancelada = cancelada ? ' &bull; CANCELADA' : '';
+
+            html +=
+                '<div class="venda-card' + (cancelada ? ' cancelada' : '') + '" id="card' + v.id + '">' +
+                    '<div class="venda-card-header" onclick="toggleExpand(' + v.id + ')">' +
+                        '<div class="venda-card-left">' +
+                            '<span class="venda-icon">&#128196;</span>' +
+                            '<div>' +
+                                '<div class="venda-id">Venda #' + v.id + '</div>' +
+                                '<div class="venda-meta">' + metaForma + metaDesc + metaCancelada + '</div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="venda-card-right">' +
+                            '<div class="venda-valor' + (cancelada ? '" style="text-decoration:line-through;color:var(--muted)' : '') + '">R$ ' + fmtNum(valor) + '</div>' +
+                            '<span class="venda-badge ' + statusClass + '">' + statusLabel + '</span>' +
+                            btnCancel +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="venda-expand" id="exp' + v.id + '">' +
+                        '<div class="pags-block">' + (pillsHtml || '<span style="color:var(--muted);font-size:12px;">Sem registros de pagamento</span>') + '</div>' +
+                        '<div class="itens-block">' + itensHtml + '</div>' +
+                    '</div>' +
+                '</div>';
         }
 
-        /* itens */
-        var itensHtml = '';
-        var itens = v.Itens || [];
-        for (var j = 0; j < itens.length; j++) {
-            var it  = itens[j];
-            var qtdIt  = parseFloat(it.quantidade) || 0;
-            var prIt   = parseFloat(it.preco_unitario) || 0;
-            var nome   = (it.Produto && it.Produto.descricao) ? it.Produto.descricao : 'Produto #' + it.produto_id;
-            itensHtml += '<div class="item-linha">'
-                       + '<div><div class="item-nome">' + nome + '</div>'
-                       + '<div class="item-qtd">' + qtdIt + 'x &nbsp;R$ ' + fmtNum(prIt) + '</div></div>'
-                       + '<div class="item-sub">R$ ' + fmtNum(qtdIt * prIt) + '</div>'
-                       + '</div>';
-        }
-
-        var btnCancel = cancelada ? '' :
-            '<button class="btn-cancelar" data-id="' + v.id + '" onclick="event.stopPropagation();cancelarVenda(' + v.id + ')">&#128465; Cancelar venda</button>';
-
-        html += '<div class="venda-card' + (cancelada ? ' cancelada' : '') + '" id="card' + v.id + '">'
-              + '<div class="venda-card-header" onclick="toggleItens(' + v.id + ')">'
-              +   '<div class="venda-card-left">'
-              +     '<span class="venda-icon">&#128196;</span>'
-              +     '<div>'
-              +       '<div class="venda-id">Venda #' + v.id + '</div>'
-              +       '<div class="venda-meta">' + nomeForma(v.forma_pagamento) + (cancelada ? ' &bull; CANCELADA' : '') + '</div>'
-              +     '</div>'
-              +   '</div>'
-              +   '<div class="venda-card-right">'
-              +     '<div class="venda-valor' + (cancelada ? '" style="text-decoration:line-through;color:var(--muted)' : '') + '">R$ ' + fmtNum(valor) + '</div>'
-              +     '<span class="venda-badge ' + (cancelada ? 'badge-cancelado' : 'badge-pago') + '">' + (cancelada ? 'Cancelada' : 'Paga') + '</span>'
-              +     btnCancel
-              +   '</div>'
-              + '</div>'
-              + '<div class="venda-itens" id="itens' + v.id + '">' + itensHtml + '</div>'
-              + '</div>';
+        lista.innerHTML = html;
+        atualizarTotais(totais, totalGeral, totalDescontos, qtdVendas);
     }
 
-    lista.innerHTML = html;
-    atualizarTotais(d, p, c, qtd);
-}
+    function toggleExpand(id) {
+        var el = document.getElementById('exp' + id);
+        if (el) el.classList.toggle('open');
+    }
 
-function toggleItens(id) {
-    var el = document.getElementById('itens' + id);
-    if (el) el.classList.toggle('open');
-}
+    function atualizarTotais(totais, geral, descontos, qtd) {
+        document.getElementById('totalDinheiro').textContent  = 'R$ ' + fmtNum(totais.dinheiro);
+        document.getElementById('totalPix').textContent       = 'R$ ' + fmtNum(totais.pix);
+        document.getElementById('totalDebito').textContent    = 'R$ ' + fmtNum(totais.cartao_debito);
+        document.getElementById('totalCredito').textContent   = 'R$ ' + fmtNum(totais.cartao_credito);
+        document.getElementById('totalQtd').textContent       = qtd;
+        document.getElementById('totalDescontos').textContent = 'R$ ' + fmtNum(descontos);
+        document.getElementById('totalGeral').textContent     = 'R$ ' + fmtNum(geral);
+    }
 
-function atualizarTotais(d, p, c, qtd) {
-    document.getElementById('totalDinheiro').textContent = 'R$ ' + fmtNum(d);
-    document.getElementById('totalPix').textContent      = 'R$ ' + fmtNum(p);
-    document.getElementById('totalCartao').textContent   = 'R$ ' + fmtNum(c);
-    document.getElementById('totalQtd').textContent      = qtd;
-    document.getElementById('totalGeral').textContent    = 'R$ ' + fmtNum(d + p + c);
-}
+    function cancelarVenda(id) {
+        if (!confirm('Cancelar a venda #' + id + '? O estoque será estornado.')) return;
+        fetch('/admin/vendas/' + id + '/cancelar', { method: 'PATCH', credentials: 'include' })
+            .then(function(res) {
+                return res.json().then(function(json) {
+                    if (!res.ok) throw new Error(json.message || 'Erro ao cancelar');
+                    toast('Venda #' + id + ' cancelada');
+                    buscarVendas();
+                });
+            })
+            .catch(function(err) { toast('Erro: ' + err.message, 'error'); });
+    }
 
-function cancelarVenda(id) {
-    if (!confirm('Cancelar a venda #' + id + '? O estoque ser\u00e1 estornado.')) return;
-    fetch('/admin/vendas/' + id + '/cancelar', {
-        method: 'PATCH', credentials: 'include'
-    })
-    .then(function(res) {
-        return res.json().then(function(json) {
-            if (!res.ok) throw new Error(json.message || 'Erro ao cancelar');
-            toast('Venda #' + id + ' cancelada');
-            buscarVendas();
-        });
-    })
-    .catch(function(err) { toast('Erro: ' + err.message, 'error'); });
-}
-
-/* carrega ao abrir */
-buscarVendas();
+    buscarVendas();
 </script>
 </body>
 </html>

@@ -122,8 +122,6 @@ router.get('/deletar/:id', isAdminAuthenticated, async (req, res) => {
         res.send('Erro ao excluir o agendamento');
     }
 });
-
-// ── Dashboard dados ── sem alteração
 router.get('/admin/dashboard/dados', isAdminAuthenticated, async (req, res) => {
     try {
         const fim = req.query.fim ? new Date(req.query.fim) : new Date();
@@ -137,8 +135,19 @@ router.get('/admin/dashboard/dados', isAdminAuthenticated, async (req, res) => {
         });
         const lista = agendamentos.map(a => a.get({ plain: true }));
 
+        // ── Deduplica combos: um pacote_id = um agendamento ──────────────
+        // Para KPIs e evolução, cada pacote_id conta 1x (pelo primeiro item)
+        const vistos = new Set();
+        const listaDedup = lista.filter(a => {
+            if (!a.pacote_id) return true;           // serviço avulso → sempre inclui
+            if (vistos.has(a.pacote_id)) return false; // combo já visto → ignora
+            vistos.add(a.pacote_id);
+            return true;                              // primeiro do combo → inclui
+        });
+
+        // ── Evolução por barbeiro (usa lista dedup) ───────────────────────
         const evolucao = {};
-        lista.forEach(a => {
+        listaDedup.forEach(a => {
             const d = new Date(a.data);
             d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
             const dia = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -147,6 +156,7 @@ router.get('/admin/dashboard/dados', isAdminAuthenticated, async (req, res) => {
             evolucao[dia][barb] = (evolucao[dia][barb] || 0) + 1;
         });
 
+        // ── Serviços por barbeiro (usa lista COMPLETA — mostra todos os serviços do combo) ──
         const servicosPorBarbeiro = {};
         lista.forEach(a => {
             const barb = a.barbeiro || 'Sem barbeiro';
@@ -154,12 +164,13 @@ router.get('/admin/dashboard/dados', isAdminAuthenticated, async (req, res) => {
             servicosPorBarbeiro[barb][a.servico] = (servicosPorBarbeiro[barb][a.servico] || 0) + 1;
         });
 
+        // ── KPIs (usa lista dedup) ────────────────────────────────────────
         const porBarbeiro = {};
         const faturamentoPorBarbeiro = {};
         const porServico = {};
         let faturamentoTotal = 0;
 
-        lista.forEach(a => {
+        listaDedup.forEach(a => {
             const barb = a.barbeiro || 'Sem barbeiro';
             porBarbeiro[barb] = (porBarbeiro[barb] || 0) + 1;
             faturamentoPorBarbeiro[barb] = (faturamentoPorBarbeiro[barb] || 0) + parseFloat(a.valor || 0);
@@ -168,14 +179,15 @@ router.get('/admin/dashboard/dados', isAdminAuthenticated, async (req, res) => {
         });
 
         const topBarbeiro = Object.entries(porBarbeiro).sort((a, b) => b[1] - a[1])[0];
-        const topServico = Object.entries(porServico).sort((a, b) => b[1] - a[1])[0];
+        const topServico  = Object.entries(porServico).sort((a, b) => b[1] - a[1])[0];
 
         res.json({
             periodo: { inicio: inicio.toISOString().split('T')[0], fim: fim.toISOString().split('T')[0] },
             kpis: {
-                totalAgendamentos: lista.length, faturamentoTotal: faturamentoTotal.toFixed(2),
+                totalAgendamentos: listaDedup.length,
+                faturamentoTotal: faturamentoTotal.toFixed(2),
                 topBarbeiro: topBarbeiro ? { nome: topBarbeiro[0], count: topBarbeiro[1] } : null,
-                topServico: topServico ? { nome: topServico[0], count: topServico[1] } : null
+                topServico:  topServico  ? { nome: topServico[0],  count: topServico[1]  } : null
             },
             evolucao, servicosPorBarbeiro, faturamentoPorBarbeiro, porBarbeiro
         });

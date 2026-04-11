@@ -136,7 +136,7 @@ router.get('/admin', isAdminAuthenticated, async (req, res) => {
     try {
         const idEmpresa = req.user.idEmpresa;
         const [agendamentos, admins, servicos, empresa] = await Promise.all([
-            Agendamento.findAll({ where: { idEmpresa } }),
+            Agendamento.findAll({ where: { idEmpresa, status: { [Op.ne]: 'cancelado' } } }),
             Admin.findAll({ where: { idEmpresa }, attributes: ['id', 'nome', 'email', 'role', 'ativo'] }),
             Servico.findAll({ where: { ativo: true, idEmpresa }, order: [['nome', 'ASC']] }),
             Empresa.findByPk(idEmpresa)

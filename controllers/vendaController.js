@@ -2,9 +2,10 @@
 const { Op } = require('sequelize');
 const sequelize = require('../config/db');
 
-const Venda     = require('../models/Venda');
+const Venda = require('../models/Venda');
 const VendaItem = require('../models/VendaItem');
-const Produto   = require('../models/produto');
+const Produto = require('../models/produto');
+const MovtoEstoque = require('../models/MovtoEstoque');
 
 /* ─────────────────────────────────────────────
    GET /admin/vendas/produtos?busca=TERMO
@@ -46,7 +47,7 @@ exports.criar = async (req, res) => {
     const t = await sequelize.transaction();
     try {
         const { forma_pagamento, desconto = 0, itens } = req.body;
-        const idEmpresa  = req.user.idEmpresa;
+        const idEmpresa = req.user.idEmpresa;
         const usuario_id = req.user.id;
 
         if (!itens || !itens.length) {
@@ -55,14 +56,14 @@ exports.criar = async (req, res) => {
         }
 
         const mapaForma = {
-            'Dinheiro':      'dinheiro',
-            'Pix':           'pix',
+            'Dinheiro': 'dinheiro',
+            'Pix': 'pix',
             'Cartao Debito': 'cartao_debito',
-            'Cartao Credito':'cartao_credito',
+            'Cartao Credito': 'cartao_credito',
         };
         const formaNormalizada = mapaForma[forma_pagamento] || 'outro';
 
-        const total       = itens.reduce((acc, i) => acc + (i.preco_unitario * i.quantidade), 0);
+        const total = itens.reduce((acc, i) => acc + (i.preco_unitario * i.quantidade), 0);
         const total_final = Math.max(0, total - parseFloat(desconto));
 
         const venda = await Venda.create({
@@ -71,25 +72,46 @@ exports.criar = async (req, res) => {
             total,
             desconto,
             total_final,
-            forma_pagamento:  formaNormalizada,
+            forma_pagamento: formaNormalizada,
             status_pagamento: 'pago',
         }, { transaction: t });
 
         for (const item of itens) {
             const subtotal = item.preco_unitario * item.quantidade;
             await VendaItem.create({
-                venda_id:       venda.id,
-                produto_id:     item.produto_id,
-                quantidade:     item.quantidade,
+                venda_id: venda.id,
+                produto_id: item.produto_id,
+                quantidade: item.quantidade,
                 preco_unitario: item.preco_unitario,
                 subtotal,
             }, { transaction: t });
 
-            await Produto.decrement('estoque', {
-                by: item.quantidade,
+            // ── Substitui o decrement para ter qtd_anterior disponível ──
+            const produto = await Produto.findOne({
                 where: { id: item.produto_id, idEmpresa },
                 transaction: t,
+                lock: true,
             });
+
+            if (produto) {
+                const qtdAnterior = parseFloat(produto.estoque) || 0;
+                const quantidade = parseFloat(item.quantidade);
+                const qtdFinal = Math.max(0, qtdAnterior - quantidade);
+
+                await produto.update({ estoque: qtdFinal }, { transaction: t });
+
+                await MovtoEstoque.create({
+                    empresa_id: idEmpresa,
+                    produto_id: item.produto_id,
+                    documento_id: venda.id,
+                    tipo_documento: 'VENDA',
+                    ent_sai: 'S',
+                    qtd_anterior: qtdAnterior,
+                    quantidade,
+                    qtd_final: qtdFinal,
+                    usuario_id,
+                }, { transaction: t });
+            }
         }
 
         await t.commit();
@@ -109,10 +131,10 @@ exports.criar = async (req, res) => {
 exports.fechamento = async (req, res) => {
     try {
         const idEmpresa = req.user.idEmpresa;
-        const data      = req.query.data || new Date().toISOString().slice(0, 10);
+        const data = req.query.data || new Date().toISOString().slice(0, 10);
 
         const inicio = new Date(data + 'T00:00:00');
-        const fim    = new Date(data + 'T23:59:59');
+        const fim = new Date(data + 'T23:59:59');
 
         const vendas = await Venda.findAll({
             where: {
@@ -120,9 +142,9 @@ exports.fechamento = async (req, res) => {
                 createdAt: { [Op.between]: [inicio, fim] },
             },
             include: [{
-                model:      VendaItem,
-                as:         'Itens',
-                include:    [{ model: Produto, as: 'Produto', attributes: ['descricao'] }],
+                model: VendaItem,
+                as: 'Itens',
+                include: [{ model: Produto, as: 'Produto', attributes: ['descricao'] }],
             }],
             order: [['createdAt', 'DESC']],
         });
@@ -142,10 +164,10 @@ exports.cancelar = async (req, res) => {
     const t = await sequelize.transaction();
     try {
         const idEmpresa = req.user.idEmpresa;
-        const { id }    = req.params;
+        const { id } = req.params;
 
         const venda = await Venda.findOne({
-            where:   { id, idEmpresa },
+            where: { id, idEmpresa },
             include: [{ model: VendaItem, as: 'Itens' }],
         });
 
@@ -161,11 +183,30 @@ exports.cancelar = async (req, res) => {
 
         // Estorna estoque de cada item
         for (const item of venda.Itens) {
-            await Produto.increment('estoque', {
-                by: item.quantidade,
+            const produto = await Produto.findOne({
                 where: { id: item.produto_id, idEmpresa },
                 transaction: t,
+                lock: true,
             });
+            if (!produto) continue;
+
+            const qtdAnterior = parseFloat(produto.estoque) || 0;
+            const quantidade = parseFloat(item.quantidade);
+            const qtdFinal = qtdAnterior + quantidade;
+
+            await produto.update({ estoque: qtdFinal }, { transaction: t });
+
+            await MovtoEstoque.create({
+                empresa_id: idEmpresa,
+                produto_id: item.produto_id,
+                documento_id: venda.id,
+                tipo_documento: 'ESTORNO_VENDA',
+                ent_sai: 'E',
+                qtd_anterior: qtdAnterior,
+                quantidade,
+                qtd_final: qtdFinal,
+                usuario_id: req.user.id,
+            }, { transaction: t });
         }
 
         await venda.update({ status_pagamento: 'cancelado' }, { transaction: t });
@@ -202,9 +243,9 @@ exports.viewDashboardVendas = (req, res) => {
 exports.dashboardVendas = async (req, res) => {
     try {
         const idEmpresa = req.user.idEmpresa;
-        const fim    = req.query.fim    ? new Date(req.query.fim    + 'T23:59:59') : new Date();
+        const fim = req.query.fim ? new Date(req.query.fim + 'T23:59:59') : new Date();
         const inicio = req.query.inicio ? new Date(req.query.inicio + 'T00:00:00')
-                                        : new Date(fim.getTime() - 30 * 24 * 60 * 60 * 1000);
+            : new Date(fim.getTime() - 30 * 24 * 60 * 60 * 1000);
 
         const vendas = await Venda.findAll({
             where: {
@@ -223,19 +264,19 @@ exports.dashboardVendas = async (req, res) => {
         const lista = vendas.map(v => v.get({ plain: true }));
 
         // ── KPIs ──────────────────────────────────────────
-        const totalVendas      = lista.length;
+        const totalVendas = lista.length;
         const faturamentoTotal = lista.reduce((s, v) => s + parseFloat(v.total_final || 0), 0);
-        const totalDesconto    = lista.reduce((s, v) => s + parseFloat(v.desconto || 0), 0);
-        const ticketMedio      = totalVendas > 0 ? faturamentoTotal / totalVendas : 0;
+        const totalDesconto = lista.reduce((s, v) => s + parseFloat(v.desconto || 0), 0);
+        const ticketMedio = totalVendas > 0 ? faturamentoTotal / totalVendas : 0;
 
         // ── Evolução diária ────────────────────────────────
         const evolucao = {};
         lista.forEach(v => {
             const d = new Date(v.createdAt);
-            const dia = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            const dia = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
             if (!evolucao[dia]) evolucao[dia] = { faturamento: 0, quantidade: 0 };
             evolucao[dia].faturamento += parseFloat(v.total_final || 0);
-            evolucao[dia].quantidade  += 1;
+            evolucao[dia].quantidade += 1;
         });
 
         // ── Formas de pagamento ────────────────────────────
@@ -253,7 +294,7 @@ exports.dashboardVendas = async (req, res) => {
             (v.Itens || []).forEach(item => {
                 const nome = item.Produto?.descricao || `Produto #${item.produto_id}`;
                 if (!produtosMap[nome]) produtosMap[nome] = { quantidade: 0, faturamento: 0 };
-                produtosMap[nome].quantidade  += parseFloat(item.quantidade || 0);
+                produtosMap[nome].quantidade += parseFloat(item.quantidade || 0);
                 produtosMap[nome].faturamento += parseFloat(item.subtotal || 0);
             });
         });
@@ -267,13 +308,13 @@ exports.dashboardVendas = async (req, res) => {
         res.json({
             periodo: {
                 inicio: inicio.toISOString().split('T')[0],
-                fim:    fim.toISOString().split('T')[0]
+                fim: fim.toISOString().split('T')[0]
             },
             kpis: {
                 totalVendas,
                 faturamentoTotal: faturamentoTotal.toFixed(2),
-                ticketMedio:      ticketMedio.toFixed(2),
-                totalDesconto:    totalDesconto.toFixed(2),
+                ticketMedio: ticketMedio.toFixed(2),
+                totalDesconto: totalDesconto.toFixed(2),
                 topProduto
             },
             evolucao,

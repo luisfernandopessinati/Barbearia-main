@@ -482,13 +482,31 @@
             '</div>' +
             '<table>' + tabelaHeader + linhasItens + '<tr><td colspan="4"><hr class="divider"></td></tr>' + rodape + '</table>' +
             '<div class="footer">' + msgFinal + '</div>' +
-            '<script>window.onload=function(){window.print();window.onafterprint=function(){window.close();}}<\/script>' +
             '</body></html>';
 
-        var win = window.open('', '_blank', 'width=500,height=700');
-        if (win) { win.document.write(html); win.document.close(); }
-        else toast('Permita pop-ups para imprimir.', 'error');
-    }
+        var iframeId = 'printFrame';
+            var frame = document.getElementById(iframeId);
+            if (!frame) {
+                frame = document.createElement('iframe');
+                frame.id = iframeId;
+                frame.style.cssText = 'position:fixed;width:0;height:0;border:0;left:-9999px;top:-9999px;';
+                document.body.appendChild(frame);
+            }
+
+            frame.onload = function() {
+                try {
+                    frame.contentWindow.focus();
+                    frame.contentWindow.print();
+                } catch(e) {
+                    // fallback para mobile que bloqueia iframe print
+                    var win = window.open('', '_blank');
+                    if (win) { win.document.write(html); win.document.close(); }
+                    else toast('Permita pop-ups para imprimir.', 'error');
+                }
+            };
+
+            frame.srcdoc = html;
+        }
 
     function fmtNum(n) { return parseFloat(n).toFixed(2).replace('.', ','); }
 

@@ -152,7 +152,22 @@
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: var(--dark); }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
+    .btn-upload {
+      background: var(--dark3);
+      border: 1px solid var(--border);
+      color: var(--gold);
+      padding: 7px 14px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-radius: 3px;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-upload:hover { border-color: var(--gold); background: rgba(201,168,76,0.08); }
     /* ── MOBILE ── */
     @media (max-width: 600px) {
       .main { padding: 10px; }
@@ -160,6 +175,7 @@
       .header-title { font-size: 14px; }
       .form-row { grid-template-columns: 1fr; }
       .btn-novo span { display: none; }
+      .btn-novo { min-width: 38px; min-height: 38px; padding: 8px 10px; justify-content: center; }
 
       /* no mobile: mostra foto e estoque, esconde grupo, cód barras e ativo */
       th.col-grupo, td.col-grupo,
@@ -210,7 +226,7 @@
         <input type="text" id="busca" placeholder="Buscar por nome ou cód. barras..." oninput="filtrar()">
       </div>
       <button class="btn-novo" onclick="abrirModal()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
         <span>Novo Produto</span>
       </button>
     </div>
@@ -317,7 +333,29 @@
           <button type="button" class="btn-fechar-scanner" onclick="fecharScanner()">&#215;</button>
         </div>
       </div>
-      <div class="form-group"><label>Imagem</label><input type="file" id="campo-imagem" accept="image/*"></div>
+      <div class="form-group">
+        <label>Imagem</label>
+        <div class="img-upload-wrap">
+          <div id="img-preview-wrap" style="display:none; margin-bottom:8px;">
+            <img id="img-preview" src="" alt="Preview" style="width:80px;height:80px;object-fit:cover;border-radius:4px;border:1px solid var(--border);">
+            <button type="button" onclick="limparImagem()" style="background:none;border:none;color:var(--danger);font-size:11px;cursor:pointer;display:block;margin-top:4px;">Remover</button>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <!-- Abre galeria -->
+            <label class="btn-upload" for="campo-imagem" style="cursor:pointer;">
+              🖼 Galeria
+            </label>
+            <!-- Abre câmera direto (mobile) -->
+            <label class="btn-upload" for="campo-imagem-camera" style="cursor:pointer;">
+              📷 Câmera
+            </label>
+          </div>
+          <!-- input galeria -->
+          <input type="file" id="campo-imagem" accept="image/*" style="display:none" onchange="previewImagem(this)">
+          <!-- input câmera (capture força abrir câmera no celular) -->
+          <input type="file" id="campo-imagem-camera" accept="image/*" capture="environment" style="display:none" onchange="previewImagem(this)">
+        </div>
+      </div>
       <div class="form-group"><div class="form-check"><input type="checkbox" id="campo-ativo" checked><span>Produto ativo</span></div></div>
     </div>
     <div class="modal-footer">
@@ -388,6 +426,7 @@
 
   var _editando = false;
   function abrirModal() {
+    limparImagem();
     _editando = false;
     document.getElementById('modal-titulo').textContent = 'Novo Produto';
     ['campo-id','campo-descricao','campo-grupo','campo-codbarras'].forEach(function(id){ document.getElementById(id).value = ''; });
@@ -402,6 +441,7 @@
   }
 
   function abrirEditar(p) {
+    limparImagem();
     _editando = true;
     document.getElementById('modal-titulo').textContent = 'Editar Produto';
     document.getElementById('campo-id').value          = p.id;
@@ -525,6 +565,31 @@
     }
   }
 
+  function previewImagem(input) {
+    // Sincroniza os dois inputs (galeria e câmera apontam para o mesmo campo)
+    if (input.id === 'campo-imagem-camera') {
+      // Copia o arquivo para o input principal via DataTransfer
+      var dt = new DataTransfer();
+      dt.items.add(input.files[0]);
+      document.getElementById('campo-imagem').files = dt.files;
+    }
+    var file = input.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('img-preview').src = e.target.result;
+      document.getElementById('img-preview-wrap').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function limparImagem() {
+    document.getElementById('campo-imagem').value = '';
+    document.getElementById('campo-imagem-camera').value = '';
+    document.getElementById('img-preview').src = '';
+    document.getElementById('img-preview-wrap').style.display = 'none';
+  }
+
   function statCard(val, label, cor) {
     return '<div style="background:var(--dark3);border:1px solid var(--border);border-radius:4px;padding:10px;text-align:center;"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:20px;font-weight:700;color:'+(cor||'var(--gold)')+';">'+val+'</div><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">'+label+'</div></div>';
   }
@@ -533,6 +598,8 @@
     document.getElementById('drawer-produto').style.transform = 'translateX(100%)';
     document.getElementById('drawer-prod-overlay').style.display = 'none';
   }
+
+
 </script>
 </body>
 </html>

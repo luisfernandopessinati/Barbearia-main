@@ -162,7 +162,9 @@ router.get('/admin', isAdminAuthenticated, async (req, res) => {
                 servico: agendamento.servico,
                 barbeiro: agendamento.barbeiro,
                 pago: agendamento.pago || 0,
-                pacote_id: agendamento.pacote_id || null
+                pacote_id: agendamento.pacote_id || null,
+                status: agendamento.status,
+                alerta_faltou: agendamento.alerta_faltou || false
             };
         });
 
@@ -231,7 +233,26 @@ router.post('/admin/agendar', isAdminAuthenticated, async (req, res) => {
 
         const servicoObj = !isCompromisso ? await Servico.findOne({ where: { nome: servico, idEmpresa } }) : null;
         const valor = servicoObj ? parseFloat(servicoObj.valor) : 0;
+        let alertaFaltou = false;
+        if (!isCompromisso && telefone) {
+            const telNormalizado = normalizarTelefone(telefone);
+            const ultimoAgendamento = await sequelize.query(`
+        SELECT status FROM Agendamentos
+        WHERE telefone = :telefone
+          AND idEmpresa = :idEmpresa
+          AND status NOT IN ('cancelado')
+          AND data < :data
+        ORDER BY data DESC, horario DESC
+        LIMIT 1
+    `, {
+                replacements: { telefone: telNormalizado, idEmpresa, data },
+                type: QueryTypes.SELECT
+            });
 
+            if (ultimoAgendamento.length > 0 && ultimoAgendamento[0].status === 'cliente_faltou') {
+                alertaFaltou = true;
+            }
+        }
         const novoAgendamento = await Agendamento.create({
             barbeiro,
             nome: isCompromisso ? (req.body.motivo || 'Compromisso') : nome,
@@ -244,7 +265,8 @@ router.post('/admin/agendar', isAdminAuthenticated, async (req, res) => {
             hora_inicio: hiInicio, hora_fim: hiFim || null,
             servico_id: isCompromisso ? null : (servico_id || null),
             status: isCompromisso ? 'compromisso' : 'pendente',
-            observacao: isCompromisso ? null : (req.body.observacao || null)
+            observacao: isCompromisso ? null : (req.body.observacao || null),
+            alerta_faltou: alertaFaltou
         });
 
         // ── Histórico ──
@@ -388,12 +410,14 @@ router.get('/admin/agendamentos-json', isAdminAuthenticated, async (req, res) =>
                 id: a.id,
                 nome: a.nome,
                 telefone: a.telefone,
-                data: `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`,
+                data: `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`,
                 horario: a.horario,
                 hora_fim: a.hora_fim ? a.hora_fim.substring(0, 5) : '',
                 servico: a.servico,
                 barbeiro: a.barbeiro,
                 pago: a.pago || 0,
+                status: a.status,
+                alerta_faltou: a.alerta_faltou || false,
                 pacote_id: a.pacote_id || null
             };
         });
@@ -404,7 +428,7 @@ router.get('/admin/agendamentos-json', isAdminAuthenticated, async (req, res) =>
 });
 
 // ── Dashboard ──
-router.get('/admin/dashboard', isAdminAuthenticated, async (req, res) => {
+router.get('/admin/bodashard', isAdminAuthenticated, async (req, res) => {
     try {
         const admins = await Admin.findAll({ attributes: ['nome'], where: { idEmpresa: req.user.idEmpresa } });
         const barbeiros = admins.map(a => ({ id: a.id, nome: a.nome }));
@@ -440,19 +464,134 @@ router.get('/admin/notificacoes', isAdminAuthenticated, async (req, res) => {
             order: [['createdAt', 'DESC']],
             limit: 20
         });
-        res.json({ sucesso: true, notificacoes: notificacoes.map(n => ({
-            id: n.id,
-            acao: n.acao,
-            nome: n.nome,
-            servico: n.servico,
-            barbeiro: n.barbeiro,
-            data: n.data,
-            hora_inicio: n.hora_inicio,
-            feito_por_nome: n.feito_por_nome,
-            createdAt: n.createdAt
-        }))});
+        res.json({
+            sucesso: true, notificacoes: notificacoes.map(n => ({
+                id: n.id,
+                acao: n.acao,
+                nome: n.nome,
+                servico: n.servico,
+                barbeiro: n.barbeiro,
+                data: n.data,
+                hora_inicio: n.hora_inicio,
+                feito_por_nome: n.feito_por_nome,
+                createdAt: n.createdAt
+            }))
+        });
     } catch (e) {
         res.status(500).json({ erro: e.message });
+    }
+});
+
+// ── Marcar cliente faltou ──
+router.patch('/agendamentos/:id/cliente-faltou', isAdminAuthenticated, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const idEmpresa = req.user.idEmpresa;
+
+        // Busca o agendamento atual
+        const rows = await sequelize.query(
+            'SELECT * FROM Agendamentos WHERE id = :id AND idEmpresa = :idEmpresa',
+            { replacements: { id, idEmpresa }, type: QueryTypes.SELECT }
+        );
+        if (!rows.length) return res.status(404).json({ erro: 'Agendamento não encontrado.' });
+
+        const ag = rows[0];
+
+        // Marca o agendamento atual como cliente_faltou
+        await sequelize.query(
+            'UPDATE Agendamentos SET status = "cliente_faltou" WHERE id = :id AND idEmpresa = :idEmpresa',
+            { replacements: { id, idEmpresa }, type: QueryTypes.UPDATE }
+        );
+
+        // Busca o próximo agendamento futuro deste cliente (pelo telefone)
+        const proximos = await sequelize.query(`
+            SELECT id FROM Agendamentos
+            WHERE telefone = :telefone
+              AND idEmpresa = :idEmpresa
+              AND status NOT IN ('cancelado', 'cliente_faltou', 'concluido')
+              AND data > :data
+            ORDER BY data ASC, horario ASC
+            LIMIT 1
+        `, {
+            replacements: { telefone: ag.telefone, idEmpresa, data: ag.data },
+            type: QueryTypes.SELECT
+        });
+
+        // Se existe próximo agendamento, marca o alerta
+        if (proximos.length > 0) {
+            await sequelize.query(
+                'UPDATE Agendamentos SET alerta_faltou = 1 WHERE id = :id AND idEmpresa = :idEmpresa',
+                { replacements: { id: proximos[0].id, idEmpresa }, type: QueryTypes.UPDATE }
+            );
+        }
+
+        // Histórico
+        await registrarHistorico(
+            { ...ag, status: 'cliente_faltou' },
+            'cliente_faltou',
+            'admin',
+            req.user.id,
+            req.user.nome
+        );
+
+        return res.json({ sucesso: true });
+    } catch (e) {
+        return res.status(500).json({ erro: e.message });
+    }
+});
+
+
+// cliente chegou confirmar agendamento 
+router.patch('/agendamentos/:id/desfazer-faltou', isAdminAuthenticated, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const idEmpresa = req.user.idEmpresa;
+
+        // Busca telefone E data do agendamento atual
+        const rows = await sequelize.query(
+            'SELECT telefone, data FROM Agendamentos WHERE id = :id AND idEmpresa = :idEmpresa',
+            { replacements: { id, idEmpresa }, type: QueryTypes.SELECT }
+        );
+
+        if (!rows.length) return res.status(404).json({ erro: 'Agendamento não encontrado.' });
+
+        const { telefone, data } = rows[0];
+
+        // Volta o agendamento para pendente
+        await sequelize.query(
+            'UPDATE Agendamentos SET status = "pendente" WHERE id = :id AND idEmpresa = :idEmpresa',
+            { replacements: { id, idEmpresa }, type: QueryTypes.UPDATE }
+        );
+
+        // Remove o alerta só do próximo agendamento APÓS a data atual
+        await sequelize.query(`
+            UPDATE Agendamentos SET alerta_faltou = 0
+            WHERE telefone = :telefone
+              AND idEmpresa = :idEmpresa
+              AND alerta_faltou = 1
+              AND data > :data
+            ORDER BY data ASC
+            LIMIT 1
+        `, {
+            replacements: { telefone, idEmpresa, data },
+            type: QueryTypes.UPDATE
+        });
+
+        return res.json({ sucesso: true });
+    } catch (e) {
+        console.error('ERRO desfazer-faltou:', e.message);
+        return res.status(500).json({ erro: e.message });
+    }
+});
+
+// ── Dashboard ──
+router.get('/admin/dashboard', isAdminAuthenticated, async (req, res) => {
+    try {
+        const admins = await Admin.findAll({ attributes: ['nome'], where: { idEmpresa: req.user.idEmpresa } });
+        const barbeiros = admins.map(a => ({ id: a.id, nome: a.nome }));
+        res.render('dashboard', { barbeiros });
+    } catch (error) {
+        res.status(500).send('Erro: ' + error.message);
     }
 });
 
@@ -468,5 +607,85 @@ router.post('/admin/notificacoes/marcar-visto', isAdminAuthenticated, async (req
         res.status(500).json({ erro: e.message });
     }
 });
+
+
+router.get('/admin/dashboard/dados', isAdminAuthenticated, async (req, res) => {
+    try {
+        const fim = req.query.fim ? new Date(req.query.fim + 'T12:00:00') : new Date();
+        const inicio = req.query.inicio ? new Date(req.query.inicio + 'T12:00:00') : new Date(fim.getTime() - 30 * 24 * 60 * 60 * 1000);
+        fim.setHours(23, 59, 59, 999);
+        inicio.setHours(0, 0, 0, 0);
+
+        const agendamentos = await Agendamento.findAll({
+            where: {
+                idEmpresa: req.user.idEmpresa,
+                data:      { [Op.between]: [inicio, fim] },
+                status:    { [Op.in]: ['pendente', 'compromisso'] },
+            },
+            order: [['data', 'ASC']]
+        });
+        const lista = agendamentos.map(a => a.get({ plain: true }));
+
+        // ── Deduplica combos: um pacote_id = um agendamento ──────────────
+        // Para KPIs e evolução, cada pacote_id conta 1x (pelo primeiro item)
+        const vistos = new Set();
+        const listaDedup = lista.filter(a => {
+            if (!a.pacote_id) return true;           // serviço avulso → sempre inclui
+            if (vistos.has(a.pacote_id)) return false; // combo já visto → ignora
+            vistos.add(a.pacote_id);
+            return true;                              // primeiro do combo → inclui
+        });
+
+        // ── Evolução por barbeiro (usa lista dedup) ───────────────────────
+        const evolucao = {};
+        listaDedup.forEach(a => {
+            const d = new Date(a.data);
+            d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+            const dia = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+            if (!evolucao[dia]) evolucao[dia] = {};
+            const barb = a.barbeiro || 'Sem barbeiro';
+            evolucao[dia][barb] = (evolucao[dia][barb] || 0) + 1;
+        });
+
+        // ── Serviços por barbeiro (usa lista COMPLETA — mostra todos os serviços do combo) ──
+        const servicosPorBarbeiro = {};
+        lista.forEach(a => {
+            const barb = a.barbeiro || 'Sem barbeiro';
+            if (!servicosPorBarbeiro[barb]) servicosPorBarbeiro[barb] = {};
+            servicosPorBarbeiro[barb][a.servico] = (servicosPorBarbeiro[barb][a.servico] || 0) + 1;
+        });
+
+        // ── KPIs (usa lista dedup) ────────────────────────────────────────
+        const porBarbeiro = {};
+        const faturamentoPorBarbeiro = {};
+        const porServico = {};
+        let faturamentoTotal = 0;
+
+        listaDedup.forEach(a => {
+            const barb = a.barbeiro || 'Sem barbeiro';
+            porBarbeiro[barb] = (porBarbeiro[barb] || 0) + 1;
+            faturamentoPorBarbeiro[barb] = (faturamentoPorBarbeiro[barb] || 0) + parseFloat(a.valor || 0);
+            porServico[a.servico] = (porServico[a.servico] || 0) + 1;
+            faturamentoTotal += parseFloat(a.valor || 0);
+        });
+
+        const topBarbeiro = Object.entries(porBarbeiro).sort((a, b) => b[1] - a[1])[0];
+        const topServico  = Object.entries(porServico).sort((a, b) => b[1] - a[1])[0];
+
+        res.json({
+            periodo: { inicio: inicio.toISOString().split('T')[0], fim: fim.toISOString().split('T')[0] },
+            kpis: {
+                totalAgendamentos: listaDedup.length,
+                faturamentoTotal: faturamentoTotal.toFixed(2),
+                topBarbeiro: topBarbeiro ? { nome: topBarbeiro[0], count: topBarbeiro[1] } : null,
+                topServico:  topServico  ? { nome: topServico[0],  count: topServico[1]  } : null
+            },
+            evolucao, servicosPorBarbeiro, faturamentoPorBarbeiro, porBarbeiro
+        });
+    } catch (error) {
+        res.status(500).json({ erro: error.message });
+    }
+});
+
 
 module.exports = router;

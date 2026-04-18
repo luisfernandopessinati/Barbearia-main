@@ -582,8 +582,8 @@
     // ── Dados do backend ──────────────────────────────────
     const todosAgendamentos = [
         {{#each agendamentos}}
-    { id: {{id}}, nome: "{{nome}}", telefone: "{{telefone}}", data: "{{data}}", horario: "{{horario}}", hora_fim: "{{hora_fim}}", servico: "{{servico}}", barbeiro: "{{barbeiro}}", pago: {{#if pago}} 1{{else}} 0{{/if}}, pacote_id: "{{pacote_id}}" },
-    {{/each}}
+        { id: {{id}}, nome: "{{nome}}", telefone: "{{telefone}}", data: "{{data}}", horario: "{{horario}}", hora_fim: "{{hora_fim}}", servico: "{{servico}}", barbeiro: "{{barbeiro}}", pago: {{#if pago}}1{{else}}0{{/if}}, pacote_id: "{{pacote_id}}", status: "{{status}}", alerta_faltou: {{#if alerta_faltou}}true{{else}}false{{/if}} },
+        {{/each}}
     ];
 
     const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -650,6 +650,10 @@
             <a id="popup-excluir" href="#" class="btn-del" onclick="return confirm('Excluir este agendamento?')">
                 <i class="fa-solid fa-trash"></i> Excluir
             </a>
+            <a id="popup-faltou" href="#" class="btn-del" title="Cliente não compareceu" 
+                style="background:#7c3aed;">
+                <i class="fa-solid fa-user-xmark"></i>
+            </a>
         </div>`;
     document.body.appendChild(popup);
 
@@ -682,6 +686,18 @@
         btnPago.className = `btn-pago-mini ${a.pago ? 'pago' : 'nao-pago'}`;
         btnPago.title = a.pago ? 'Pago ✅' : 'Não pago — clique para marcar';
 
+        // Botão cliente faltou — estado dinâmico
+        const btnFaltou = document.getElementById('popup-faltou');
+        btnFaltou.dataset.id = a.id;
+        if (a.status === 'cliente_faltou') {
+            btnFaltou.style.background = '#27ae60';
+            btnFaltou.title = 'Desfazer — cliente chegou';
+            btnFaltou.innerHTML = '<i class="fa-solid fa-user-check"></i>';
+        } else {
+            btnFaltou.style.background = '#7c3aed';
+            btnFaltou.title = 'Cliente não compareceu';
+            btnFaltou.innerHTML = '<i class="fa-solid fa-user-xmark"></i>';
+        }
         // Monta link WhatsApp
         const tel = a.telefone.replace(/\D/g, '');
         const mensagem = encodeURIComponent(
@@ -732,6 +748,33 @@
             btn.title = json.pago ? 'Pago ✅' : 'Não pago — clique para marcar';
             popup.classList.remove('open');
             renderCalendar();
+        }
+    });
+    // marcar que o cliente faltou 
+    document.body.addEventListener('click', async e => {
+        const btn = e.target.closest('#popup-faltou');
+        if (!btn) return;
+        e.preventDefault(); e.stopPropagation();
+
+        const id = btn.dataset.id;
+        const ag = todosAgendamentos.find(a => a.id == id);
+        const desfazendo = ag?.status === 'cliente_faltou';
+
+        const msg = desfazendo
+            ? 'Desfazer? O agendamento voltará para pendente.'
+            : 'Marcar que o cliente não compareceu?';
+
+        if (!confirm(msg)) return;
+
+        const rota = desfazendo
+            ? `/agendamentos/${id}/desfazer-faltou`
+            : `/agendamentos/${id}/cliente-faltou`;
+
+        const res = await fetch(rota, { method: 'PATCH' });
+        const json = await res.json();
+        if (json.sucesso) {
+            popup.classList.remove('open');
+            await recarregarAgendamentos();
         }
     });
     // Agendamento / compromisso 
@@ -842,7 +885,7 @@
                         <div style="border-left: 3px solid ${cor}; padding-left: 5px; display: flex; flex-direction: column; position: relative;">
                             ${isPacote && !a.pago ? `<span style="position:absolute;top:-4px;right:-4px;width:8px;height:8px;background:#e74c3c;border-radius:50%;"></span>` : ''}
                             <span style="font-weight:bold;color:${cor};font-size:11px;text-transform:uppercase;">${a.barbeiro}</span>
-                            <span style="color:#fff;font-size:13px;">${a.nome}</span>
+                            <span style="color:#fff;font-size:13px;">${a.alerta_faltou ? '⚠️ ' : ''}${a.nome}</span>
                             <span style="font-size:10px;opacity:0.6;">${a.servico}${isPacote ? ' 📦' : ''}</span>
                         </div>`;
                         ev.addEventListener('click', e => abrirPopup(e, a));
@@ -984,8 +1027,8 @@
                             <div style="width:7px;height:7px;background:${isPacote ? cor : 'var(--gold)'};border-radius:50%;position:absolute;left:-3px;top:5px;"></div>
                         </div>
                         <div style="flex:1;background:var(--bg3);padding:8px 10px;border-radius:8px;border:1px solid ${corBorda};">
-                            <div style="font-weight:bold;color:var(--text);font-size:13px;">
-                                ${a.nome} ${isPacote ? '📦' : ''}
+                           <div style="font-weight:bold;color:var(--text);font-size:13px;">
+                                ${a.alerta_faltou ? '⚠️ ' : ''}${a.nome} ${isPacote ? '📦' : ''}
                             </div>
                             <div style="font-size:11px;color:var(--muted);margin-top:2px;">
                                 ✂️ ${a.servico} &nbsp;·&nbsp; 👤 ${a.barbeiro}

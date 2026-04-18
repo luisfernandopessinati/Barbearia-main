@@ -62,6 +62,10 @@ router.post('/loginUsuario/:token', async (req, res) => {
         req.session.clienteNome = cliente.nome;
         req.session.clienteTelefone = cliente.telefone;
         req.session.clienteEmpresaId = idEmpresa;
+
+        // ── Flag para popup de nascimento ──
+        req.session.pedirNascimento = !cliente.nascimento;
+
         res.redirect(`/agendar/${token}`);
     } catch (error) {
         res.render('loginUsuario', { erro: 'Erro ao fazer login.', token });
@@ -103,6 +107,7 @@ router.get('/agendar/:token', async (req, res) => {
             horariosOcupados, servicos: servicosFormatados, barbeiros,
             Sucesso: agendamentoSucesso?.mensagem || null,
             whatsappLink: agendamentoSucesso?.whatsappLink || null,
+            pedirNascimento: req.session.pedirNascimento || false,
             token,
             empresa: {
                 estilo: empresa.estilo || 1,
@@ -137,13 +142,38 @@ router.post('/agendar/:token', async (req, res) => {
         const servicoObj = await Servico.findOne({ where: { nome: servico, idEmpresa } });
         const valor = servicoObj ? parseFloat(servicoObj.valor) : 0;
 
+        let alertaFaltou = false;
+        const telefoneCliente = req.session.clienteTelefone;
+        if (telefoneCliente) {
+            const ultimoAgendamento = await sequelize.query(`
+                SELECT status FROM Agendamentos
+                WHERE telefone = :telefone
+                AND idEmpresa = :idEmpresa
+                AND status NOT IN ('cancelado')
+                AND data < :data
+                ORDER BY data DESC, horario DESC
+                LIMIT 1
+            `, {
+                replacements: { telefone: telefoneCliente, idEmpresa, data },
+                type: QueryTypes.SELECT
+            });
+
+            if (ultimoAgendamento.length > 0 && ultimoAgendamento[0].status === 'cliente_faltou') {
+                alertaFaltou = true;
+            }
+        }
+
+        const pedirNascimento = req.session.pedirNascimento || false;
+        req.session.pedirNascimento = false;
+
         const novoAgendamento = await Agendamento.create({
             barbeiro, nome: req.session.clienteNome, telefone: req.session.clienteTelefone,
             data, horario: hiInicio, servico, valor, idEmpresa,
             profissional_id: profissional_id || null,
             hora_inicio: hiInicio, hora_fim: hiFim || null,
             servico_id: servico_id || null, status: 'pendente',
-            observacao: observacao || null  
+            observacao: observacao || null,
+            alerta_faltou: alertaFaltou  
         });
 
         // ── Histórico ──
@@ -513,6 +543,23 @@ router.post('/cliente/reagendar/:id/:token', async (req, res) => {
         }
 
         res.json({ sucesso: true, whatsappLink });
+    } catch (e) {
+        res.status(500).json({ erro: e.message });
+    }
+});
+
+// ── Cliente salva próprio nascimento ──
+router.post('/cliente/nascimento/:token', async (req, res) => {
+    try {
+        if (!req.session.clienteId) return res.status(401).json({ erro: 'Sessão expirada.' });
+        const { nascimento } = req.body;
+        if (!nascimento) return res.status(400).json({ erro: 'Data inválida.' });
+
+        await Cliente.update(
+            { nascimento },
+            { where: { id: req.session.clienteId } }
+        );
+        res.json({ sucesso: true });
     } catch (e) {
         res.status(500).json({ erro: e.message });
     }

@@ -58,9 +58,14 @@ const Agendamento = sequelize.define('Agendamentos', {
         defaultValue: 0
     },
     status: {
-        type: DataTypes.ENUM('pendente', 'confirmado', 'cancelado', 'concluido', 'compromisso'),
+        type: DataTypes.ENUM('pendente', 'confirmado', 'cancelado', 'concluido', 'compromisso','cliente_faltou'),
         allowNull: false,
         defaultValue: 'pendente'
+    },
+        alerta_faltou: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
     },
     pago: {
         type: DataTypes.TINYINT(1),

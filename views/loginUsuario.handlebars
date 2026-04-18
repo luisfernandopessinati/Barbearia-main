@@ -16,7 +16,7 @@
     --light:        #fff;
     {{/if}}
   }
-
+ 
   {{#if empresa.feminino}}
   body { background-color: #fafafa; }
   .titulo { color: #1a1a1a; }
@@ -29,6 +29,7 @@
   {{/if}}
 </style>
 
+
 <div class="login login2">
   <h1 class="titulo">Agende seu horário!</h1>
   <form action="/loginUsuario/{{token}}" method="post" class="form-login">
@@ -39,12 +40,12 @@
     {{/if}}
 
     <label for="nome">Nome / Apelido:</label>
-    <input type="text" name="nome" id="nome" placeholder="Como te chamam?" required autocomplete="off">
+    {{!<input type="text" name="nome" id="nome" placeholder="Como te chamam?" required autocomplete="off">}}
+    <input type="text" name="nome" id="nome" placeholder="Como te chamam?" required autocomplete="name">    
 
     <label for="telefone">Celular:</label>
     {{!<input type="tel" name="telefone" id="telefone" placeholder="(00) 00000-0000" required autocomplete="tel">}}
-    <input type="text" name="telefone" id="telefone" placeholder="Digite seu celular com DDD" required
-      autocomplete="off">
+    <input type="tel" name="telefone" id="telefone" placeholder="(00) 00000-0000" required autocomplete="tel">         
 
     <input type="submit" value="Entrar" class="btn-login">
     <a href="/loginAdmin">Administrador</a>

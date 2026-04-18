@@ -45,7 +45,7 @@ const produtoController = {
 
             let imagem = null;
             if (req.file) {
-                imagem = '/uploads/' + req.file.filename;
+                imagem = `/uploads/fotos/${idEmpresa}/` + req.file.filename; // ← alterado
             }
 
             await Produto.create({
@@ -100,7 +100,7 @@ const produtoController = {
             };
 
             if (req.file) {
-                dados.imagem = '/uploads/' + req.file.filename;
+                dados.imagem = `/uploads/fotos/${idEmpresa}/` + req.file.filename;
             }
 
             await Produto.update(dados, { where: { id, idEmpresa } });

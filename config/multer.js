@@ -2,7 +2,6 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Garante que a pasta existe
 const uploadDir = 'public/uploads/';
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
@@ -10,19 +9,26 @@ if (!fs.existsSync(uploadDir)) {
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-    let pasta = 'public/uploads/';
-    
-    if (req.route.path.includes('empresa') || file.fieldname === 'logo') {
-        pasta = 'public/uploads/logos/';
-    } else if (file.fieldname === 'foto') {
-        pasta = 'public/uploads/fotos/';
-    }
+        let pasta = 'public/uploads/';
 
-    if (!fs.existsSync(pasta)) {
-        fs.mkdirSync(pasta, { recursive: true });
-    }
+        if (req.route.path.includes('empresa') || file.fieldname === 'logo') {
+            pasta = 'public/uploads/logos/';
 
-    cb(null, pasta);
+        } else if (file.fieldname === 'imagem') {
+            const empresaId = req.user?.idEmpresa;
+
+            if (!empresaId) {
+                return cb(new Error('Empresa não identificada para upload de imagem.'));
+            }
+
+            pasta = `public/uploads/fotos/${empresaId}/`;
+        }
+
+        if (!fs.existsSync(pasta)) {
+            fs.mkdirSync(pasta, { recursive: true });
+        }
+
+        cb(null, pasta);
     },
     filename: function (req, file, cb) {
         const ext = path.extname(file.originalname).toLowerCase();
@@ -31,29 +37,13 @@ const storage = multer.diskStorage({
     }
 });
 
-// Tipos permitidos
-const tiposPermitidos = /jpeg|jpg|png|webp/;
-/*
 const fileFilter = function (req, file, cb) {
-    const extOk = tiposPermitidos.test(path.extname(file.originalname).toLowerCase());
-    const mimeOk = /jpeg|jpg|png|webp|image\/png/.test(file.mimetype);
-
-    if (extOk && mimeOk) {
-        cb(null, true);
-    } else {
-        cb(new Error('Apenas imagens JPG, PNG e WEBP são permitidas.'));
-    }
-};*/
-
-const fileFilter = function (req, file, cb) {
-
     const ext = path.extname(file.originalname).toLowerCase();
     const extensoesPermitidas = ['.jpg', '.jpeg', '.png', '.webp'];
 
     if (!extensoesPermitidas.includes(ext)) {
         return cb(new Error('Formato de imagem não permitido.'));
     }
-
     if (!file.mimetype.startsWith('image/')) {
         return cb(new Error('Arquivo precisa ser uma imagem.'));
     }
@@ -64,7 +54,5 @@ const fileFilter = function (req, file, cb) {
 module.exports = multer({
     storage,
     fileFilter,
-    limits: {
-        fileSize: 15 * 1024 * 1024 // 5MB
-    }
+    limits: { fileSize: 15 * 1024 * 1024 }
 });

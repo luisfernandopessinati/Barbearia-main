@@ -774,8 +774,8 @@ function fecharNascimento() {
 
 <script>
   const TOKEN = '{{token}}';
+  const DIAS_CANCELAMENTO = {{empresa.dias_cancelamento}}; 
   const hoje = new Date();
-
   const state = {
     profissionalId: null,
     profissionalNome: null,
@@ -1195,7 +1195,15 @@ async function carregarAgendamentosCliente() {
             const hoje = new Date();
             const [diaA, mesA, anoA] = a.data.split('/').map(Number);
             const dataAgend = new Date(anoA, mesA - 1, diaA);
-            const ehHoje = dataAgend.toDateString() === hoje.toDateString();
+            hoje.setHours(0, 0, 0, 0);
+            dataAgend.setHours(0, 0, 0, 0);
+            const diffDias = Math.ceil((dataAgend - hoje) / (1000 * 60 * 60 * 24));
+
+            // 0 = sem restrição (só bloqueia se já passou)
+            // > 0 = bloqueia se faltar menos que X dias
+            const bloqueado = DIAS_CANCELAMENTO === 0 
+                ? diffDias < 0   // só bloqueia datas passadas
+                : diffDias < DIAS_CANCELAMENTO;
             card.innerHTML = `
             <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;">
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
@@ -1212,12 +1220,12 @@ async function carregarAgendamentosCliente() {
                 </div>
             </div>
             <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;">
-                ${ehHoje ? `
+                ${bloqueado  ? `
                     <div style="font-size:10px;color:var(--text-muted);text-align:center;
-                        letter-spacing:1px;line-height:1.6;padding:0 4px;">
-                        📅 Hoje<br>
-                        <span style="color:var(--border-color);">sem alterações</span>
-                    </div>
+                    letter-spacing:1px;line-height:1.6;padding:0 4px;">
+                    ${diffDias === 0 ? '📅 Hoje' : DIAS_CANCELAMENTO > 0 ? `⏱ Prazo encerrado` : '📅 Passado'}<br>
+                    <span style="color:var(--border-color);">sem alterações</span>
+                </div>
                 ` : `
                     <button class="btn-reagendar-agend" data-id="${a.id}" 
                         data-servico="${a.servico}" data-barbeiro="${a.barbeiro}"

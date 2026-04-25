@@ -111,7 +111,8 @@ router.get('/agendar/:token', async (req, res) => {
             token,
             empresa: {
                 estilo: empresa.estilo || 1,
-                feminino: empresa.estilo == 2
+                feminino: empresa.estilo == 2,
+                dias_cancelamento: empresa.dias_cancelamento || 0 
             }
         });
     } catch (error) {
@@ -432,6 +433,20 @@ router.post('/cliente/cancelar/:id/:token', async (req, res) => {
         });
         if (!agendamento) return res.status(404).json({ erro: 'Agendamento não encontrado.' });
 
+        if (empresa.dias_cancelamento > 0) {
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+            const dataAgendamento = new Date(agendamento.data);
+            dataAgendamento.setMinutes(dataAgendamento.getMinutes() + dataAgendamento.getTimezoneOffset());
+            dataAgendamento.setHours(0, 0, 0, 0);
+            const diffDias = Math.ceil((dataAgendamento - hoje) / (1000 * 60 * 60 * 24));
+            if (diffDias < empresa.dias_cancelamento) {
+                return res.status(403).json({ 
+                    erro: `Cancelamentos só são permitidos com ${empresa.dias_cancelamento} dias de antecedência.` 
+                });
+            }
+        }        
+
         const dadosAntigos = JSON.parse(JSON.stringify(agendamento.get({ plain: true })));
         await agendamento.update({ status: 'cancelado' });
         await registrarHistorico(
@@ -492,6 +507,20 @@ router.post('/cliente/reagendar/:id/:token', async (req, res) => {
             }
         });
         if (!agendamento) return res.status(404).json({ erro: 'Agendamento não encontrado.' });
+       
+        if (empresa.dias_cancelamento > 0) {
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+            const dataAgendamento = new Date(agendamento.data);
+            dataAgendamento.setMinutes(dataAgendamento.getMinutes() + dataAgendamento.getTimezoneOffset());
+            dataAgendamento.setHours(0, 0, 0, 0);
+            const diffDias = Math.ceil((dataAgendamento - hoje) / (1000 * 60 * 60 * 24));
+            if (diffDias < empresa.dias_cancelamento) {
+                return res.status(403).json({ 
+                    erro: `Reagendamentos só são permitidos com ${empresa.dias_cancelamento} dias de antecedência.` 
+                });
+            }
+        }
 
         const { data, hora_inicio, hora_fim } = req.body;
         if (!data || !hora_inicio || !hora_fim) {

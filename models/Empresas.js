@@ -73,7 +73,17 @@ const Empresa = sequelize.define('Empresa', {
         type: DataTypes.TINYINT,
         allowNull: true,
         defaultValue: 1
-    }
+    },
+    pacote: {
+        type: DataTypes.TINYINT,
+        allowNull: false,
+        defaultValue: 1  // 1=Basico, 2=Produtos, 3=Servicos e Produtos
+    },
+    dias_cancelamento: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0  // 0 = sem restrição
+    }  
 }, {
     tableName: 'empresas',
     timestamps: true

@@ -471,6 +471,22 @@
                     <option value="2">🌸 Claro (rosa e branco)</option>
                 </select>
             </div>
+            <div class="modal-field full">
+                <label>Pacote</label>
+                <select id="empresa-pacote-input"
+                    style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;">
+                    <option value="1">📅 Básico — Só agendamentos</option>
+                    <option value="2">🛍️ Produtos</option>
+                    <option value="3">✂️ Serviços e Produtos</option>
+                </select>
+            </div>
+            <div class="modal-field full">
+                <label>Prazo mínimo para cancelar / reagendar (dias)</label>
+                <input type="number" id="empresa-dias-cancelamento-input" min="0" max="30" placeholder="0 = sem restrição"
+                    style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;"
+                    onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
+                <small style="color:var(--muted);font-size:11px;">Ex: 1 = cliente não pode cancelar no mesmo dia do agendamento</small>
+            </div>
         </div>
         <div style="margin-top:16px;">
             <button class="btn-confirmar" id="btn-salvar-empresa" style="width:100%;font-size:15px;padding:10px;">Salvar
@@ -1385,6 +1401,8 @@
         cidade: document.getElementById('empresa-cidade-input'),
         observacao: document.getElementById('empresa-observacao-input'),
         estilo: document.getElementById('empresa-estilo-input'),
+        pacote: document.getElementById('empresa-pacote-input'),              
+        dias_cancelamento: document.getElementById('empresa-dias-cancelamento-input'),
     };
 
     async function carregarDadosEmpresa() {
@@ -1405,6 +1423,8 @@
             camposEmpresa.cidade.value = data.cidade || '';
             camposEmpresa.observacao.value = data.observacao || '';
             camposEmpresa.estilo.value = data.estilo || '1';
+            camposEmpresa.pacote.value = data.pacote || '1';
+            camposEmpresa.dias_cancelamento.value = data.dias_cancelamento || '0';
 
             const preview = document.getElementById('empresa-logo-preview');
             preview.innerHTML = data.logo

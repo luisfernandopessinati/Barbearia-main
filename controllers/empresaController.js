@@ -85,7 +85,8 @@ module.exports = {
             const empresa = await Empresa.findByPk(req.user.idEmpresa, {
                 attributes: ['id', 'nome', 'fantasia', 'cnpj', 'celular',
                              'endereco', 'numero', 'bairro', 'cidade',
-                             'segmento', 'observacao', 'logo', 'estilo']
+                             'segmento', 'observacao', 'logo', 'estilo',
+                            'pacote', 'dias_cancelamento']
             });
 
             if (!empresa) return res.status(404).json({ erro: 'Empresa não encontrada.' });
@@ -102,7 +103,7 @@ module.exports = {
             const empresa = await Empresa.findByPk(req.user.idEmpresa);
             if (!empresa) return res.status(404).json({ erro: 'Empresa não encontrada.' });
 
-            const { nome, fantasia, celular, endereco, numero, bairro, cidade, segmento, observacao, estilo } = req.body;
+            const { nome, fantasia, celular, endereco, numero, bairro, cidade, segmento, observacao, estilo, pacote, dias_cancelamento } = req.body;
 
             // Se veio um novo logo, apaga o anterior (se existir e não for externo)
             if (req.file && empresa.logo) {
@@ -121,6 +122,8 @@ module.exports = {
                 segmento,
                 observacao,
                 estilo,
+                pacote: pacote || 1, 
+                dias_cancelamento: parseInt(dias_cancelamento) || 0,
                 ...(req.file && { logo: `/uploads/logos/${req.file.filename}` })
             });
 

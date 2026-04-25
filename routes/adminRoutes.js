@@ -172,6 +172,7 @@ router.get('/admin', isAdminAuthenticated, async (req, res) => {
             agendamentos: agendamentosFormatados,
             barbeiros,
             servicos: servicosFormatados,
+            pacote: empresa.pacote || 1,
             empresa: empresa ? empresa.get({ plain: true }) : null
         });
     } catch (error) {

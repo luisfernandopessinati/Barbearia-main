@@ -86,6 +86,7 @@
                     </span>
                     <span class="item-badge">Novo</span>
                 </button>
+                {{#if (gte empresa.pacote 2)}}
                 <button class="config-dropdown-item" id="menu-vendas">
                     <span class="item-icon">🛍️</span>
                     <span class="item-label">
@@ -110,7 +111,7 @@
                     </span>
                     <span class="item-badge">Novo</span>
                 </button>
-
+                {{/if}}
                 <div class="config-dropdown-sep"></div>
                 <div class="config-dropdown-label">Relatórios</div>
 
@@ -122,6 +123,7 @@
                     </span>
                     <span class="item-badge">Novo</span>
                 </button>
+                {{#if (gte empresa.pacote 2)}}
                 <button class="config-dropdown-item" id="menu-dashboard-vendas">
                     <span class="item-icon">🛒</span>
                     <span class="item-label">
@@ -130,6 +132,7 @@
                     </span>
                     <span class="item-badge">Novo</span>
                 </button>
+                {{/if}}
 
                 <div class="config-dropdown-sep"></div>
                 <div class="config-dropdown-label">Cadastros</div>
@@ -1088,7 +1091,7 @@
     document.getElementById('btn-hoje').addEventListener('click', () => { weekOffset = 0; renderCalendar(); renderCounts(); });
     document.getElementById('btn-sair').addEventListener('click', () => { window.location.href = '/logout'; });
     document.getElementById('menu-clientes').addEventListener('click', () => { window.location.href = '/clientes'; });
-    document.getElementById('menu-estoque').addEventListener('click', () => { toggleDropdown(false); window.location.href = '/admin/estoque'; });
+    //document.getElementById('menu-estoque').addEventListener('click', () => { toggleDropdown(false); window.location.href = '/admin/estoque'; });
     let _lastWidth = window.innerWidth;
     window.addEventListener('resize', () => {
         if (window.innerWidth !== _lastWidth) {
@@ -2017,10 +2020,10 @@
     bindMenuItemToModal('menu-empresa', 'modal-empresa-overlay', carregarDadosEmpresa);
 
     document.getElementById('menu-dashboard').addEventListener('click', () => { toggleDropdown(false); window.location.href = '/admin/dashboard'; });
-    document.getElementById('menu-dashboard-vendas').addEventListener('click', () => { toggleDropdown(false); window.location.href = '/admin/dashboard/vendas'; });
-    document.getElementById('menu-produtos').addEventListener('click', () => { toggleDropdown(false); window.location.href = '/admin/produtos'; });
-    document.getElementById('menu-vendas').addEventListener('click', () => { toggleDropdown(false); window.location.href = '/admin/vendas'; });
-
+    document.getElementById('menu-dashboard-vendas')?.addEventListener('click', () => { toggleDropdown(false); window.location.href = '/admin/dashboard/vendas'; });
+    document.getElementById('menu-vendas')?.addEventListener('click', () => { toggleDropdown(false); window.location.href = '/admin/vendas'; });
+    document.getElementById('menu-estoque')?.addEventListener('click', () => { toggleDropdown(false); window.location.href = '/admin/estoque'; });
+    document.getElementById('menu-produtos')?.addEventListener('click', () => { toggleDropdown(false); window.location.href = '/admin/produtos'; });
     // ── Init ──────────────────────────────────────────────
     renderStats();
     renderCalendar();

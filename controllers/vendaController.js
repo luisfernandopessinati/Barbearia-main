@@ -2,11 +2,12 @@
 const { Op } = require('sequelize');
 const sequelize = require('../config/db');
 
-const Venda       = require('../models/Venda');
-const VendaItem   = require('../models/VendaItem');
-const Produto     = require('../models/produto');
+const Venda        = require('../models/Venda');
+const VendaItem    = require('../models/VendaItem');
+const Produto      = require('../models/produto');
 const MovtoEstoque = require('../models/MovtoEstoque');
-const Pagamento   = require('../models/Pagamento');
+const Pagamento    = require('../models/Pagamento');
+const Despesa      = require('../models/Despesa');
 
 /* ─────────────────────────────────────────────────────────────────
    Associações locais (caso não estejam definidas em um index.js)
@@ -248,14 +249,15 @@ exports.criar = async (req, res) => {
    GET /admin/fechamento/dados?data=YYYY-MM-DD
    Retorna vendas do dia + pagamentos para o fechamento de caixa.
    ─────────────────────────────────────────────────────────────── */
+
 exports.fechamento = async (req, res) => {
     try {
         const idEmpresa = req.user.idEmpresa;
         const data = req.query.data || new Date().toISOString().slice(0, 10);
-
+ 
         const inicio = new Date(data + 'T00:00:00');
         const fim    = new Date(data + 'T23:59:59');
-
+ 
         const vendas = await Venda.findAll({
             where: {
                 idEmpresa,
@@ -275,8 +277,23 @@ exports.fechamento = async (req, res) => {
             ],
             order: [['createdAt', 'DESC']],
         });
-
-        return res.json({ data: vendas });
+ 
+        const despesas = await Despesa.findAll({
+            where: {
+                idEmpresa,
+                createdAt: { [Op.between]: [inicio, fim] },
+            },
+            order: [['createdAt', 'DESC']],
+        });
+ 
+        const totalDespesas = despesas.reduce((s, d) => s + parseFloat(d.valor || 0), 0);
+ 
+        return res.json({
+            data:          vendas,
+            despesas:      despesas,
+            totalDespesas: totalDespesas.toFixed(2),
+        });
+ 
     } catch (err) {
         console.error('[vendaController.fechamento]', err);
         return res.status(500).json({ message: 'Erro ao buscar fechamento' });

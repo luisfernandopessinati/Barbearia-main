@@ -31,7 +31,14 @@
             display: flex; align-items: center; justify-content: space-between;
         }
 
-        /* ── Área central ── */
+        /* ────────────────────────────────────────────────────────
+           LAYOUT DESKTOP vs MOBILE
+           No desktop (>= 768px) usamos flexbox side-by-side:
+           coluna esquerda = lista de itens | coluna direita = painel pagamento
+           No mobile mantemos o comportamento original com footer deslizante.
+        ───────────────────────────────────────────────────────── */
+
+        /* ── MOBILE: comportamento original ── */
         .area-itens {
             position: fixed;
             top: var(--header-h); left: 0; right: 0;
@@ -41,6 +48,64 @@
         }
         .area-itens.expanded { bottom: var(--footer-expanded); }
 
+        .area-footer {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: #050505; border-top: 1px solid var(--card-border);
+            z-index: 100; overflow: hidden;
+            height: var(--footer-collapsed);
+            transition: height .32s cubic-bezier(.4,0,.2,1);
+        }
+        .area-footer.expanded { height: var(--footer-expanded); }
+
+        /* ── DESKTOP (>= 768px): layout lado a lado ── */
+        @media (min-width: 768px) {
+            /* Desativa o comportamento de footer deslizante */
+            .area-itens {
+                position: fixed;
+                top: var(--header-h); left: 0;
+                /* ocupa apenas a metade esquerda */
+                right: 400px;
+                bottom: 0 !important; /* sem footer flutuante */
+                transition: none;
+            }
+            .area-itens.expanded { bottom: 0 !important; }
+
+            .area-footer {
+                position: fixed;
+                top: var(--header-h); right: 0;
+                left: auto;
+                bottom: 0;
+                width: 400px;
+                height: auto !important; /* altura total */
+                border-top: none;
+                border-left: 1px solid var(--card-border);
+                display: flex;
+                flex-direction: column;
+                overflow-y: auto;
+            }
+            .area-footer.expanded { height: auto !important; }
+
+            /* Esconde a barra de toggle no desktop */
+            .footer-bar { display: none !important; }
+
+            /* Painel sempre visível no desktop */
+            .footer-panel {
+                flex: 1;
+                height: auto !important;
+                overflow-y: auto;
+                padding: 16px;
+            }
+
+            /* Botão câmera fica inline no desktop */
+            .search-area { padding: 16px; }
+        }
+
+        @media (min-width: 1100px) {
+            .area-itens { right: 460px; }
+            .area-footer { width: 460px; }
+        }
+
+        /* ── Search area ── */
         .search-area {
             background: var(--surface); border-bottom: 1px solid var(--card-border);
             padding: 14px 16px; flex-shrink: 0;
@@ -58,16 +123,7 @@
 
         .items-list { flex: 1; overflow-y: auto; padding: 14px 16px; }
 
-        /* ── Footer ── */
-        .area-footer {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: #050505; border-top: 1px solid var(--card-border);
-            z-index: 100; overflow: hidden;
-            height: var(--footer-collapsed);
-            transition: height .32s cubic-bezier(.4,0,.2,1);
-        }
-        .area-footer.expanded { height: var(--footer-expanded); }
-
+        /* ── Footer bar (mobile only) ── */
         .footer-bar {
             height: var(--footer-collapsed);
             display: flex; align-items: center;
@@ -91,11 +147,25 @@
         .footer-bar-arrow { font-size: 14px; transition: transform .32s ease; display: inline-block; }
         .area-footer.expanded .footer-bar-arrow { transform: rotate(180deg); }
 
+        /* ── Footer panel ── */
         .footer-panel {
             padding: 12px 14px;
             display: flex; flex-direction: column; gap: 9px;
             height: calc(var(--footer-expanded) - var(--footer-collapsed));
             overflow: hidden;
+        }
+
+        /* Desktop: título do painel */
+        .footer-panel-title {
+            display: none;
+            color: var(--gold); font-size: 13px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            padding-bottom: 10px; border-bottom: 1px solid var(--card-border);
+            flex-shrink: 0;
+        }
+        @media (min-width: 768px) {
+            .footer-panel { height: auto; overflow-y: auto; }
+            .footer-panel-title { display: block; }
         }
 
         .pag-add-row { display: flex; gap: 8px; align-items: flex-end; flex-shrink: 0; }
@@ -210,15 +280,11 @@
         }
         .btn-camera-pdv:hover { border-color: var(--gold); }
 
-        /*
-         * SCANNER — direto no body, fora de qualquer container fixed.
-         * z-index alto para cobrir tudo.
-         */
         .scanner-pdv {
             display: none;
-            position: fixed; inset: 0;          /* cobre a tela toda */
+            position: fixed; inset: 0;
             background: rgba(0,0,0,.96);
-            z-index: 900;                        /* acima de header (100) e footer (100) */
+            z-index: 900;
             flex-direction: column;
             align-items: center; justify-content: center; gap: 20px;
         }
@@ -332,10 +398,7 @@
     </div>
 </div>
 
-<!--
-    SCANNER — fora de qualquer container com position:fixed/absolute/overflow
-    para que o position:fixed dele funcione corretamente e cubra a tela toda.
--->
+<!-- Scanner -->
 <div class="scanner-pdv" id="scannerPdv">
     <div class="scanner-pdv-box">
         <video id="scannerPdvVideo" playsinline muted autoplay width="400" height="300"></video>
@@ -350,7 +413,7 @@
     <a href="/admin" style="text-decoration:none;color:var(--gold);display:flex;align-items:center;gap:5px;font-weight:600;font-size:14px;">&#8592; VOLTAR</a>
 </header>
 
-<!-- Área central (sem o scanner dentro) -->
+<!-- Área central -->
 <div class="area-itens" id="areaItens">
     <div class="search-area">
         <div class="search-row">
@@ -372,8 +435,9 @@
     </div>
 </div>
 
-<!-- Footer -->
+<!-- Footer / Painel de Pagamento -->
 <div class="area-footer" id="areaFooter">
+    <!-- Barra de toggle (mobile apenas) -->
     <div class="footer-bar" id="footerBar" onclick="toggleFooter()">
         <div class="footer-bar-total">
             <div class="footer-bar-label">Total</div>
@@ -385,7 +449,10 @@
         </div>
     </div>
 
+    <!-- Painel sempre visível no desktop, colapsável no mobile -->
     <div class="footer-panel">
+        <div class="footer-panel-title">&#128179; Pagamento</div>
+
         <div class="pag-add-row">
             <div class="input-group">
                 <label>Forma de Pagamento</label>
@@ -438,7 +505,7 @@
     var _ultimaVenda    = null;
     var footerAberto    = false;
     var EMPRESA_NOME    = '{{empresaNome}}';
-    var IMG_BASE        = '';   /* imagem já vem com caminho completo ex: /public/uploads/xxx.png */
+    var IMG_BASE        = '';
 
     var buscaInput    = document.getElementById('buscaInput');
     var suggestionsEl = document.getElementById('suggestions');
@@ -448,8 +515,12 @@
         cartao_debito: 'Cartão Débito', cartao_credito: 'Cartão Crédito',
     };
 
-    /* ── Footer toggle ── */
+    /* ── Detecta se é desktop ── */
+    function isDesktop() { return window.innerWidth >= 768; }
+
+    /* ── Footer toggle (mobile only) ── */
     function toggleFooter() {
+        if (isDesktop()) return; // no desktop não faz nada
         footerAberto = !footerAberto;
         document.getElementById('areaFooter').classList.toggle('expanded', footerAberto);
         document.getElementById('areaItens').classList.toggle('expanded', footerAberto);
@@ -554,7 +625,6 @@
         for (var i = 0; i < itensVenda.length; i++) {
             var it  = itensVenda[i];
             var src = it.imagem ? (IMG_BASE + it.imagem) : '';
-            /* img preenche o thumb; se falhar troca por placeholder via JS */
             var thumbInner = src
                 ? '<img src="' + src + '" alt="" style="width:48px;height:48px;object-fit:cover;display:block;" onload="this.style.opacity=1" onerror="this.style.display=\'none\';this.parentNode.querySelector(\'.item-thumb-placeholder\').style.display=\'flex\'">'
                   + '<span class="item-thumb-placeholder" style="display:none;width:48px;height:48px;align-items:center;justify-content:center;">&#128247;</span>'
@@ -770,14 +840,11 @@
     function abrirScannerPdv() {
         var video = document.getElementById('scannerPdvVideo');
         document.getElementById('scannerPdv').classList.add('open');
-
         navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } })
             .then(function(stream) {
                 pdvStream = stream;
                 video.srcObject = stream;
-                /* play() pode retornar promise em alguns browsers */
                 var p = video.play(); if (p) p.catch(function(){});
-
                 if ('BarcodeDetector' in window) {
                     var det = new BarcodeDetector({ formats: ['ean_13','ean_8','code_128','code_39','upc_a','upc_e','qr_code'] });
                     pdvLoop = setInterval(function() {
@@ -786,7 +853,6 @@
                         }
                     }, 400);
                 } else {
-                    /* fallback ZXing */
                     var s = document.createElement('script');
                     s.src = 'https://cdnjs.cloudflare.com/ajax/libs/zxing-js/0.20.0/zxing.min.js';
                     s.onload = function() {
@@ -825,7 +891,7 @@
         }
         var video = document.getElementById('scannerPdvVideo');
         video.srcObject = null;
-        video.load(); /* garante reset completo no iOS */
+        video.load();
     }
 </script>
 </body>

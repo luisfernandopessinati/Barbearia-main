@@ -43,18 +43,24 @@
         #toast.error { background: var(--danger); }
         #toast.show  { display: flex; }
 
-        .page { max-width: 720px; margin: 0 auto; padding: 20px 16px 40px; }
+        .page { max-width: 720px; margin: 0 auto; padding: 20px 16px 60px; }
 
-        /* Filtro */
+        /* ── Filtro ── */
         .filtro-row { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 20px; }
         .filtro-row .input-group { flex: 1; }
         .input-group label { display: block; color: var(--gold); font-size: 11px; text-transform: uppercase; margin-bottom: 5px; font-weight: 600; letter-spacing: 1px; }
-        .input-group input[type="date"] {
+        .input-group input[type="date"],
+        .input-group input[type="number"],
+        .input-group input[type="text"],
+        .input-group select {
             width: 100%; background: var(--card); border: 1px solid var(--card-border);
             border-radius: 8px; color: #fff; padding: 10px 12px;
             font-family: var(--font-main); font-size: 15px; outline: none; color-scheme: dark;
+            transition: border-color .2s;
         }
-        .input-group input[type="date"]:focus { border-color: var(--gold); }
+        .input-group input:focus,
+        .input-group select:focus { border-color: var(--gold); }
+
         .btn-buscar {
             background: var(--gold); color: #000; border: none;
             padding: 10px 18px; border-radius: 8px; font-weight: 700;
@@ -64,7 +70,7 @@
         .btn-buscar:hover    { opacity: .85; }
         .btn-buscar:disabled { opacity: .4; cursor: not-allowed; }
 
-        /* Cards de totais por forma */
+        /* ── Grid de totais ── */
         .totais-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px; }
         .total-card { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 14px 16px; }
         .total-card-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 4px; }
@@ -74,20 +80,63 @@
         .val-debito   { color: #a78bfa; }
         .val-credito  { color: var(--gold); }
 
-        /* Card total geral */
+        /* ── Card saldo final — destaque vermelho quando negativo ── */
+        .resumo-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+
         .total-geral-card {
             background: var(--card); border: 1px solid var(--gold);
             border-radius: var(--radius); padding: 16px 20px;
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 12px;
         }
         .total-geral-label { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
         .total-geral-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
         .total-geral-value { font-family: var(--font-mono); font-size: 28px; color: var(--gold); font-weight: 700; }
 
-        /* Vendas */
+        /* Card de despesas resumo */
+        .despesas-resumo-card {
+            background: var(--card); border: 1px solid rgba(224,84,84,.3);
+            border-radius: var(--radius); padding: 16px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 12px;
+        }
+        .despesas-resumo-value { font-family: var(--font-mono); font-size: 24px; color: var(--danger); font-weight: 700; }
+
+        /* Card saldo líquido */
+        .saldo-card {
+            border-radius: var(--radius); padding: 16px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 24px; border: 2px solid var(--gold);
+            background: rgba(212,175,55,.06);
+        }
+        .saldo-card.negativo { border-color: var(--danger); background: rgba(224,84,84,.06); }
+        .saldo-value { font-family: var(--font-mono); font-size: 30px; font-weight: 700; color: var(--gold); }
+        .saldo-card.negativo .saldo-value { color: var(--danger); }
+
+        /* ── Tabs vendas / despesas ── */
+        .tabs { display: flex; gap: 0; margin-bottom: 16px; border-bottom: 1px solid var(--card-border); }
+        .tab-btn {
+            padding: 10px 20px; background: none; border: none; color: var(--muted);
+            font-family: var(--font-main); font-size: 13px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer;
+            border-bottom: 2px solid transparent; margin-bottom: -1px;
+            transition: color .2s, border-color .2s;
+        }
+        .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+        .tab-btn:hover:not(.active) { color: var(--text); }
+        .tab-count {
+            display: inline-block; background: var(--card); border: 1px solid var(--card-border);
+            border-radius: 20px; font-size: 10px; padding: 1px 7px; margin-left: 6px;
+            font-family: var(--font-mono); color: var(--muted);
+        }
+        .tab-btn.active .tab-count { background: var(--gold-glow); border-color: rgba(212,175,55,.4); color: var(--gold); }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
         .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 12px; font-weight: 600; }
 
+        /* ── Cards de venda ── */
         .venda-card {
             background: var(--card); border: 1px solid var(--card-border);
             border-radius: var(--radius); margin-bottom: 10px;
@@ -120,11 +169,9 @@
         }
         .btn-cancelar:hover { background: rgba(224,84,84,.12); }
 
-        /* Itens expandidos */
         .venda-expand { display: none; border-top: 1px solid var(--card-border); }
         .venda-expand.open { display: block; }
 
-        /* Bloco de pagamentos dentro do card */
         .pags-block {
             padding: 10px 16px; border-bottom: 1px solid var(--card-border);
             display: flex; flex-wrap: wrap; gap: 8px;
@@ -137,7 +184,6 @@
         .pag-pill-forma { color: var(--muted); text-transform: uppercase; font-size: 10px; letter-spacing: .5px; }
         .pag-pill-valor { font-family: var(--font-mono); font-weight: 600; color: var(--gold); }
 
-        /* Itens do pedido */
         .itens-block { padding: 0 16px 14px; }
         .item-linha {
             display: flex; justify-content: space-between; align-items: center;
@@ -148,17 +194,69 @@
         .item-qtd  { color: var(--gold); font-size: 12px; margin-top: 2px; }
         .item-sub  { font-family: var(--font-mono); font-size: 13px; white-space: nowrap; }
 
-        /* Empty */
+        /* ── Formulário de despesa ── */
+        .despesa-form {
+            background: var(--card); border: 1px solid var(--card-border);
+            border-radius: var(--radius); padding: 16px; margin-bottom: 20px;
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .despesa-form-title {
+            font-size: 11px; text-transform: uppercase; letter-spacing: 2px;
+            color: var(--gold); font-weight: 700; margin-bottom: 2px;
+        }
+        .form-row { display: flex; gap: 10px; }
+        .form-row .input-group { flex: 1; }
+        .btn-add-despesa {
+            background: var(--danger); color: #fff; border: none;
+            padding: 10px 18px; border-radius: 8px; font-weight: 700;
+            font-size: 15px; cursor: pointer; transition: opacity .2s;
+            display: flex; align-items: center; gap: 6px; white-space: nowrap;
+            align-self: flex-end;
+        }
+        .btn-add-despesa:hover    { opacity: .85; }
+        .btn-add-despesa:disabled { opacity: .4; cursor: not-allowed; }
+
+        /* ── Cards de despesa ── */
+        .despesa-card {
+            background: var(--card); border: 1px solid rgba(224,84,84,.2);
+            border-left: 4px solid var(--danger);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            padding: 12px 14px; margin-bottom: 8px;
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            animation: fadeIn .2s ease;
+        }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
+
+        .despesa-card-left { flex: 1; min-width: 0; }
+        .despesa-descricao { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .despesa-meta { font-size: 11px; color: var(--muted); margin-top: 3px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .despesa-categoria { color: var(--danger); font-weight: 600; text-transform: uppercase; font-size: 10px; letter-spacing: .5px; }
+        .despesa-forma { color: var(--muted); font-size: 10px; }
+        .despesa-hora { color: var(--muted); font-size: 10px; }
+
+        .despesa-card-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .despesa-valor { font-family: var(--font-mono); font-weight: 700; font-size: 15px; color: var(--danger); }
+        .btn-remove-despesa {
+            background: none; border: none; color: var(--muted);
+            cursor: pointer; font-size: 16px; padding: 4px 6px;
+            border-radius: 6px; transition: color .2s, background .2s; line-height: 1;
+        }
+        .btn-remove-despesa:hover { color: var(--danger); background: rgba(224,84,84,.12); }
+
+        /* ── Empty states ── */
         .empty-state { text-align: center; padding: 60px 20px; opacity: .3; }
         .empty-state span { font-size: 48px; display: block; margin-bottom: 10px; }
 
         .spinner { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,.2); border-top-color: #000; border-radius: 50%; animation: spin .6s linear infinite; display: inline-block; }
+        .spinner.light { border-color: rgba(255,255,255,.15); border-top-color: var(--gold); }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         @media (max-width: 480px) {
             .totais-grid { grid-template-columns: 1fr 1fr; }
             .total-card-value  { font-size: 18px; }
             .total-geral-value { font-size: 22px; }
+            .saldo-value       { font-size: 24px; }
+            .form-row          { flex-direction: column; }
         }
     </style>
 </head>
@@ -168,21 +266,22 @@
 
 <header>
     <a href="/admin/vendas" class="btn-back">&#8592; PDV</a>
-    <span class="header-title">Fechamento &#8212; <span id="dataDisplay">--/--/----</span></span>
+    <span class="header-title">Caixa &#8212; <span id="dataDisplay">--/--/----</span></span>
     <div style="width:60px;"></div>
 </header>
 
 <div class="page">
 
+    <!-- Filtro de data -->
     <div class="filtro-row">
         <div class="input-group">
             <label>Data</label>
             <input type="date" id="filtroData">
         </div>
-        <button class="btn-buscar" id="btnBuscar" onclick="buscarVendas()">&#8635; Buscar</button>
+        <button class="btn-buscar" id="btnBuscar" onclick="buscarDados()">&#8635; Buscar</button>
     </div>
 
-    <!-- Totais por forma — lidos de Pagamentos -->
+    <!-- Totais por forma de pagamento -->
     <div class="totais-grid">
         <div class="total-card">
             <div class="total-card-label">Dinheiro</div>
@@ -202,8 +301,8 @@
         </div>
     </div>
 
-    <!-- Linha extra: qtd de vendas -->
-    <div class="totais-grid" style="margin-bottom:12px;">
+    <!-- Qtd vendas + descontos -->
+    <div class="totais-grid">
         <div class="total-card">
             <div class="total-card-label">Vendas</div>
             <div class="total-card-value" id="totalQtd" style="color:var(--text)">0</div>
@@ -214,27 +313,104 @@
         </div>
     </div>
 
+    <!-- Total bruto das vendas -->
     <div class="total-geral-card">
         <div>
-            <div class="total-geral-label">Total Geral</div>
+            <div class="total-geral-label">Total Vendas</div>
             <div class="total-geral-sub">apenas vendas conclu&#237;das</div>
         </div>
         <div class="total-geral-value" id="totalGeral">R$ 0,00</div>
     </div>
 
-    <div class="section-title">Vendas Realizadas</div>
-    <div id="listaVendas"></div>
+    <!-- Total de despesas -->
+    <div class="despesas-resumo-card">
+        <div>
+            <div class="total-geral-label" style="color:var(--danger)">Total Despesas</div>
+            <div class="total-geral-sub">sa&#237;das lan&#231;adas no dia</div>
+        </div>
+        <div class="despesas-resumo-value" id="totalDespesasResumo">R$ 0,00</div>
+    </div>
+
+    <!-- Saldo líquido do dia -->
+    <div class="saldo-card" id="saldoCard">
+        <div>
+            <div class="total-geral-label">Saldo L&#237;quido</div>
+            <div class="total-geral-sub">vendas &minus; despesas</div>
+        </div>
+        <div class="saldo-value" id="saldoLiquido">R$ 0,00</div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" id="tabVendasBtn" onclick="mudarTab('vendas')">
+            &#128196; Vendas <span class="tab-count" id="tabVendasCount">0</span>
+        </button>
+        <button class="tab-btn" id="tabDespesasBtn" onclick="mudarTab('despesas')">
+            &#128197; Despesas <span class="tab-count" id="tabDespesasCount">0</span>
+        </button>
+    </div>
+
+    <!-- Tab: Vendas -->
+    <div class="tab-panel active" id="tabVendas">
+        <div id="listaVendas">
+            <div class="empty-state"><span>&#128196;</span><p>Busque uma data para ver as vendas</p></div>
+        </div>
+    </div>
+
+    <!-- Tab: Despesas -->
+    <div class="tab-panel" id="tabDespesas">
+
+        <!-- Formulário de lançamento -->
+        <div class="despesa-form">
+            <div class="despesa-form-title">&#43; Lan&#231;ar Despesa / Sa&#237;da</div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label>Descri&#231;&#227;o</label>
+                    <input type="text" id="despDescricao" placeholder="Ex: Compra de sacolas">
+                </div>
+                <div class="input-group" style="max-width:130px;">
+                    <label>Valor R$</label>
+                    <input type="number" id="despValor" step="0.01" min="0.01" placeholder="0,00">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label>Categoria</label>
+                    <select id="despCategoria">
+                        <option value="operacional">Operacional</option>
+                        <option value="fornecedor">Fornecedor</option>
+                        <option value="sangria">Sangria</option>
+                        <option value="outros" selected>Outros</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Forma de Sa&#237;da</label>
+                    <select id="despForma">
+                        <option value="dinheiro">Dinheiro</option>
+                        <option value="pix">Pix</option>
+                        <option value="cartao_debito">Cart&#227;o D&#233;bito</option>
+                        <option value="cartao_credito">Cart&#227;o Cr&#233;dito</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                </div>
+                <button class="btn-add-despesa" id="btnAddDespesa" onclick="lancarDespesa()">
+                    &#8659; Lan&#231;ar
+                </button>
+            </div>
+        </div>
+
+        <!-- Lista de despesas do dia -->
+        <div id="listaDespesas">
+            <div class="empty-state"><span>&#128197;</span><p>Nenhuma despesa lan&#231;ada hoje</p></div>
+        </div>
+
+    </div>
 
 </div>
 
 <script>
-    /* ── Data inicial ── */
-    var hoje = new Date();
-    var dd   = String(hoje.getDate()).padStart(2,'0');
-    var mm   = String(hoje.getMonth()+1).padStart(2,'0');
-    var yyyy = hoje.getFullYear();
-    document.getElementById('filtroData').value    = yyyy + '-' + mm + '-' + dd;
-    document.getElementById('dataDisplay').textContent = dd + '/' + mm + '/' + yyyy;
+    /* ── Helpers ── */
+    function fmtNum(n) { return parseFloat(n || 0).toFixed(2).replace('.', ','); }
 
     function toast(msg, tipo) {
         var el = document.getElementById('toast');
@@ -244,24 +420,50 @@
         el._t = setTimeout(function(){ el.className = ''; }, 3500);
     }
 
-    function fmtNum(n) { return parseFloat(n || 0).toFixed(2).replace('.', ','); }
+    function fmtHora(dtStr) {
+        if (!dtStr) return '';
+        var d = new Date(dtStr);
+        return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+    }
 
     var FORMA_LABEL = {
-        dinheiro:       'Dinheiro',
-        pix:            'Pix',
-        cartao_debito:  'Débito',
-        cartao_credito: 'Crédito',
-        crediario:      'Crediário',
-        misto:          'Misto',
-        outro:          'Outro',
+        dinheiro: 'Dinheiro', pix: 'Pix',
+        cartao_debito: 'Débito', cartao_credito: 'Crédito',
+        crediario: 'Crediário', misto: 'Misto', outro: 'Outro',
     };
 
-    /* ── Busca ── */
-    function buscarVendas() {
+    var CAT_LABEL = {
+        operacional: 'Operacional', fornecedor: 'Fornecedor',
+        sangria: 'Sangria', outros: 'Outros',
+    };
+
+    /* ── Data inicial (hoje) ── */
+    var hoje = new Date();
+    var dd   = String(hoje.getDate()).padStart(2,'0');
+    var mm   = String(hoje.getMonth()+1).padStart(2,'0');
+    var yyyy = hoje.getFullYear();
+    document.getElementById('filtroData').value        = yyyy + '-' + mm + '-' + dd;
+    document.getElementById('dataDisplay').textContent = dd + '/' + mm + '/' + yyyy;
+
+    /* ── Estado local ── */
+    var _despesasDia = [];
+    var _dataAtual   = '';
+
+    /* ── Tabs ── */
+    function mudarTab(tab) {
+        document.getElementById('tabVendas').classList.toggle('active',   tab === 'vendas');
+        document.getElementById('tabDespesas').classList.toggle('active', tab === 'despesas');
+        document.getElementById('tabVendasBtn').classList.toggle('active',   tab === 'vendas');
+        document.getElementById('tabDespesasBtn').classList.toggle('active', tab === 'despesas');
+    }
+
+    /* ── Busca vendas + despesas ── */
+    function buscarDados() {
         var btn  = document.getElementById('btnBuscar');
         var data = document.getElementById('filtroData').value;
         if (!data) { toast('Selecione uma data', 'error'); return; }
 
+        _dataAtual = data;
         var p = data.split('-');
         document.getElementById('dataDisplay').textContent = p[2] + '/' + p[1] + '/' + p[0];
 
@@ -274,24 +476,27 @@
                 if (!ct.includes('application/json')) { toast('Sessão expirada — recarregue', 'error'); return; }
                 return res.json().then(function(json) {
                     if (!res.ok) throw new Error(json.message || 'Erro ao buscar');
+                    _despesasDia = json.despesas || [];
                     renderVendas(json.data || []);
+                    renderDespesas(_despesasDia);
+                    atualizarSaldo();
                 });
             })
             .catch(function(err) { toast('Erro: ' + err.message, 'error'); })
             .finally(function() { btn.disabled = false; btn.innerHTML = '&#8635; Buscar'; });
     }
 
-    /* ── Render ── */
+    /* ── Render vendas (sem alteração de lógica) ── */
     function renderVendas(vendas) {
         var lista = document.getElementById('listaVendas');
-
-        /* Acumuladores por forma — lidos de v.Pagamentos */
         var totais = { dinheiro: 0, pix: 0, cartao_debito: 0, cartao_credito: 0 };
         var totalGeral = 0, totalDescontos = 0, qtdVendas = 0;
 
+        document.getElementById('tabVendasCount').textContent = vendas.length;
+
         if (!vendas.length) {
             lista.innerHTML = '<div class="empty-state"><span>&#128196;</span><p>Nenhuma venda neste dia</p></div>';
-            atualizarTotais(totais, 0, 0, 0);
+            atualizarTotaisVendas(totais, 0, 0, 0);
             return;
         }
 
@@ -302,26 +507,20 @@
             var valor     = parseFloat(v.total_final) || 0;
             var desconto  = parseFloat(v.desconto)    || 0;
 
-            /* ── Soma nos totais apenas vendas não canceladas ── */
             if (!cancelada) {
                 qtdVendas++;
-                totalGeral    += valor;
+                totalGeral     += valor;
                 totalDescontos += desconto;
-
-                /* itera Pagamentos (novo modelo) */
                 var pags = v.Pagamentos || [];
                 for (var k = 0; k < pags.length; k++) {
-                    var pag  = pags[k];
-                    if (pag.origem === 'estorno') continue;   /* ignora estornos */
+                    var pag = pags[k];
+                    if (pag.origem === 'estorno') continue;
                     var vPag = parseFloat(pag.valor) || 0;
                     var f    = pag.forma_pagamento || 'outro';
                     if (totais[f] !== undefined) totais[f] += vPag;
-                    /* formas não mapeadas nos cards (crediario, misto, outro)
-                       são ignoradas nos cartões mas aparecem nos pills da venda */
                 }
             }
 
-            /* ── Pills de pagamento ── */
             var pillsHtml = '';
             var pagsVenda = v.Pagamentos || [];
             if (pagsVenda.length) {
@@ -334,18 +533,16 @@
                         + '</div>';
                 }
             } else {
-                /* fallback para vendas antigas sem Pagamentos */
                 pillsHtml = '<div class="pag-pill">'
                     + '<span class="pag-pill-forma">' + (FORMA_LABEL[v.forma_pagamento] || v.forma_pagamento || '—') + '</span>'
                     + '<span class="pag-pill-valor">R$ ' + fmtNum(valor) + '</span>'
                     + '</div>';
             }
 
-            /* ── Itens do pedido ── */
             var itensHtml = '';
             var itens = v.Itens || [];
             for (var j = 0; j < itens.length; j++) {
-                var it    = itens[j];
+                var it   = itens[j];
                 var qtdIt = parseFloat(it.quantidade)     || 0;
                 var prIt  = parseFloat(it.preco_unitario) || 0;
                 var nome  = (it.Produto && it.Produto.descricao) ? it.Produto.descricao : 'Produto #' + it.produto_id;
@@ -357,17 +554,13 @@
             }
 
             var statusClass = cancelada ? 'badge-cancelado' : (v.status_pagamento === 'pendente' ? 'badge-pendente' : 'badge-pago');
-            var statusLabel = cancelada ? 'Cancelada' : (v.status_pagamento === 'pendente' ? 'Pendente' : 'Paga');
+            var statusLabel = cancelada ? 'Cancelada'       : (v.status_pagamento === 'pendente' ? 'Pendente'       : 'Paga');
+            var btnCancel   = cancelada ? '' : '<button class="btn-cancelar" onclick="event.stopPropagation();cancelarVenda(' + v.id + ')">&#128465; Cancelar venda</button>';
 
-            var btnCancel = cancelada ? '' :
-                '<button class="btn-cancelar" onclick="event.stopPropagation();cancelarVenda(' + v.id + ')">&#128465; Cancelar venda</button>';
-
-            /* desconto no meta da venda */
             var metaForma = pagsVenda.length > 1
                 ? pagsVenda.length + ' formas de pagamento'
                 : (FORMA_LABEL[v.forma_pagamento] || v.forma_pagamento || '—');
             var metaDesc = desconto > 0 ? ' &bull; Desc. R$ ' + fmtNum(desconto) : '';
-            var metaCancelada = cancelada ? ' &bull; CANCELADA' : '';
 
             html +=
                 '<div class="venda-card' + (cancelada ? ' cancelada' : '') + '" id="card' + v.id + '">' +
@@ -376,7 +569,7 @@
                             '<span class="venda-icon">&#128196;</span>' +
                             '<div>' +
                                 '<div class="venda-id">Venda #' + v.id + '</div>' +
-                                '<div class="venda-meta">' + metaForma + metaDesc + metaCancelada + '</div>' +
+                                '<div class="venda-meta">' + metaForma + metaDesc + (cancelada ? ' &bull; CANCELADA' : '') + '</div>' +
                             '</div>' +
                         '</div>' +
                         '<div class="venda-card-right">' +
@@ -386,14 +579,14 @@
                         '</div>' +
                     '</div>' +
                     '<div class="venda-expand" id="exp' + v.id + '">' +
-                        '<div class="pags-block">' + (pillsHtml || '<span style="color:var(--muted);font-size:12px;">Sem registros de pagamento</span>') + '</div>' +
+                        '<div class="pags-block">' + (pillsHtml || '<span style="color:var(--muted);font-size:12px;">Sem registros</span>') + '</div>' +
                         '<div class="itens-block">' + itensHtml + '</div>' +
                     '</div>' +
                 '</div>';
         }
 
         lista.innerHTML = html;
-        atualizarTotais(totais, totalGeral, totalDescontos, qtdVendas);
+        atualizarTotaisVendas(totais, totalGeral, totalDescontos, qtdVendas);
     }
 
     function toggleExpand(id) {
@@ -401,7 +594,7 @@
         if (el) el.classList.toggle('open');
     }
 
-    function atualizarTotais(totais, geral, descontos, qtd) {
+    function atualizarTotaisVendas(totais, geral, descontos, qtd) {
         document.getElementById('totalDinheiro').textContent  = 'R$ ' + fmtNum(totais.dinheiro);
         document.getElementById('totalPix').textContent       = 'R$ ' + fmtNum(totais.pix);
         document.getElementById('totalDebito').textContent    = 'R$ ' + fmtNum(totais.cartao_debito);
@@ -409,8 +602,106 @@
         document.getElementById('totalQtd').textContent       = qtd;
         document.getElementById('totalDescontos').textContent = 'R$ ' + fmtNum(descontos);
         document.getElementById('totalGeral').textContent     = 'R$ ' + fmtNum(geral);
+        atualizarSaldo();
     }
 
+    /* ── Render despesas ── */
+    function renderDespesas(despesas) {
+        var lista = document.getElementById('listaDespesas');
+        document.getElementById('tabDespesasCount').textContent = despesas.length;
+
+        if (!despesas.length) {
+            lista.innerHTML = '<div class="empty-state"><span>&#128197;</span><p>Nenhuma despesa lan&#231;ada neste dia</p></div>';
+            atualizarSaldo();
+            return;
+        }
+
+        var html = '';
+        for (var i = 0; i < despesas.length; i++) {
+            var d = despesas[i];
+            html +=
+                '<div class="despesa-card" id="desp' + d.id + '">' +
+                    '<div class="despesa-card-left">' +
+                        '<div class="despesa-descricao">' + d.descricao + '</div>' +
+                        '<div class="despesa-meta">' +
+                            '<span class="despesa-categoria">' + (CAT_LABEL[d.categoria] || d.categoria) + '</span>' +
+                            '<span class="despesa-forma">' + (FORMA_LABEL[d.forma_pagamento] || d.forma_pagamento) + '</span>' +
+                            '<span class="despesa-hora">&#128337; ' + fmtHora(d.createdAt) + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="despesa-card-right">' +
+                        '<span class="despesa-valor">- R$ ' + fmtNum(d.valor) + '</span>' +
+                        '<button class="btn-remove-despesa" onclick="removerDespesa(' + d.id + ')" title="Excluir">&#215;</button>' +
+                    '</div>' +
+                '</div>';
+        }
+        lista.innerHTML = html;
+        atualizarSaldo();
+    }
+
+    /* ── Saldo líquido ── */
+    function atualizarSaldo() {
+        var totalVendas   = parseFloat((document.getElementById('totalGeral').textContent || '0').replace('R$ ','').replace(',','.')) || 0;
+        var totalDespesas = _despesasDia.reduce(function(s,d){ return s + parseFloat(d.valor || 0); }, 0);
+        var saldo         = totalVendas - totalDespesas;
+
+        document.getElementById('totalDespesasResumo').textContent = 'R$ ' + fmtNum(totalDespesas);
+        document.getElementById('saldoLiquido').textContent        = 'R$ ' + fmtNum(saldo);
+
+        var card = document.getElementById('saldoCard');
+        card.classList.toggle('negativo', saldo < 0);
+    }
+
+    /* ── Lançar despesa ── */
+    function lancarDespesa() {
+        var descricao = document.getElementById('despDescricao').value.trim();
+        var valor     = parseFloat(document.getElementById('despValor').value);
+        var categoria = document.getElementById('despCategoria').value;
+        var forma     = document.getElementById('despForma').value;
+
+        if (!descricao) { toast('Informe a descrição', 'error'); document.getElementById('despDescricao').focus(); return; }
+        if (!valor || valor <= 0) { toast('Informe um valor válido', 'error'); document.getElementById('despValor').focus(); return; }
+
+        var btn = document.getElementById('btnAddDespesa');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner light"></span>';
+
+        fetch('/admin/despesas', {
+            method: 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ descricao: descricao, valor: valor, categoria: categoria, forma_pagamento: forma }),
+        })
+        .then(function(res) {
+            return res.json().then(function(json) {
+                if (!res.ok) throw new Error(json.message || 'Erro ao lançar');
+                _despesasDia.unshift(json.data);
+                renderDespesas(_despesasDia);
+                document.getElementById('despDescricao').value = '';
+                document.getElementById('despValor').value     = '';
+                toast('Despesa lançada!');
+            });
+        })
+        .catch(function(err) { toast('Erro: ' + err.message, 'error'); })
+        .finally(function() { btn.disabled = false; btn.innerHTML = '&#8659; Lan&#231;ar'; });
+    }
+
+    /* ── Remover despesa ── */
+    function removerDespesa(id) {
+        if (!confirm('Excluir esta despesa?')) return;
+
+        fetch('/admin/despesas/' + id, { method: 'DELETE', credentials: 'include' })
+            .then(function(res) {
+                return res.json().then(function(json) {
+                    if (!res.ok) throw new Error(json.message || 'Erro ao excluir');
+                    _despesasDia = _despesasDia.filter(function(d){ return d.id !== id; });
+                    renderDespesas(_despesasDia);
+                    toast('Despesa removida');
+                });
+            })
+            .catch(function(err) { toast('Erro: ' + err.message, 'error'); });
+    }
+
+    /* ── Cancelar venda ── */
     function cancelarVenda(id) {
         if (!confirm('Cancelar a venda #' + id + '? O estoque será estornado.')) return;
         fetch('/admin/vendas/' + id + '/cancelar', { method: 'PATCH', credentials: 'include' })
@@ -418,13 +709,14 @@
                 return res.json().then(function(json) {
                     if (!res.ok) throw new Error(json.message || 'Erro ao cancelar');
                     toast('Venda #' + id + ' cancelada');
-                    buscarVendas();
+                    buscarDados();
                 });
             })
             .catch(function(err) { toast('Erro: ' + err.message, 'error'); });
     }
 
-    buscarVendas();
+    /* ── Carrega ao abrir ── */
+    buscarDados();
 </script>
 </body>
 </html>

@@ -51,34 +51,52 @@ router.post('/editar/:id', isAdminAuthenticated, async (req, res) => {
         const agendamento = await Agendamento.findOne({ where: { id, idEmpresa } });
         if (!agendamento) return res.status(404).send('Agendamento não encontrado');
 
-        // Salva os dados ANTES do update
         const dadosAntigos = JSON.parse(JSON.stringify(agendamento.get({ plain: true })));
-      
+
+        // Deriva hora_inicio a partir do novo horario
+        const novoHorario = req.body.horario; // ex: "14:30"
+        const novaHoraInicio = novoHorario ? `${novoHorario}:00` : dadosAntigos.hora_inicio;
+
+        // Calcula duração original em minutos e aplica no novo horario
+        let novaHoraFim = dadosAntigos.hora_fim;
+        if (novoHorario && dadosAntigos.hora_inicio && dadosAntigos.hora_fim) {
+            const [hIni, mIni] = dadosAntigos.hora_inicio.split(':').map(Number);
+            const [hFim, mFim] = dadosAntigos.hora_fim.split(':').map(Number);
+            const duracaoMinutos = (hFim * 60 + mFim) - (hIni * 60 + mIni);
+
+            const [hNovo, mNovo] = novoHorario.split(':').map(Number);
+            const totalMinutos = hNovo * 60 + mNovo + duracaoMinutos;
+            const hFimNovo = Math.floor(totalMinutos / 60);
+            const mFimNovo = totalMinutos % 60;
+            novaHoraFim = `${String(hFimNovo).padStart(2, '0')}:${String(mFimNovo).padStart(2, '0')}:00`;
+        }
+
         await agendamento.update({
             nome:            req.body.nome?.trim(),
             telefone:        normalizarTelefone(req.body.telefone),
             data:            req.body.data,
-            horario:         req.body.horario,
+            horario:         novoHorario,
+            hora_inicio:     novaHoraInicio,
+            hora_fim:        novaHoraFim,
             servico:         req.body.servico,
             barbeiro:        req.body.barbeiro,
             profissional_id: req.body.profissional_id,
             observacao:      req.body.observacao?.trim() || null
         });
 
-        // dadosNovos montado manualmente do req.body
         const dadosNovos = {
             id:              agendamento.id,
             idEmpresa:       agendamento.idEmpresa,
             nome:            req.body.nome?.trim(),
             telefone:        normalizarTelefone(req.body.telefone),
             data:            req.body.data,
-            horario:         req.body.horario,
-            hora_inicio:     dadosAntigos.hora_inicio,
-            hora_fim:        dadosAntigos.hora_fim,
+            horario:         novoHorario,
+            hora_inicio:     novaHoraInicio,
+            hora_fim:        novaHoraFim,
             servico:         req.body.servico,
             barbeiro:        req.body.barbeiro,
             profissional_id: req.body.profissional_id,
-            observacao:      req.body.observacao?.trim() || null,  // ← trim aqui
+            observacao:      req.body.observacao?.trim() || null,
             status:          dadosAntigos.status,
             valor:           dadosAntigos.valor
         };
@@ -91,12 +109,12 @@ router.post('/editar/:id', isAdminAuthenticated, async (req, res) => {
             req.user.nome,
             dadosAntigos
         );
+
         res.redirect('/admin');
     } catch (error) {
         res.status(500).send('Erro ao atualizar: ' + error.message);
     }
 });
-
 // ── Deletar agendamento ──
 router.get('/deletar/:id', isAdminAuthenticated, async (req, res) => {
     try {

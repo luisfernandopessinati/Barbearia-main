@@ -1,0 +1,19 @@
+{
+  "name": "barbearia-e2e",
+  "version": "1.0.0",
+  "description": "Testes E2E do sistema Barbearia com Playwright",
+  "scripts": {
+    "test":          "playwright test --config=playwright.config.js",
+    "test:login":    "playwright test --config=playwright.config.js specs/01-login.spec.js",
+    "test:produto":  "playwright test --config=playwright.config.js specs/02-produto.spec.js",
+    "test:agenda":   "playwright test --config=playwright.config.js specs/03-agendamento-barbeiro.spec.js specs/04-agendamento-cliente.spec.js",
+    "test:venda":    "playwright test --config=playwright.config.js specs/05-venda.spec.js",
+    "test:cancelar": "playwright test --config=playwright.config.js specs/06-cancelamento.spec.js",
+    "test:caixa":    "playwright test --config=playwright.config.js specs/07-caixa.spec.js",
+    "login":         "node helpers/auth.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.0",
+    "dotenv": "^16.0.0"
+  }
+}

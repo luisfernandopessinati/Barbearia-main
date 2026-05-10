@@ -140,9 +140,18 @@ router.post('/agendar/:token', async (req, res) => {
         const ocupado = await verificarConflito(barbeiro, data, hiInicio, hiFim, idEmpresa);
         if (ocupado) return res.render('agendar', { erro: `${barbeiro} já tem agendamento às ${hiInicio} neste dia.` });
 
-        const servicoObj = await Servico.findOne({ where: { nome: servico, idEmpresa } });
-        const valor = servicoObj ? parseFloat(servicoObj.valor) : 0;
-
+        let valor = 0;
+        const nomesSeparados = servico ? servico.split(' + ') : [servico];
+        for (const nomeServico of nomesSeparados) {
+        const sObj = await Servico.findOne({ where: { nome: nomeServico.trim(), idEmpresa } });
+        if (sObj) valor += parseFloat(sObj.valor);
+        }
+        // fallback: se não achou nenhum, tenta pelo id
+        if (!valor && servico_id) {
+        const sObj = await Servico.findOne({ where: { id: servico_id, idEmpresa } });
+        if (sObj) valor = parseFloat(sObj.valor);
+        }
+        
         let alertaFaltou = false;
         const telefoneCliente = req.session.clienteTelefone;
         if (telefoneCliente) {
@@ -366,7 +375,7 @@ router.post('/clientes', isAdminAuthenticated, async (req, res) => {
 });
 // ── Agendamentos abertos do cliente ──
 router.get('/cliente/agendamentos/:token', async (req, res) => {
-    try {
+    try {      
         if (!req.session.clienteTelefone) {
             return res.status(401).json({ erro: 'Sessão expirada.' });
         }

@@ -4,7 +4,7 @@ const Bloqueio = require('../models/Bloqueio');
 const Servico = require('../models/servico');
 const { Op } = require('sequelize');
 
-async function getSlotsDisponiveis({ profissional_id, servico_id, data, idEmpresa }) {
+async function getSlotsDisponiveis({ profissional_id, servico_id, data, idEmpresa, duracao  }) {
     const diaSemana = new Date(data + 'T00:00:00').getDay();
     const horario = await HorarioFuncionamento.findOne({
         where: { profissional_id, dia_semana: diaSemana, ativo: true, idEmpresa }
@@ -13,7 +13,7 @@ async function getSlotsDisponiveis({ profissional_id, servico_id, data, idEmpres
 
     const servico = await Servico.findOne({ where: { id: servico_id, idEmpresa } });
     if (!servico) throw new Error('Serviço não encontrado');
-
+    const duracaoMinutos = duracao || servico.duracao_minutos;
     // Verifica se é hoje para filtrar horários passados
     const agora = new Date();
     const agoraBrasil = new Date(agora.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
@@ -22,7 +22,7 @@ async function getSlotsDisponiveis({ profissional_id, servico_id, data, idEmpres
     const minutosAgora = isHoje
         ? agoraBrasil.getHours() * 60 + agoraBrasil.getMinutes()
         : 0;
-    const slots = gerarSlots(horario.hora_inicio, horario.hora_fim, servico.duracao_minutos, minutosAgora);
+    const slots = gerarSlots(horario.hora_inicio, horario.hora_fim, duracaoMinutos, minutosAgora);
 
     const agendamentos = await Agendamento.findAll({
         where: {

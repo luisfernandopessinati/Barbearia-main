@@ -6,14 +6,16 @@ const { getSlotsDisponiveis } = require('../services/slotService');
 const { Op } = require('sequelize');
 
 router.get('/slots', async (req, res) => {
-    const { profissional_id, servico_id, data, token } = req.query;
+    const { profissional_id, servico_id, data, token, duracao  } = req.query;
     try {
         const empresa = await Empresa.findOne({ where: { token_agendamento: token } });
         if (!empresa) return res.status(404).json({ erro: 'Empresa não encontrada' });
         const slots = await getSlotsDisponiveis({
             profissional_id: parseInt(profissional_id),
-            servico_id: parseInt(servico_id),
-            data, idEmpresa: empresa.id
+            servico_id:      parseInt(servico_id),
+            data,
+            idEmpresa:       empresa.id,
+            duracao:         duracao ? parseInt(duracao) : null   // null = usa duração do serviço
         });
         res.json({ slots });
     } catch (error) {

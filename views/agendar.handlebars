@@ -776,21 +776,24 @@ function fecharNascimento() {
   const TOKEN = '{{token}}';
   const DIAS_CANCELAMENTO = {{empresa.dias_cancelamento}}; 
   const hoje = new Date();
-  const state = {
-    profissionalId: null,
-    profissionalNome: null,
-    servicoId: null,
-    servicoNome: null,
-    servicoPreco: null,
-    qtdSessoes: null,
-    sessoes: [],
-    data: null,
-    horaInicio: null,
-    horaFim: null,
-    viewYear: hoje.getFullYear(),
-    viewMonth: hoje.getMonth(),
-  };
-
+const state = {
+  profissionalId: null,
+  profissionalNome: null,
+  servicoId: null,
+  servicoNome: null,
+  servicoPreco: null,
+  qtdSessoes: null,
+  sessoes: [],
+  servicosIds: [],
+  servicosNomes: [],
+  servicosDuracoes: [],
+  servicosPrecos: [],
+  data: null,
+  horaInicio: null,
+  horaFim: null,
+  viewYear: hoje.getFullYear(),
+  viewMonth: hoje.getMonth(),
+};
   let feriadosSet = new Set();
   let slotsCache = [];  // guarda os slots da última busca para re-render sem refetch
 
@@ -819,7 +822,10 @@ function fecharNascimento() {
     grid.innerHTML = '<div class="horarios-loading">Carregando horários...</div>';
 
     try {
-      const url = `/slots?profissional_id=${state.profissionalId}&servico_id=${state.servicoId}&data=${toDateStr(state.data)}&token=${TOKEN}`;
+      const duracaoTotal = (state.servicosDuracoes || []).reduce((a,b) => a+b, 0) || null;
+      const url = `/slots?profissional_id=${state.profissionalId}&servico_id=${state.servicoId}`
+                + `${duracaoTotal ? '&duracao=' + duracaoTotal : ''}`
+                + `&data=${toDateStr(state.data)}&token=${TOKEN}`;
       const res = await fetch(url);
       const json = await res.json();
       slotsCache = json.slots || [];
@@ -965,36 +971,89 @@ function fecharNascimento() {
     });
   });
 
-  // ── Serviços ─────────────────────────────────────────────
+  // ── Serviços — MULTI-SERVICO ─────────────────────────────
+  // state agora guarda arrays
+  // state.servicosIds    = []
+  // state.servicosNomes  = []
+  // state.servicosDuracoes = []
+  // state.servicosPrecos = []
+  // state.servicoId  e state.servicoNome continuam como "primeiro" para compatibilidade
+
   document.querySelectorAll('.servico-card').forEach(card => {
     card.addEventListener('click', async () => {
-      document.querySelectorAll('.servico-card').forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
-      state.servicoId = card.dataset.id;
-      state.servicoNome = card.dataset.nome;
-      state.servicoPreco = card.dataset.preco;
-      state.qtdSessoes = card.dataset.sessoes && card.dataset.sessoes !== 'null' ? parseInt(card.dataset.sessoes) : null;
+      const id       = card.dataset.id;
+      const nome     = card.dataset.nome;
+      const duracao  = parseInt(card.dataset.duracao) || 30;
+      const preco    = parseFloat((card.dataset.preco || '0').replace('R$','').replace(',','.').trim()) || 0;
+      const sessoes  = card.dataset.sessoes && card.dataset.sessoes !== 'null'
+                        ? parseInt(card.dataset.sessoes) : null;
 
-      document.getElementById('input-servico-id').value = state.servicoId;
-      document.getElementById('input-servico').value = state.servicoNome;
+      // Não mistura pacote com serviço normal
+      const temPacote  = (state.servicosIds || []).some(sid => {
+        const c = document.querySelector(`.servico-card[data-id="${sid}"]`);
+        return c && c.dataset.sessoes && c.dataset.sessoes !== 'null';
+      });
+      if (sessoes && (state.servicosIds || []).length > 0 && !temPacote) {
+        alert('Pacotes devem ser agendados sozinhos. Limpe a seleção antes.');
+        return;
+      }
+      if (!sessoes && temPacote) {
+        alert('Remova o pacote antes de adicionar serviços avulsos.');
+        return;
+      }
+
+      // Inicializa arrays se necessário
+      if (!state.servicosIds) {
+        state.servicosIds = [];
+        state.servicosNomes = [];
+        state.servicosDuracoes = [];
+        state.servicosPrecos = [];
+      }
+
+      const idx = state.servicosIds.indexOf(id);
+      if (idx === -1) {
+        // Adiciona
+        state.servicosIds.push(id);
+        state.servicosNomes.push(nome);
+        state.servicosDuracoes.push(duracao);
+        state.servicosPrecos.push(preco);
+        card.classList.add('selected');
+      } else {
+        // Remove (toggle)
+        state.servicosIds.splice(idx, 1);
+        state.servicosNomes.splice(idx, 1);
+        state.servicosDuracoes.splice(idx, 1);
+        state.servicosPrecos.splice(idx, 1);
+        card.classList.remove('selected');
+      }
+
+      // Compat: primeiro serviço como "principal" para slots e conflito
+      state.servicoId    = state.servicosIds[0]    || null;
+      state.servicoNome  = state.servicosNomes.join(' + ') || null;
+      state.servicoPreco = 'R$ ' + state.servicosPrecos
+                            .reduce((a,b) => a+b, 0)
+                            .toFixed(2).replace('.', ',');
+      state.qtdSessoes   = sessoes; // pacote continua igual
+
+      // Atualiza hidden inputs
+      document.getElementById('input-servico').value    = state.servicosNomes.join(' + ');
+      document.getElementById('input-servico-id').value = state.servicosIds[0] || '';      
       resetHorario();
 
       if (state.qtdSessoes) {
-        // É pacote — esconde calendário e slots normais
         document.getElementById('secao-data').style.display = 'none';
-        document.querySelector('.calendar-wrapper').style.display = 'none'; // 👈
+        document.querySelector('.calendar-wrapper').style.display = 'none';
         document.getElementById('secao-horario').style.display = 'none';
-        document.getElementById('horarios-grid').style.display = 'none';   // 👈
+        document.getElementById('horarios-grid').style.display = 'none';
         document.getElementById('secao-pacote').style.display = '';
         gerarSessoesPacote(state.qtdSessoes);
       } else {
-        // Serviço normal — mostra calendário e slots
         document.getElementById('secao-data').style.display = '';
-        document.querySelector('.calendar-wrapper').style.display = ''; // 👈
+        document.querySelector('.calendar-wrapper').style.display = '';
         document.getElementById('secao-horario').style.display = '';
-        document.getElementById('horarios-grid').style.display = '';   // 👈
+        document.getElementById('horarios-grid').style.display = '';
         document.getElementById('secao-pacote').style.display = 'none';
-        await buscarSlots();
+        if (state.servicosIds.length > 0) await buscarSlots();
       }
 
       updateResumo();
@@ -1080,6 +1139,12 @@ function fecharNascimento() {
     if (state.profissionalNome) partes.push(state.profissionalNome);
     if (state.servicoNome) partes.push(state.servicoNome);
 
+    // MULTI-SERVICO — mostra valor total se houver serviços selecionados
+    if (state.servicosPrecos && state.servicosPrecos.length) {
+      const total = state.servicosPrecos.reduce((a, b) => a + b, 0);
+      partes.push('R$ ' + total.toFixed(2).replace('.', ','));
+    }
+
     let tudo = false;
 
     if (state.qtdSessoes) {
@@ -1091,7 +1156,11 @@ function fecharNascimento() {
       // Normal
       if (state.data) partes.push(state.data.toLocaleDateString('pt-BR'));
       if (state.horaInicio) partes.push(`${state.horaInicio.substring(0, 5)} – ${state.horaFim.substring(0, 5)}`);
-      tudo = state.profissionalId && state.servicoId && state.data && state.horaInicio;
+      // MULTI-SERVICO — tudo exige ao menos 1 serviço selecionado (servicosIds)
+      tudo = state.profissionalId
+          && state.servicosIds && state.servicosIds.length > 0
+          && state.data
+          && state.horaInicio;
     }
 
     const p = document.getElementById('resumo-texto');
@@ -1230,7 +1299,9 @@ async function carregarAgendamentosCliente() {
                     <button class="btn-reagendar-agend" data-id="${a.id}" 
                         data-servico="${a.servico}" data-barbeiro="${a.barbeiro}"
                         data-profissional-id="${a.profissional_id}"
-                        data-servico-id="${a.servico_id}" 
+                        data-servico-id="${a.servico_id}"
+                        data-hora-inicio="${a.hora_inicio || ''}"
+                        data-hora-fim="${a.hora_fim || ''}"
                         style="background:var(--accent);border:none;color:#000;
                             padding:7px 0;border-radius:7px;font-size:11px;
                             letter-spacing:1px;text-transform:uppercase;cursor:pointer;
@@ -1307,15 +1378,23 @@ document.addEventListener('click', async e => {
 let _reagendandoId = null;
 let _reagendandoServicoid = null;
 let _reagendandoProfId = null;
+let _reagendandoDuracao  = null; 
 
 document.addEventListener('click', e => {
     const btn = e.target.closest('.btn-reagendar-agend');
     if (!btn) return;
 
-    _reagendandoId = btn.dataset.id;
-    _reagendandoProfId = btn.dataset.profissionalId;
+    _reagendandoId        = btn.dataset.id;
+    _reagendandoProfId    = btn.dataset.profissionalId;
     _reagendandoServicoid = btn.dataset.servicoId;
-
+    const hi = btn.dataset.horaInicio;
+    const hf = btn.dataset.horaFim;
+    if (hi && hf) {
+        const toMin = t => { const [h,m] = t.substring(0,5).split(':').map(Number); return h*60+m; };
+        _reagendandoDuracao = toMin(hf) - toMin(hi);
+    } else {
+        _reagendandoDuracao = null;
+    }
     // Preenche info do modal
     document.getElementById('reagendar-info').textContent = 
         `✂️ ${btn.dataset.servico} · 👤 ${btn.dataset.barbeiro}`;
@@ -1357,7 +1436,9 @@ document.getElementById('reagendar-data').addEventListener('change', async funct
     }
 
     try {
-        const url = `/slots?profissional_id=${_reagendandoProfId}&servico_id=${_reagendandoServicoid}&data=${data}&token=${TOKEN}`;
+        const url = `/slots?profissional_id=${_reagendandoProfId}&servico_id=${_reagendandoServicoid}`
+          + `&data=${data}&token=${TOKEN}`
+          + `${_reagendandoDuracao ? '&duracao=' + _reagendandoDuracao : ''}`;
         const res = await fetch(url);
         const json = await res.json();
         const slots = (json.slots || []).filter(s => s.status === 'disponivel');

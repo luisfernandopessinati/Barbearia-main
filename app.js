@@ -95,7 +95,8 @@ app.engine('handlebars', engine({
         lt:   (a, b) => a < b,
         gte:  (a, b) => a >= b, 
         json: (obj)  => JSON.stringify(obj),
-        add:  (a, b) => a + b
+        add:  (a, b) => a + b,
+        sanitizeTel: (tel) => String(tel || '').replace(/\D/g, '') 
     }
 }));
 

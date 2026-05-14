@@ -1230,10 +1230,21 @@
 
             } else {
                 // Agendamento normal
+                document.getElementById('modal-servico-nome').value = adminServicoState.nomes.join(' + ');
+                document.getElementById('modal-servico-id-hidden').value = adminServicoState.ids[0] || '';
+                document.getElementById('modal-servico-id').value        = adminServicoState.ids[0] || '';
+
+                const params = new URLSearchParams(new FormData(formAdmin));
+
+                // Remove entradas duplicadas de servico_id que possam existir
+                // e força só o primeiro id (inteiro) para não truncar o campo
+                params.set('servico_id', adminServicoState.ids[0] || '');
+                params.set('servico',    adminServicoState.nomes.join(' + '));
+
                 const res = await fetch('/admin/agendar/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams(new FormData(formAdmin)).toString()
+                    body: params.toString()
                 });
                 const json = await res.json();
                 if (res.ok && json.sucesso) { fecharModal(); await recarregarAgendamentos(); }

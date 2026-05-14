@@ -11,6 +11,8 @@
         --muted: #555;
         --danger: #c0392b;
         --danger-dim: #c0392b22;
+        --whatsapp: #25d366;
+        --whatsapp-dim: #25d36622;
     }
 
     .clientes-wrap {
@@ -208,15 +210,8 @@
     }
 
     @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(-6px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
     }
 
     .barb-expand-title {
@@ -539,6 +534,44 @@
         color: var(--gold);
     }
 
+    .btn-cli-historico {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-cli-historico:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    /* ══ NOVO: BOTÃO WHATSAPP ══ */
+    .btn-cli-whatsapp {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+    }
+
+    .btn-cli-whatsapp:hover {
+        border-color: var(--whatsapp);
+        color: var(--whatsapp);
+        background: var(--whatsapp-dim);
+    }
+
     .no-results {
         text-align: center;
         padding: 40px;
@@ -712,63 +745,22 @@
 
     /* ══ MOBILE ══ */
     @media (max-width: 900px) {
-        .clientes-wrap {
-            padding: 16px;
-        }
-
-        .ranking-grid-barbeiros {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .barb-top-clientes {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .top-clientes-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
+        .clientes-wrap { padding: 16px; }
+        .ranking-grid-barbeiros { grid-template-columns: repeat(2, 1fr); }
+        .barb-top-clientes { grid-template-columns: repeat(2, 1fr); }
+        .top-clientes-grid { grid-template-columns: repeat(2, 1fr); }
         .clientes-table th:nth-child(5),
         .clientes-table td:nth-child(5),
         .clientes-table th:nth-child(6),
-        .clientes-table td:nth-child(6) {
-            display: none;
-        }
+        .clientes-table td:nth-child(6) { display: none; }
     }
 
     @media (max-width: 600px) {
-        .ranking-grid-barbeiros {
-            grid-template-columns: 1fr 1fr;
-        }
-
+        .ranking-grid-barbeiros { grid-template-columns: 1fr 1fr; }
         .clientes-table th:nth-child(4),
-        .clientes-table td:nth-child(4) {
-            display: none;
-        }
-
-        .top-clientes-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .barb-top-clientes {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    .btn-cli-historico {
-        background: none;
-        border: 1px solid var(--border);
-        color: var(--muted);
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 11px;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .btn-cli-historico:hover {
-        border-color: var(--gold);
-        color: var(--gold);
+        .clientes-table td:nth-child(4) { display: none; }
+        .top-clientes-grid { grid-template-columns: repeat(2, 1fr); }
+        .barb-top-clientes { grid-template-columns: repeat(2, 1fr); }
     }
 </style>
 
@@ -809,8 +801,7 @@
             <div class="barb-expand-panel" id="barb-expand-panel">
                 <div class="barb-expand-title" id="barb-expand-title">Top Clientes</div>
                 <div class="barb-top-clientes" id="barb-top-clientes"></div>
-                <div class="barb-expand-empty" id="barb-expand-empty" style="display:none">Nenhum cliente encontrado.
-                </div>
+                <div class="barb-expand-empty" id="barb-expand-empty" style="display:none">Nenhum cliente encontrado.</div>
             </div>
 
         </div>
@@ -843,6 +834,7 @@
     <div class="clientes-header">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
             <div class="section-titulo" style="margin-bottom:0">👥 Todos os Clientes</div>
+
             <button id="btn-aniversarios" style="
                 background:none;border:1px solid var(--border);color:var(--muted);
                 padding:6px 14px;border-radius:6px;font-size:11px;letter-spacing:1px;
@@ -851,6 +843,17 @@
                 onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
                 🎂 Aniversários
             </button>
+
+            <!-- ══ NOVO: Inativos ══ -->
+            <button id="btn-inativos" style="
+                background:none;border:1px solid var(--border);color:var(--muted);
+                padding:6px 14px;border-radius:6px;font-size:11px;letter-spacing:1px;
+                text-transform:uppercase;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;"
+                onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'"
+                onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+                😴 Inativos
+            </button>
+
             <button id="btn-novo-cliente" style="
                 background:var(--gold);border:none;color:#000;
                 padding:6px 14px;border-radius:6px;font-size:11px;letter-spacing:1px;
@@ -879,8 +882,12 @@
             </thead>
             <tbody id="clientes-tbody">
                 {{#each clientes}}
+                {{!--
+                    IMPORTANTE: data-ultimo deve conter a data ISO do último agendamento (YYYY-MM-DD).
+                    Deixe vazio caso o cliente nunca tenha agendado. Ex: data-ultimo="2024-11-10"
+                --}}
                 <tr data-id="{{id}}" data-nome="{{nome}}" data-telefone="{{telefone}}" data-obs="{{observacao}}"
-                    data-nascimento="{{nascimento}}">
+                    data-nascimento="{{nascimento}}" data-ultimo="{{ultimoAgendamentoISO}}" data-arquivado="0">
                     <td>
                         <div class="td-nome-wrap">
                             <div class="td-avatar">{{substr nome 0 2}}</div>
@@ -891,11 +898,21 @@
                     <td><span class="td-total">{{total}}</span></td>
                     <td class="td-muted">{{#if nascimento}}{{nascimento}}{{else}}—{{/if}}</td>
                     <td class="td-muted">{{ultimoAgendamento}}</td>
-                    <td style="display:flex;gap:6px;">
+                    <td style="display:flex;gap:6px;align-items:center;">
                         <button class="btn-cli-edit" data-id="{{id}}" data-nome="{{nome}}" data-tel="{{telefone}}"
                             data-obs="{{observacao}}" data-nascimento="{{nascimento}}" title="Editar">✎</button>
                         <button class="btn-cli-historico" data-id="{{id}}" data-nome="{{nome}}" data-tel="{{telefone}}"
                             title="Histórico">📋</button>
+                        <!-- ══ NOVO: WhatsApp ══ -->
+                        <a class="btn-cli-whatsapp"
+                            href="https://wa.me/55{{sanitizeTel telefone}}"
+                            target="_blank" rel="noopener noreferrer"
+                            title="Abrir WhatsApp">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                            </svg>
+                            WA
+                        </a>
                     </td>
                 </tr>
                 {{/each}}
@@ -997,10 +1014,20 @@
                 </div>
                 <div id="drawer-tel" style="font-size:12px;color:var(--muted);margin-top:2px;"></div>
             </div>
-            <button onclick="fecharDrawer()"
-                style="background:none;border:1px solid var(--border);color:var(--muted);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;transition:all .2s;"
-                onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'"
-                onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">✕</button>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <!-- WhatsApp — sempre visível, útil no mobile -->
+                <a id="drawer-wa-btn" href="#" target="_blank" rel="noopener noreferrer"
+                    style="display:inline-flex;align-items:center;gap:5px;background:none;border:1px solid var(--whatsapp);color:var(--whatsapp);padding:6px 12px;border-radius:8px;font-size:11px;font-family:'DM Sans',sans-serif;font-weight:600;text-decoration:none;white-space:nowrap;transition:all .2s;letter-spacing:.5px;"
+                    onmouseover="this.style.background='var(--whatsapp-dim)'"
+                    onmouseout="this.style.background='none'">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    WA
+                </a>
+                <button onclick="fecharDrawer()"
+                    style="background:none;border:1px solid var(--border);color:var(--muted);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;transition:all .2s;"
+                    onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'"
+                    onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">✕</button>
+            </div>
         </div>
 
         <div id="drawer-obs-wrap"
@@ -1008,6 +1035,17 @@
             <div style="font-size:9px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:4px;">
                 📌 Observação do cliente</div>
             <div id="drawer-obs" style="font-size:13px;color:var(--text);"></div>
+        </div>
+
+        <!-- Banner "nunca agendou" com botão arquivar -->
+        <div id="drawer-nunca-wrap" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:16px;display:none;align-items:center;justify-content:space-between;gap:10px;">
+            <div style="font-size:12px;color:var(--muted);">😶 Nunca realizou um agendamento</div>
+            <button id="drawer-btn-arquivar"
+                style="background:none;border:1px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:6px;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:all .2s;letter-spacing:.5px;"
+                onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'"
+                onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+                Arquivar
+            </button>
         </div>
 
         <div id="drawer-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;">
@@ -1026,6 +1064,11 @@
 </div>
 
 <script>
+    // ── Helper: sanitiza telefone para wa.me ──
+    function sanitizeTelJS(tel) {
+        return String(tel).replace(/\D/g, '');
+    }
+
     // ── Expand barbeiro ──
     let activeBarbCard = null;
 
@@ -1103,9 +1146,10 @@
             }
         });
     }
+
     if (tbody) {
         tbody.addEventListener('click', e => {
-            if (e.target.closest('.btn-cli-edit')) return; // clique no lápis → modal, não drawer
+            if (e.target.closest('.btn-cli-edit') || e.target.closest('.btn-cli-historico') || e.target.closest('.btn-cli-whatsapp')) return;
             const row = e.target.closest('tr');
             if (!row || !row.dataset.id) return;
             abrirDrawer(row.dataset.id, row.dataset.nome, row.dataset.telefone);
@@ -1139,7 +1183,6 @@
         if (e.target === modalOverlay) fecharModalCli();
     });
 
-    // Abre modal ao clicar no botão ✎
     // ── Botão editar ──
     document.addEventListener('click', e => {
         const btn = e.target.closest('.btn-cli-edit');
@@ -1177,15 +1220,17 @@
             const json = await res.json();
 
             if (json.sucesso) {
-                // Atualiza tabela sem recarregar
                 document.getElementById(`cli-nome-${id}`).textContent = nome;
                 document.getElementById(`cli-tel-${id}`).textContent = tel;
 
-                // Atualiza data-attributes da linha e do botão
                 const row = tbody.querySelector(`tr[data-id="${id}"]`);
                 if (row) { row.dataset.nome = nome; row.dataset.telefone = tel; }
                 const btn = document.querySelector(`.btn-cli-edit[data-id="${id}"]`);
                 if (btn) { btn.dataset.nome = nome; btn.dataset.tel = tel; }
+
+                // Atualiza link WhatsApp da linha
+                const waLink = row ? row.querySelector('.btn-cli-whatsapp') : null;
+                if (waLink) waLink.href = `https://wa.me/55${sanitizeTelJS(tel)}`;
 
                 fecharModalCli();
             } else {
@@ -1198,8 +1243,45 @@
             btnCliSalvar.disabled = false;
         }
     });
+
+    // ── Arquivamento (localStorage) ──
+    const ARQUIVADOS_KEY = 'clientes_arquivados_v1';
+
+    function getArquivados() {
+        try { return JSON.parse(localStorage.getItem(ARQUIVADOS_KEY) || '[]'); }
+        catch { return []; }
+    }
+
+    function arquivarCliente(id) {
+        const lista = getArquivados();
+        if (!lista.includes(String(id))) lista.push(String(id));
+        localStorage.setItem(ARQUIVADOS_KEY, JSON.stringify(lista));
+        // Marca a linha na tabela
+        const row = document.querySelector(`#clientes-tbody tr[data-id="${id}"]`);
+        if (row) row.dataset.arquivado = '1';
+    }
+
+    function desarquivarCliente(id) {
+        const lista = getArquivados().filter(x => x !== String(id));
+        localStorage.setItem(ARQUIVADOS_KEY, JSON.stringify(lista));
+        const row = document.querySelector(`#clientes-tbody tr[data-id="${id}"]`);
+        if (row) row.dataset.arquivado = '0';
+    }
+
+    // Aplica estado arquivado ao carregar a página
+    (function aplicarArquivados() {
+        const arquivados = getArquivados();
+        arquivados.forEach(id => {
+            const row = document.querySelector(`#clientes-tbody tr[data-id="${id}"]`);
+            if (row) row.dataset.arquivado = '1';
+        });
+    })();
+
     // ── Drawer histórico ──
+    let drawerClienteId = null;
+
     async function abrirDrawer(id, nome, tel) {
+        drawerClienteId = id;
         const drawer = document.getElementById('drawer-cliente');
         const overlay = document.getElementById('drawer-overlay');
         const lista = document.getElementById('drawer-lista');
@@ -1208,6 +1290,11 @@
         document.getElementById('drawer-tel').textContent = tel;
         document.getElementById('drawer-stats').innerHTML = '';
         document.getElementById('drawer-obs-wrap').style.display = 'none';
+        document.getElementById('drawer-nunca-wrap').style.display = 'none';
+
+        // Atualiza link WhatsApp do drawer
+        document.getElementById('drawer-wa-btn').href = `https://wa.me/55${sanitizeTelJS(tel)}`;
+
         lista.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:40px;">Carregando...</div>';
 
         overlay.style.display = 'block';
@@ -1218,22 +1305,20 @@
             const json = await res.json();
             if (!json.sucesso) throw new Error(json.erro);
 
-            // Observação fixa
             if (json.cliente.observacao) {
                 document.getElementById('drawer-obs').textContent = json.cliente.observacao;
                 document.getElementById('drawer-obs-wrap').style.display = 'block';
             }
 
-            // Nascimento
             if (json.cliente.nascimento) {
                 const [y, m, d] = json.cliente.nascimento.split('-');
                 document.getElementById('drawer-tel').textContent = `${tel}  ·  🎂 ${d}/${m}/${y}`;
             }
 
-            // Stats
             const total = json.agendamentos.length;
             const pagos = json.agendamentos.filter(a => a.pago).length;
             const gasto = json.agendamentos.reduce((acc, a) => acc + parseFloat(a.valor.replace(',', '.')), 0);
+
             document.getElementById('drawer-stats').innerHTML = `
             <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
                 <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);">${total}</div>
@@ -1248,7 +1333,28 @@
                 <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Total gasto</div>
             </div>`;
 
-            // Lista
+            // Banner "nunca agendou" + botão arquivar/desarquivar
+            if (total === 0) {
+                const nuncaWrap = document.getElementById('drawer-nunca-wrap');
+                const btnArq = document.getElementById('drawer-btn-arquivar');
+                const row = document.querySelector(`#clientes-tbody tr[data-id="${id}"]`);
+                const jaArquivado = row?.dataset.arquivado === '1';
+
+                btnArq.textContent = jaArquivado ? '↩ Desarquivar' : 'Arquivar';
+                btnArq.onclick = () => {
+                    if (row?.dataset.arquivado === '1') {
+                        desarquivarCliente(id);
+                        btnArq.textContent = 'Arquivar';
+                        row.dataset.arquivado = '0';
+                    } else {
+                        arquivarCliente(id);
+                        btnArq.textContent = '↩ Desarquivar';
+                        if (row) row.dataset.arquivado = '1';
+                    }
+                };
+                nuncaWrap.style.display = 'flex';
+            }
+
             if (!json.agendamentos.length) {
                 lista.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:40px;">Nenhum agendamento encontrado.</div>';
                 return;
@@ -1308,9 +1414,7 @@
             const nasc = row.dataset.nascimento;
             if (!nasc) return;
             const [y, m, d] = nasc.split('-');
-            // Compara só dia e mês, ignora ano
             const aniv = new Date(hoje.getFullYear(), parseInt(m) - 1, parseInt(d));
-            // Se já passou este ano, testa o próximo
             if (aniv < hoje) aniv.setFullYear(hoje.getFullYear() + 1);
             if (aniv <= em7dias) {
                 aniversariantes.push({
@@ -1322,7 +1426,6 @@
             }
         });
 
-        // Monta popup simples
         let existing = document.getElementById('modal-aniv');
         if (existing) existing.remove();
 
@@ -1354,7 +1457,121 @@
         document.body.appendChild(modal);
     });
 
-        // ── Modal novo cliente ──────────────────────────────
+    // ── ══ NOVO: Inativos ══ ──
+    document.getElementById('btn-inativos')?.addEventListener('click', () => {
+        let existingModal = document.getElementById('modal-inativos-picker');
+        if (existingModal) existingModal.remove();
+
+        const picker = document.createElement('div');
+        picker.id = 'modal-inativos-picker';
+        picker.style.cssText = 'position:fixed;inset:0;background:#000000cc;z-index:500;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
+        picker.innerHTML = `
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px;width:100%;max-width:360px;position:relative;">
+            <button onclick="document.getElementById('modal-inativos-picker').remove()"
+                style="position:absolute;top:14px;right:14px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;">✕</button>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--text);margin-bottom:4px;">😴 Clientes Inativos</div>
+            <p style="font-size:12px;color:var(--muted);margin-bottom:20px;">Sem agendamento há quantos dias?</p>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px;">
+                ${[15, 30, 45, 60, 90, 120, 180, 365].map(dias => `
+                <button onclick="filtrarInativos(${dias})" style="
+                    background:var(--bg3);border:1px solid var(--border);color:var(--muted);
+                    padding:10px 6px;border-radius:8px;font-family:'Bebas Neue',sans-serif;
+                    font-size:18px;letter-spacing:1px;cursor:pointer;transition:all .2s;
+                    display:flex;flex-direction:column;align-items:center;gap:2px;"
+                    onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'"
+                    onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+                    ${dias}
+                    <span style="font-size:9px;letter-spacing:1px;text-transform:uppercase;font-family:'DM Sans',sans-serif;">dias</span>
+                </button>`).join('')}
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <input id="inativos-custom" type="number" min="1" max="9999" placeholder="Outro..."
+                    style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .2s;"
+                    onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"
+                />
+                <button onclick="filtrarInativos(parseInt(document.getElementById('inativos-custom').value))"
+                    style="background:var(--gold);border:none;color:#000;padding:10px 18px;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;">
+                    IR
+                </button>
+            </div>
+        </div>`;
+        picker.addEventListener('click', e => { if (e.target === picker) picker.remove(); });
+        document.body.appendChild(picker);
+    });
+
+    function filtrarInativos(dias) {
+        if (!dias || isNaN(dias) || dias < 1) return;
+
+        document.getElementById('modal-inativos-picker')?.remove();
+
+        const hoje = new Date();
+        const rows = document.querySelectorAll('#clientes-tbody tr');
+        const result = [];
+
+        rows.forEach(row => {
+            // Ignora clientes arquivados
+            if (row.dataset.arquivado === '1') return;
+
+            const ultimoISO = row.dataset.ultimo;
+            let diffDias = Infinity;
+
+            if (ultimoISO) {
+                const ultimo = new Date(ultimoISO);
+                diffDias = Math.floor((hoje - ultimo) / (1000 * 60 * 60 * 24));
+            }
+
+            if (diffDias >= dias) {
+                result.push({
+                    nome:     row.dataset.nome,
+                    tel:      row.dataset.telefone,
+                    id:       row.dataset.id,
+                    diffDias: diffDias === Infinity ? null : diffDias
+                });
+            }
+        });
+
+        let existingResult = document.getElementById('modal-inativos-result');
+        if (existingResult) existingResult.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'modal-inativos-result';
+        modal.style.cssText = 'position:fixed;inset:0;background:#000000cc;z-index:500;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
+
+        const listaHTML = result.length === 0
+            ? `<p style="color:var(--muted);font-size:13px;text-align:center;padding:20px 0;">Nenhum cliente inativo há mais de ${dias} dias. 🎉</p>`
+            : result.sort((a, b) => (b.diffDias ?? 99999) - (a.diffDias ?? 99999)).map(c => {
+                const labelDias = c.diffDias === null ? 'Nunca agendou' : `${c.diffDias} dias sem agendar`;
+                const waLink = `https://wa.me/55${sanitizeTelJS(c.tel)}`;
+                const cor = c.diffDias === null || c.diffDias > 90 ? 'var(--danger)' : 'var(--gold)';
+                return `
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;gap:10px;">
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.nome}</div>
+                        <div style="font-size:11px;color:${cor};margin-top:2px;">⏱ ${labelDias}</div>
+                    </div>
+                    <a href="${waLink}" target="_blank" rel="noopener noreferrer"
+                        style="display:inline-flex;align-items:center;gap:5px;background:none;border:1px solid var(--whatsapp);color:var(--whatsapp);padding:5px 12px;border-radius:6px;font-size:11px;font-family:'DM Sans',sans-serif;font-weight:600;text-decoration:none;white-space:nowrap;transition:all .2s;letter-spacing:.5px;"
+                        onmouseover="this.style.background='var(--whatsapp-dim)'"
+                        onmouseout="this.style.background='none'">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        Chamar
+                    </a>
+                </div>`;
+            }).join('');
+
+        modal.innerHTML = `
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px;width:100%;max-width:440px;position:relative;max-height:80vh;display:flex;flex-direction:column;">
+            <button onclick="document.getElementById('modal-inativos-result').remove()"
+                style="position:absolute;top:14px;right:14px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;z-index:1;">✕</button>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--text);margin-bottom:2px;">😴 Inativos — +${dias} dias</div>
+            <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">${result.length} cliente${result.length !== 1 ? 's' : ''} encontrado${result.length !== 1 ? 's' : ''}</p>
+            <div style="overflow-y:auto;flex:1;">${listaHTML}</div>
+        </div>`;
+        modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+        document.body.appendChild(modal);
+    }
+
+    // ── Modal novo cliente ──────────────────────────────
     const novoCliOverlay = document.getElementById('modal-novo-cli-overlay');
 
     document.getElementById('btn-novo-cliente').addEventListener('click', () => {
@@ -1396,15 +1613,16 @@
 
             if (json.sucesso) {
                 fecharNovoCliModal();
-                // Adiciona linha na tabela sem recarregar a página
                 const tbody = document.getElementById('clientes-tbody');
                 if (tbody) {
+                    const telLimpo = sanitizeTelJS(json.cliente.telefone);
                     const tr = document.createElement('tr');
                     tr.dataset.id = json.cliente.id;
                     tr.dataset.nome = json.cliente.nome;
                     tr.dataset.telefone = json.cliente.telefone;
                     tr.dataset.obs = obs;
                     tr.dataset.nascimento = nascimento;
+                    tr.dataset.ultimo = '';
                     tr.innerHTML = `
                         <td>
                             <div class="td-nome-wrap">
@@ -1414,13 +1632,19 @@
                         </td>
                         <td class="td-muted" id="cli-tel-${json.cliente.id}">${json.cliente.telefone}</td>
                         <td><span class="td-total">0</span></td>
-                        <td class="td-muted">${nascimento ? nascimento.split('-').reverse().join('/') : '—'}</td>
+                        <td class="td-muted">${nascimento || '—'}</td>
                         <td class="td-muted">—</td>
-                        <td style="display:flex;gap:6px;">
+                        <td style="display:flex;gap:6px;align-items:center;">
                             <button class="btn-cli-edit" data-id="${json.cliente.id}" data-nome="${json.cliente.nome}"
                                 data-tel="${json.cliente.telefone}" data-obs="${obs}" data-nascimento="${nascimento}" title="Editar">✎</button>
                             <button class="btn-cli-historico" data-id="${json.cliente.id}" data-nome="${json.cliente.nome}"
                                 data-tel="${json.cliente.telefone}" title="Histórico">📋</button>
+                            <a class="btn-cli-whatsapp"
+                                href="https://wa.me/55${telLimpo}"
+                                target="_blank" rel="noopener noreferrer" title="Abrir WhatsApp">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                                WA
+                            </a>
                         </td>`;
                     tbody.prepend(tr);
                 }
@@ -1434,6 +1658,8 @@
             btn.disabled = false;
         }
     });
+
+    // ── Máscara de data DD/MM/AAAA ──
     function mascaraData(input) {
         input.addEventListener('input', function () {
             let v = this.value.replace(/\D/g, '').substring(0, 8);
@@ -1443,5 +1669,18 @@
         });
     }
     mascaraData(document.getElementById('novo-cli-nascimento'));
-    mascaraData(document.getElementById('cli-edit-nascimento'));    
+    mascaraData(document.getElementById('cli-edit-nascimento'));
 </script>
+
+{{!--
+    ╔══════════════════════════════════════════════════════════════════╗
+    ║  BACKEND: registre o helper Handlebars para sanitizar telefone  ║
+    ║                                                                  ║
+    ║  hbs.registerHelper('sanitizeTel', tel =>                       ║
+    ║    String(tel || '').replace(/\D/g, '')                         ║
+    ║  );                                                              ║
+    ║                                                                  ║
+    ║  E passe ultimoAgendamentoISO em cada cliente (YYYY-MM-DD),     ║
+    ║  ex: MAX(DATE(data_hora)) AS ultimoAgendamentoISO               ║
+    ╚══════════════════════════════════════════════════════════════════╝
+--}}

@@ -343,15 +343,21 @@
 
                 <!-- Serviço -->
                 <div class="edit-field">
-                    <label for="servico">Serviço</label>
-                    <select id="servico" name="servico" required>
-                        <option value="">Selecione</option>
-                        {{#each servicos}}
-                        <option value="{{nome}}" {{#if (eq nome ../agendamento.servico)}}selected{{/if}}>{{nome}} — R$
-                            {{valor}}</option>
-                        {{/each}}
-                    </select>
-                </div>
+                <label for="servico">Serviço</label>
+                <select id="servico" name="servico" required>
+                    <option value="">Selecione</option>
+                    {{!-- Opção atual — aparece sempre, mesmo que seja "Corte + Barba" --}}
+                    <option value="{{agendamento.servico}}" selected>
+                        ✓ {{agendamento.servico}} (atual)
+                    </option>
+                    {{#each servicos}}
+                    {{!-- Mostra os demais só se não for igual ao atual --}}
+                    {{#unless (eq nome ../agendamento.servico)}}
+                    <option value="{{nome}}">{{nome}} — R$ {{valor}}</option>
+                    {{/unless}}
+                    {{/each}}
+                </select>
+            </div>
 
                 <!-- Observação -->            
                 <div class="edit-field full">
@@ -364,7 +370,7 @@
                 </div>
 
             </div>
-
+            <input type="hidden" id="duracao_servico" name="duracao_servico" value="">
             <div class="edit-actions">
                 <a href="/admin" class="btn-cancelar">Cancelar</a>
                 <button type="submit" class="btn-salvar">Salvar alterações</button>
@@ -379,4 +385,14 @@
         const selected = this.options[this.selectedIndex];
         document.getElementById('profissional_id').value = selected.getAttribute('data-id');
     });
+    const duracoes = {
+        {{#each servicos}}
+        "{{nome}}": {{duracao_minutos}},
+        {{/each}}
+    };
+
+    document.getElementById('servico').addEventListener('change', function () {
+        const duracao = duracoes[this.value] || '';
+        document.getElementById('duracao_servico').value = duracao;
+    });    
 </script>

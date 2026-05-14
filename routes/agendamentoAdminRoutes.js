@@ -32,9 +32,10 @@ router.get('/editar/:id', isAdminAuthenticated, async (req, res) => {
         plain.data = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}-${String(data.getDate()).padStart(2, '0')}`;
         const barbeiros = admins.map(a => ({ id: a.id, nome: a.nome }));
         const servicosFormatados = servicos.map(s => ({
-            nome: s.nome,
+            id: s.id, nome: s.nome,
             valor: parseFloat(s.valor).toFixed(2).replace('.', ','),
-            qtd_sessoes: s.qtd_sessoes || null
+            qtd_sessoes: s.qtd_sessoes || null,
+            duracao_minutos: s.duracao_minutos || 30  // ← isso faltava
         }));
         res.render('editar', { agendamento: plain, barbeiros, servicos: servicosFormatados });
     } catch (error) {
@@ -59,16 +60,23 @@ router.post('/editar/:id', isAdminAuthenticated, async (req, res) => {
 
         // Calcula duração original em minutos e aplica no novo horario
         let novaHoraFim = dadosAntigos.hora_fim;
-        if (novoHorario && dadosAntigos.hora_inicio && dadosAntigos.hora_fim) {
-            const [hIni, mIni] = dadosAntigos.hora_inicio.split(':').map(Number);
-            const [hFim, mFim] = dadosAntigos.hora_fim.split(':').map(Number);
-            const duracaoMinutos = (hFim * 60 + mFim) - (hIni * 60 + mIni);
-
-            const [hNovo, mNovo] = novoHorario.split(':').map(Number);
-            const totalMinutos = hNovo * 60 + mNovo + duracaoMinutos;
-            const hFimNovo = Math.floor(totalMinutos / 60);
-            const mFimNovo = totalMinutos % 60;
-            novaHoraFim = `${String(hFimNovo).padStart(2, '0')}:${String(mFimNovo).padStart(2, '0')}:00`;
+        if (novoHorario) {
+            const duracaoParam = req.body.duracao_servico ? parseInt(req.body.duracao_servico) : null;
+            let duracaoMinutos;
+            if (duracaoParam && duracaoParam > 0) {
+                duracaoMinutos = duracaoParam;
+            } else if (dadosAntigos.hora_inicio && dadosAntigos.hora_fim) {
+                const [hIni, mIni] = dadosAntigos.hora_inicio.split(':').map(Number);
+                const [hFim, mFim] = dadosAntigos.hora_fim.split(':').map(Number);
+                duracaoMinutos = (hFim * 60 + mFim) - (hIni * 60 + mIni);
+            }
+            if (duracaoMinutos) {
+                const [hNovo, mNovo] = novoHorario.split(':').map(Number);
+                const totalMinutos = hNovo * 60 + mNovo + duracaoMinutos;
+                const hFimNovo = Math.floor(totalMinutos / 60);
+                const mFimNovo = totalMinutos % 60;
+                novaHoraFim = `${String(hFimNovo).padStart(2,'0')}:${String(mFimNovo).padStart(2,'0')}:00`;
+            }
         }
 
         await agendamento.update({

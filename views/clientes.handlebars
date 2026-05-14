@@ -928,7 +928,7 @@
         </div>
         <div class="modal-cli-field">
             <label>Data de Nascimento</label>
-            <input id="novo-cli-nascimento" type="date">
+            <input id="novo-cli-nascimento" type="text" placeholder="DD/MM/AAAA" maxlength="10">
         </div>
         <div class="modal-cli-field">
             <label>Observação</label>
@@ -962,7 +962,7 @@
         </div>
         <div class="modal-cli-field">
             <label>Data de Nascimento</label>
-            <input id="cli-edit-nascimento" type="date">
+            <input id="cli-edit-nascimento" type="text" placeholder="DD/MM/AAAA" maxlength="10">
         </div>
         <div class="modal-cli-field">
             <label>Observação</label>
@@ -1172,7 +1172,7 @@
             const res = await fetch(`/clientes/${id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nome, telefone: tel, observacao: obs, nascimento: nascimento || null })
+                body: JSON.stringify({ nome, telefone: tel, observacao: obs, nascimento: fmtDataBack(nascimento) })
             });
             const json = await res.json();
 
@@ -1390,7 +1390,7 @@
             const res = await fetch('/clientes', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nome, telefone: tel, nascimento: nascimento || null, observacao: obs || null })
+                body: JSON.stringify({ nome, telefone: tel, nascimento: fmtDataBack(nascimento), observacao: obs || null })
             });
             const json = await res.json();
 
@@ -1434,4 +1434,14 @@
             btn.disabled = false;
         }
     });
+    function mascaraData(input) {
+        input.addEventListener('input', function () {
+            let v = this.value.replace(/\D/g, '').substring(0, 8);
+            if (v.length >= 5) v = v.slice(0,2) + '/' + v.slice(2,4) + '/' + v.slice(4);
+            else if (v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2);
+            this.value = v;
+        });
+    }
+    mascaraData(document.getElementById('novo-cli-nascimento'));
+    mascaraData(document.getElementById('cli-edit-nascimento'));    
 </script>

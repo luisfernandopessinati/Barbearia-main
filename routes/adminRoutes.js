@@ -146,7 +146,8 @@ router.get('/admin', isAdminAuthenticated, async (req, res) => {
         const servicosFormatados = servicos.map(s => ({
             id: s.id, nome: s.nome,
             valor: parseFloat(s.valor).toFixed(2).replace('.', ','),
-            qtd_sessoes: s.qtd_sessoes || null
+            qtd_sessoes: s.qtd_sessoes || null,
+            duracao_minutos: s.duracao_minutos || 30
         }));
 
         const agendamentosFormatados = agendamentos.map(agendamento => {
@@ -182,7 +183,7 @@ router.get('/admin', isAdminAuthenticated, async (req, res) => {
 
 // ── Slots admin ──
 router.get('/admin/slots', isAdminAuthenticated, async (req, res) => {
-    const { profissional_id, servico_id, data } = req.query;
+    const { profissional_id, servico_id, data, duracao } = req.query;
     const idEmpresa = req.user.idEmpresa;
     try {
         const servico = await Servico.findOne({ where: { id: servico_id, idEmpresa } });
@@ -191,8 +192,13 @@ router.get('/admin/slots', isAdminAuthenticated, async (req, res) => {
         const slots = [];
         let atual = 7 * 60;
         const fim = 22 * 60;
-        while (atual + servico.duracao_minutos <= fim) {
-            slots.push({ hora_inicio: minutesToTime(atual), hora_fim: minutesToTime(atual + servico.duracao_minutos) });
+        const duracaoMinutos = duracao ? parseInt(duracao) : servico.duracao_minutos;
+
+        while (atual + duracaoMinutos <= fim) {
+            slots.push({
+                hora_inicio: minutesToTime(atual),
+                hora_fim: minutesToTime(atual + duracaoMinutos)
+            });
             atual += 30;
         }
 

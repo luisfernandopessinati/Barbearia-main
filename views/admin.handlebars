@@ -297,12 +297,31 @@
                 </div>
                 <div id="campoServico" class="modal-field full">
                     <label>Serviço</label>
-                    <select name="servico" id="modal-servico">
-                        <option value="">Selecione</option>
-                        {{#each servicos}}<option value="{{nome}}" data-id="{{id}}" data-sessoes="{{qtd_sessoes}}">
-                            {{nome}} — R$ {{valor}}</option>
+                    <div id="modal-servicos-lista" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;">
+                        {{#each servicos}}
+                        <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;
+                            background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+                            cursor:pointer;transition:border-color .2s;font-size:13px;"
+                            onmouseover="this.style.borderColor='var(--gold)'"
+                            onmouseout="this.style.borderColor='var(--border)'">
+                            <input type="checkbox" class="chk-servico-admin"
+                                data-id="{{id}}"
+                                data-nome="{{nome}}"
+                                data-valor="{{valor}}"
+                                data-duracao="{{duracao_minutos}}"
+                                data-sessoes="{{qtd_sessoes}}"
+                                style="accent-color:var(--gold);width:16px;height:16px;flex-shrink:0;">
+                            <span style="flex:1;">{{nome}}</span>
+                            <span style="color:var(--muted);font-size:12px;">R$ {{valor}}</span>
+                            {{#if qtd_sessoes}}
+                            <span style="font-size:10px;color:var(--gold);letter-spacing:1px;">📦 {{qtd_sessoes}}x</span>
+                            {{/if}}
+                        </label>
                         {{/each}}
-                    </select>
+                    </div>
+                    <!-- hidden inputs para compatibilidade com o submit -->
+                    <input type="hidden" name="servico" id="modal-servico-nome">
+                    <input type="hidden" name="servico_id" id="modal-servico-id-hidden">
                 </div>
                 <div id="campoPacote" style="display:none;" class="modal-field full">
                     <label
@@ -1142,8 +1161,19 @@
     const hoje = new Date();
     modalData.setAttribute('min', `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`);
 
-    function fecharModal() { overlay.classList.remove('open'); formAdmin.reset(); modalErro.textContent = ''; }
+    function fecharModal() {
+        overlay.classList.remove('open');
+        formAdmin.reset();
+        modalErro.textContent = '';
 
+        // MULTI-SERVICO — reseta estado de serviços
+        adminServicoState.ids = [];
+        adminServicoState.nomes = [];
+        adminServicoState.duracoes = [];
+        adminServicoState.valores = [];
+        adminServicoState.qtdSessoes = null;
+        document.querySelectorAll('.chk-servico-admin').forEach(c => c.checked = false);
+    }
     document.getElementById('btn-novo').addEventListener('click', () => { modalErro.textContent = ''; overlay.classList.add('open'); });
     document.getElementById('modal-close').addEventListener('click', fecharModal);
     document.getElementById('btn-cancelar').addEventListener('click', fecharModal);
@@ -1156,9 +1186,8 @@
         btnConfirmar.disabled = true;
 
         try {
-            const servicoOpt = document.getElementById('modal-servico').selectedOptions[0];
-            const qtdSessoes = servicoOpt?.dataset.sessoes;
-            const isPacote = qtdSessoes && qtdSessoes !== 'null' && qtdSessoes !== '';
+            // MULTI-SERVICO — lê do state, não mais do select
+            const isPacote = adminServicoState.qtdSessoes !== null;
 
             if (isPacote) {
                 // Monta array de sessões
@@ -1183,8 +1212,8 @@
                 const body = new URLSearchParams({
                     nome: document.querySelector('[name="nome"]').value,
                     telefone: document.querySelector('[name="telefone"]').value,
-                    servico: servicoOpt.value,
-                    servico_id: servicoOpt.dataset.id,
+                    servico: adminServicoState.nomes[0] || '',       // MULTI-SERVICO
+                    servico_id: adminServicoState.ids[0] || '',      // MULTI-SERVICO
                     barbeiro: barbeiroSel.value,
                     profissional_id: profId || '',
                     sessoes: JSON.stringify(sessoes)
@@ -1718,27 +1747,39 @@
     // ── Slots dinâmicos ───────────────────────────────────
     async function buscarSlotsAdmin() {
         const barbeiro = document.getElementById('modal-barbeiro');
-        const servico = document.getElementById('modal-servico');
         const data = document.getElementById('modal-data').value;
         const selectHorario = document.getElementById('modal-horario');
         const profId = barbeiro.selectedOptions[0]?.dataset.id;
-        const servicoId = servico.selectedOptions[0]?.dataset.id;
-        if (!profId || !servicoId || !data) { selectHorario.innerHTML = '<option value="">Selecione barbeiro, serviço e data</option>'; return; }
+
+        // MULTI-SERVICO — lê do state, não mais do select
+        const servicoId    = adminServicoState.ids[0];
+        const duracaoTotal = adminServicoState.duracoes.reduce((a, b) => a + b, 0) || null;
+
+        if (!profId || !servicoId || !data) {
+            selectHorario.innerHTML = '<option value="">Selecione barbeiro, serviço e data</option>';
+            return;
+        }
         selectHorario.innerHTML = '<option value="">Carregando...</option>';
         try {
-            const res = await fetch(`/admin/slots?profissional_id=${profId}&servico_id=${servicoId}&data=${data}`);
+            const url = `/admin/slots?profissional_id=${profId}&servico_id=${servicoId}&data=${data}`
+                    + `${duracaoTotal ? '&duracao=' + duracaoTotal : ''}`;
+            const res  = await fetch(url);
             const json = await res.json();
             const slots = (json.slots || []).filter(s => s.status === 'disponivel');
-            selectHorario.innerHTML = slots.length ? '<option value="">Selecione</option>' : '<option value="">Nenhum horário disponível</option>';
+            selectHorario.innerHTML = slots.length
+                ? '<option value="">Selecione</option>'
+                : '<option value="">Nenhum horário disponível</option>';
             slots.forEach(s => {
                 const opt = document.createElement('option');
                 opt.value = s.hora_inicio.substring(0, 5);
                 opt.dataset.horaInicio = s.hora_inicio;
-                opt.dataset.horaFim = s.hora_fim;
+                opt.dataset.horaFim    = s.hora_fim;
                 opt.textContent = `${s.hora_inicio.substring(0, 5)} – ${s.hora_fim.substring(0, 5)}`;
                 selectHorario.appendChild(opt);
             });
-        } catch (e) { selectHorario.innerHTML = '<option value="">Erro ao carregar horários</option>'; }
+        } catch (e) {
+            selectHorario.innerHTML = '<option value="">Erro ao carregar horários</option>';
+        }
     }
 
     document.getElementById('modal-horario').addEventListener('change', function () {
@@ -1746,7 +1787,7 @@
         document.getElementById('modal-profissional-id').value = document.getElementById('modal-barbeiro').selectedOptions[0]?.dataset.id || '';
         document.getElementById('modal-hora-inicio').value = opt?.dataset.horaInicio || '';
         document.getElementById('modal-hora-fim').value = opt?.dataset.horaFim || '';
-        document.getElementById('modal-servico-id').value = document.getElementById('modal-servico').selectedOptions[0]?.dataset.id || '';
+        document.getElementById('modal-servico-id').value = adminServicoState.ids[0] || '';
     });
 
     async function gerarCamposSessoes(qtd) {
@@ -1779,7 +1820,7 @@
                 const data = this.value;
                 const selectHorario = sessao.querySelector('.sessao-horario');
                 const profId = document.getElementById('modal-barbeiro').selectedOptions[0]?.dataset.id;
-                const servicoId = document.getElementById('modal-servico').selectedOptions[0]?.dataset.id;
+                const servicoId = adminServicoState.ids[0];
 
                 if (!profId || !servicoId || !data) return;
 
@@ -1812,27 +1853,77 @@
         }
     }
 
-    document.getElementById('modal-servico').addEventListener('change', function () {
-        const opt = this.selectedOptions[0];
-        const qtdSessoes = opt?.dataset.sessoes;
-        const campoPacote = document.getElementById('campoPacote');
-        const campoData = document.getElementById('modal-data').closest('.modal-field');
+        const adminServicoState = {
+        ids: [],
+        nomes: [],
+        duracoes: [],
+        valores: [],
+        qtdSessoes: null
+    };
+
+    document.getElementById('modal-servicos-lista').addEventListener('change', async function(e) {
+        const chk = e.target.closest('.chk-servico-admin');
+        if (!chk) return;
+
+        const id       = chk.dataset.id;
+        const nome     = chk.dataset.nome;
+        const duracao  = parseInt(chk.dataset.duracao) || 30;
+        const valor    = parseFloat(chk.dataset.valor?.replace(',', '.')) || 0;
+        const sessoes  = chk.dataset.sessoes && chk.dataset.sessoes !== 'null'
+                        ? parseInt(chk.dataset.sessoes) : null;
+
+        if (chk.checked) {
+            const temPacote = adminServicoState.qtdSessoes !== null;
+            if (sessoes && adminServicoState.ids.length > 0 && !temPacote) {
+                alert('Pacotes devem ser agendados sozinhos.');
+                chk.checked = false;
+                return;
+            }
+            if (!sessoes && temPacote) {
+                alert('Remova o pacote antes de adicionar serviços avulsos.');
+                chk.checked = false;
+                return;
+            }
+            adminServicoState.ids.push(id);
+            adminServicoState.nomes.push(nome);
+            adminServicoState.duracoes.push(duracao);
+            adminServicoState.valores.push(valor);
+            if (sessoes) adminServicoState.qtdSessoes = sessoes;
+        } else {
+            const idx = adminServicoState.ids.indexOf(id);
+            if (idx !== -1) {
+                adminServicoState.ids.splice(idx, 1);
+                adminServicoState.nomes.splice(idx, 1);
+                adminServicoState.duracoes.splice(idx, 1);
+                adminServicoState.valores.splice(idx, 1);
+            }
+            if (sessoes) adminServicoState.qtdSessoes = null;
+        }
+
+        // Atualiza hidden inputs
+        document.getElementById('modal-servico-nome').value      = adminServicoState.nomes.join(' + ');
+        document.getElementById('modal-servico-id-hidden').value = adminServicoState.ids[0] || '';
+        document.getElementById('modal-servico-id').value        = adminServicoState.ids[0] || '';
+
+        // Controla visibilidade pacote vs normal
+        const campoPacote  = document.getElementById('campoPacote');
+        const campoData    = document.getElementById('modal-data').closest('.modal-field');
         const campoHorario = document.getElementById('modal-horario').closest('.modal-field');
 
-        if (qtdSessoes && qtdSessoes !== 'null' && qtdSessoes !== '') {
-            campoPacote.style.display = '';
-            campoData.style.display = 'none';
+        if (adminServicoState.qtdSessoes) {
+            campoPacote.style.display  = '';
+            campoData.style.display    = 'none';
             campoHorario.style.display = 'none';
-            document.getElementById('modal-data').required = false;    // 👈
-            document.getElementById('modal-horario').required = false; // 👈
-            gerarCamposSessoes(parseInt(qtdSessoes));
+            document.getElementById('modal-data').required    = false;
+            document.getElementById('modal-horario').required = false;
+            gerarCamposSessoes(adminServicoState.qtdSessoes);
         } else {
-            campoPacote.style.display = 'none';
-            campoData.style.display = '';
+            campoPacote.style.display  = 'none';
+            campoData.style.display    = '';
             campoHorario.style.display = '';
-            document.getElementById('modal-data').required = true;    // 👈
-            document.getElementById('modal-horario').required = false; // horário não tem required
-            buscarSlotsAdmin();
+            document.getElementById('modal-data').required    = true;
+            document.getElementById('modal-horario').required = false;
+            if (adminServicoState.ids.length > 0) buscarSlotsAdmin();
         }
     });
     document.getElementById('modal-data').addEventListener('change', buscarSlotsAdmin);

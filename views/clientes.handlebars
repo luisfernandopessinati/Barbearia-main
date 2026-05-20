@@ -853,7 +853,16 @@
                 onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
                 😴 Inativos
             </button>
-
+            <!-- ══ NOVO: Nunca Agendaram ══ -->
+            <button id="btn-nunca-agendou" style="
+                background:none;border:1px solid var(--border);color:var(--muted);
+                padding:6px 14px;border-radius:6px;font-size:11px;letter-spacing:1px;
+                text-transform:uppercase;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;"
+                onmouseover="this.style.borderColor='var(--muted)';this.style.color='var(--text)'"
+                onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+                onclick="filtrarNuncaAgendou()">
+                👻 Nunca Agendaram
+            </button>
             <button id="btn-novo-cliente" style="
                 background:var(--gold);border:none;color:#000;
                 padding:6px 14px;border-radius:6px;font-size:11px;letter-spacing:1px;
@@ -1509,23 +1518,24 @@
         const result = [];
 
         rows.forEach(row => {
-            // Ignora clientes arquivados
             if (row.dataset.arquivado === '1') return;
 
-            const ultimoISO = row.dataset.ultimo;
+            const ultimoISO = row.dataset.ultimo?.trim();
             let diffDias = Infinity;
 
             if (ultimoISO) {
                 const ultimo = new Date(ultimoISO);
-                diffDias = Math.floor((hoje - ultimo) / (1000 * 60 * 60 * 24));
+                if (!isNaN(ultimo.getTime())) {
+                    diffDias = Math.floor((hoje - ultimo) / (1000 * 60 * 60 * 24));
+                }
             }
 
-            if (diffDias >= dias) {
+            if (diffDias !== Infinity && diffDias >= dias) {
                 result.push({
                     nome:     row.dataset.nome,
                     tel:      row.dataset.telefone,
                     id:       row.dataset.id,
-                    diffDias: diffDias === Infinity ? null : diffDias
+                    diffDias: diffDias
                 });
             }
         });
@@ -1539,15 +1549,14 @@
 
         const listaHTML = result.length === 0
             ? `<p style="color:var(--muted);font-size:13px;text-align:center;padding:20px 0;">Nenhum cliente inativo há mais de ${dias} dias. 🎉</p>`
-            : result.sort((a, b) => (b.diffDias ?? 99999) - (a.diffDias ?? 99999)).map(c => {
-                const labelDias = c.diffDias === null ? 'Nunca agendou' : `${c.diffDias} dias sem agendar`;
+            : result.sort((a, b) => b.diffDias - a.diffDias).map(c => {
                 const waLink = `https://wa.me/55${sanitizeTelJS(c.tel)}`;
-                const cor = c.diffDias === null || c.diffDias > 90 ? 'var(--danger)' : 'var(--gold)';
+                const cor = c.diffDias > 90 ? 'var(--danger)' : 'var(--gold)';
                 return `
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;gap:10px;">
                     <div style="flex:1;min-width:0;">
                         <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.nome}</div>
-                        <div style="font-size:11px;color:${cor};margin-top:2px;">⏱ ${labelDias}</div>
+                        <div style="font-size:11px;color:${cor};margin-top:2px;">⏱ ${c.diffDias} dias sem agendar</div>
                     </div>
                     <a href="${waLink}" target="_blank" rel="noopener noreferrer"
                         style="display:inline-flex;align-items:center;gap:5px;background:none;border:1px solid var(--whatsapp);color:var(--whatsapp);padding:5px 12px;border-radius:6px;font-size:11px;font-family:'DM Sans',sans-serif;font-weight:600;text-decoration:none;white-space:nowrap;transition:all .2s;letter-spacing:.5px;"
@@ -1571,6 +1580,57 @@
         document.body.appendChild(modal);
     }
 
+    function filtrarNuncaAgendou() {
+        const rows = document.querySelectorAll('#clientes-tbody tr');
+        const result = [];
+
+        rows.forEach(row => {
+            if (row.dataset.arquivado === '1') return;
+            const ultimoISO = row.dataset.ultimo?.trim();
+            const dataValida = ultimoISO && !isNaN(new Date(ultimoISO).getTime());
+            if (!dataValida) {
+                result.push({ nome: row.dataset.nome, tel: row.dataset.telefone, id: row.dataset.id });
+            }
+        });
+
+        let existing = document.getElementById('modal-nunca-result');
+        if (existing) existing.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'modal-nunca-result';
+        modal.style.cssText = 'position:fixed;inset:0;background:#000000cc;z-index:500;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
+
+        const listaHTML = result.length === 0
+            ? `<p style="color:var(--muted);font-size:13px;text-align:center;padding:20px 0;">Nenhum cliente sem agendamento. 🎉</p>`
+            : result.map(c => {
+                const waLink = `https://wa.me/55${sanitizeTelJS(c.tel)}`;
+                return `
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;gap:10px;">
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.nome}</div>
+                        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Nunca realizou um agendamento</div>
+                    </div>
+                    <a href="${waLink}" target="_blank" rel="noopener noreferrer"
+                        style="display:inline-flex;align-items:center;gap:5px;background:none;border:1px solid var(--whatsapp);color:var(--whatsapp);padding:5px 12px;border-radius:6px;font-size:11px;font-family:'DM Sans',sans-serif;font-weight:600;text-decoration:none;white-space:nowrap;transition:all .2s;letter-spacing:.5px;"
+                        onmouseover="this.style.background='var(--whatsapp-dim)'"
+                        onmouseout="this.style.background='none'">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        Chamar
+                    </a>
+                </div>`;
+            }).join('');
+
+        modal.innerHTML = `
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px;width:100%;max-width:440px;position:relative;max-height:80vh;display:flex;flex-direction:column;">
+            <button onclick="document.getElementById('modal-nunca-result').remove()"
+                style="position:absolute;top:14px;right:14px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;z-index:1;">✕</button>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--text);margin-bottom:2px;">👻 Nunca Agendaram</div>
+            <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">${result.length} cliente${result.length !== 1 ? 's' : ''} encontrado${result.length !== 1 ? 's' : ''}</p>
+            <div style="overflow-y:auto;flex:1;">${listaHTML}</div>
+        </div>`;
+        modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+        document.body.appendChild(modal);
+    }
     // ── Modal novo cliente ──────────────────────────────
     const novoCliOverlay = document.getElementById('modal-novo-cli-overlay');
 

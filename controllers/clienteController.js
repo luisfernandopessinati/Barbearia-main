@@ -83,10 +83,15 @@ module.exports = {
 
                 const ultimo = agendamentos[0];
                 let ultimoAgendamento = null;
+                let ultimoAgendamentoISO = '';
                 if (ultimo) {
                     const d = new Date(ultimo.data);
                     d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
                     ultimoAgendamento = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+                    const yyyy = d.getFullYear();
+                    const mm = String(d.getMonth()+1).padStart(2,'0');
+                    const dd = String(d.getDate()).padStart(2,'0');
+                    ultimoAgendamentoISO = `${yyyy}-${mm}-${dd}`;
                 }
 
                 const servicoCount = {};
@@ -104,6 +109,7 @@ module.exports = {
                     total,
                     valorTotal: valorTotal.toFixed(2).replace('.', ','),
                     ultimoAgendamento,
+                    ultimoAgendamentoISO, 
                     servicoFavorito
                 };
             }));
